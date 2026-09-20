@@ -1,0 +1,224 @@
+---
+/**
+ * "What the model sees in a knee": Michal's interactive readout (BRIEF.md §11.5), set natively in
+ * the site's two typefaces and cobalt accent. Three cases, twelve labels each: a confidence bar
+ * against the 0.50 threshold, the numeric confidence, the radiologist's ground truth and whether
+ * the two agree. All three cases are rendered on the server. Without JavaScript they are simply
+ * stacked, case A first; with it, the buttons appear and one case shows at a time.
+ * Every value is data below; nothing is computed except the agreement and the score.
+ */
+const THRESHOLD = 0.5;
+const LABELS = ['ACL', 'MCL', 'Medial meniscus', 'Lateral meniscus', 'Medial OA', 'Lateral OA', 'Patellofemoral OA', 'Effusion', 'Synovitis', 'Baker’s cyst', 'Contusion', 'Fracture'];
+type Row = [number, 0 | 1];
+const CASES: { id: string; name: string; rows: Row[] }[] = [
+  { id: 'a', name: 'Advanced degenerative knee',
+    rows: [[0.962, 1], [0.373, 0], [0.872, 1], [0.956, 1], [0.937, 1], [0.994, 1], [0.689, 1], [0.967, 1], [0.961, 1], [0.534, 1], [0.688, 0], [0.155, 0]] },
+  { id: 'b', name: 'Mixed presentation, a hard read',
+    rows: [[0.224, 0], [0.262, 0], [0.976, 1], [0.237, 0], [0.170, 0], [0.032, 0], [0.029, 0], [0.939, 1], [0.370, 1], [0.081, 0], [0.880, 0], [0.490, 1]] },
+  { id: 'c', name: 'Near-normal, isolated meniscus tear',
+    rows: [[0.026, 0], [0.034, 0], [0.922, 1], [0.033, 0], [0.167, 0], [0.113, 0], [0.164, 0], [0.007, 0], [0.116, 0], [0.030, 0], [0.071, 0], [0.142, 0]] },
+];
+const cases = CASES.map((c) => {
+  const rows = c.rows.map(([conf, truth], i) => {
+    const call = conf >= THRESHOLD ? 1 : 0;
+    return { label: LABELS[i], conf, truth, call, agree: call === truth };
+  });
+  return { ...c, letter: c.id.toUpperCase(), rows, correct: rows.filter((r) => r.agree).length };
+});
+---
+
+<section class="rr wide" data-rsna-readout aria-labelledby="rr-title">
+  <h2 id="rr-title">What the model sees in a knee</h2>
+  <p class="rr__intro">
+    A 2.5D EfficientNetV2 and DINOv2 ensemble, read against 58 image-verified, held-out gold studies. For each study the
+    ensemble gives a confidence for each of the twelve abnormalities; at or above 0.50 it calls the abnormality present.
+    Three studies are set out below against the radiologist’s ground truth.
+  </p>
+
+  <div class="rr__panel print panel">
+    <div class="rr__cases" role="group" aria-label="Choose a case" hidden data-rr-buttons>
+      {cases.map((c, i) => (
+        <button type="button" class="rr__btn" aria-pressed={i === 0 ? 'true' : 'false'} aria-controls={`rr-case-${c.id}`} data-rr-case={c.id}>
+          <span class="rr__btn-k">Case {c.letter}</span>
+          <span class="rr__btn-n">{c.name}</span>
+        </button>
+      ))}
+    </div>
+
+    {cases.map((c) => (
+      <div class="rr__case" id={`rr-case-${c.id}`} data-rr-panel={c.id}>
+        <h3 class="rr__case-title">Case {c.letter}. {c.name}</h3>
+        <div class="rr__table" role="table" aria-label={`Case ${c.letter}, ${c.name}: model confidence against radiologist ground truth`}>
+          <div class="rr__row rr__row--head" role="row">
+            <span role="columnheader" class="rr__c-label">Abnormality</span>
+            <span role="columnheader" class="rr__c-bar rr__scale">
+              <span class="sr-only">Model confidence, from 0 to 1</span>
+              <span aria-hidden="true">0</span>
+              <span aria-hidden="true" class="rr__scale-mid">threshold 0.50</span>
+              <span aria-hidden="true">1</span>
+            </span>
+            <span role="columnheader" class="rr__c-val">Confidence</span>
+            <span role="columnheader" class="rr__c-truth">Radiologist</span>
+            <span role="columnheader" class="rr__c-verdict">Agreement</span>
+          </div>
+          {c.rows.map((r) => (
+            <div class:list={['rr__row', { 'rr__row--miss': !r.agree }]} role="row">
+              <span role="rowheader" class="rr__c-label">{r.label}</span>
+              <span role="cell" class="rr__c-bar" aria-hidden="true">
+                <span class="rr__track">
+                  <span class:list={['rr__fill', { 'rr__fill--on': r.call === 1 }]} style={`--v:${r.conf}`}></span>
+                  <span class="rr__mark"></span>
+                </span>
+              </span>
+              <span role="cell" class="rr__c-val">{r.conf.toFixed(3)}</span>
+              <span role="cell" class="rr__c-truth">{r.truth ? 'Present' : 'Absent'}</span>
+              <span role="cell" class="rr__c-verdict">
+                <svg class="rr__glyph" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+                  {r.agree
+                    ? <path d="M2.5 8.5 6.2 12 13.5 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                    : <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />}
+                </svg>
+                {r.agree ? 'Agrees' : 'Disagrees'}
+              </span>
+            </div>
+          ))}
+        </div>
+        <p class="rr__score"><span class="rr__score-n figure-num">{c.correct} of 12</span>{' '}labels correct at the 0.50 threshold</p>
+      </div>
+    ))}
+    <p class="sr-only" aria-live="polite" data-rr-live></p>
+  </div>
+
+  <dl class="rr__notes">
+    <div>
+      <dt>Across all 58 gold studies</dt>
+      <dd>The ensemble calls 83.5% of label cells correctly at 0.50. It slips most on synovitis and effusion.</dd>
+    </div>
+    <div>
+      <dt>Compute</dt>
+      <dd>3× A100 80GB, more than 300 GPU-hours.</dd>
+    </div>
+    <div>
+      <dt>Standing</dt>
+      <dd>The competition is still running. This is held-out validation on my side: no leaderboard position, no medal.</dd>
+    </div>
+  </dl>
+</section>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-rsna-readout]').forEach((root) => {
+    const bar = root.querySelector<HTMLElement>('[data-rr-buttons]');
+    const buttons = [...root.querySelectorAll<HTMLButtonElement>('[data-rr-case]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-rr-panel]')];
+    const live = root.querySelector<HTMLElement>('[data-rr-live]');
+    if (!bar || !buttons.length) return;
+    const show = (id: string, announce: boolean) => {
+      buttons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.rrCase === id)));
+      panels.forEach((p) => {
+        const on = p.dataset.rrPanel === id;
+        p.hidden = !on;
+        p.classList.toggle('is-shown', on && announce);
+      });
+      if (announce && live) {
+        const p = panels.find((x) => x.dataset.rrPanel === id);
+        live.textContent = `${p?.querySelector('.rr__case-title')?.textContent ?? ''} ${p?.querySelector('.rr__score')?.textContent ?? ''}`.trim();
+      }
+    };
+    bar.hidden = false;
+    root.setAttribute('data-enhanced', '');
+    show('a', false);
+    buttons.forEach((b) => b.addEventListener('click', () => show(b.dataset.rrCase ?? 'a', true)));
+  });
+</script>
+
+<style>
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .rr { margin-block: var(--space-8); }
+  .rr__intro { max-width: var(--measure); }
+  .rr__panel { margin-top: var(--space-6); background: var(--paper-deep); }
+
+  /* Case buttons: three ruled columns; the pressed one takes a cobalt rule and ink type. */
+  .rr__cases { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-4) var(--space-5); margin-bottom: var(--space-6); }
+  .rr__cases[hidden] { display: none; }
+  .rr__btn {
+    display: grid; gap: 0.15rem; align-content: start; text-align: left;
+    padding: var(--space-3) 0 var(--space-2); min-height: 2.75rem;
+    background: none; border: 0; border-top: 2px solid var(--rule-strong); border-radius: 0;
+    font: inherit; color: var(--muted); cursor: pointer;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+  }
+  .rr__btn-k { font-weight: 600; color: var(--ink-2); }
+  .rr__btn-n { font-size: var(--step--1); line-height: 1.35; }
+  .rr__btn:hover { color: var(--ink); border-top-color: var(--ink); }
+  .rr__btn[aria-pressed='true'] { border-top-color: var(--cobalt); color: var(--ink); }
+  .rr__btn[aria-pressed='true'] .rr__btn-k { color: var(--cobalt); }
+  .rr__btn:focus-visible { outline: 2px solid var(--focus); outline-offset: 5px; }
+
+  .rr__case + .rr__case { margin-top: var(--space-8); }
+  .rr__case[hidden] { display: none; }
+  .rr__case-title { font-family: var(--font-serif); font-size: var(--step-2); font-weight: 400; line-height: 1.2; letter-spacing: var(--tracking-title); color: var(--ink); margin: 0 0 var(--space-4); }
+  .rr[data-enhanced] .rr__case.is-shown { animation: rr-in 200ms var(--ease); }
+  @keyframes rr-in { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
+
+  .rr__table { border-top: 1px solid var(--ink); }
+  .rr__row {
+    display: grid; align-items: center;
+    grid-template-columns: minmax(8.5rem, 11rem) minmax(0, 1fr) 4.25rem 5.5rem 7rem;
+    column-gap: var(--space-5);
+    padding-block: 0.55rem;
+    border-bottom: var(--hairline);
+    font-size: var(--step--1);
+  }
+  .rr__row--head { color: var(--muted); align-items: end; padding-block: var(--space-2); }
+  .rr__c-label { color: var(--ink); font-weight: 500; }
+  .rr__row--head .rr__c-label { color: var(--muted); font-weight: 400; }
+  .rr__c-val { text-align: right; font-variant-numeric: tabular-nums; color: var(--ink); }
+  .rr__row--head .rr__c-val { color: var(--muted); }
+  .rr__c-truth { color: var(--ink-2); }
+  .rr__row--head .rr__c-truth { color: var(--muted); }
+  .rr__c-verdict { display: inline-flex; align-items: center; gap: 0.4em; color: var(--muted); }
+  .rr__row--miss .rr__c-verdict { color: var(--ink); font-weight: 600; }
+  .rr__glyph { flex: none; }
+
+  .rr__scale { display: grid; grid-template-columns: 1fr auto 1fr; font-variant-numeric: tabular-nums; position: relative; }
+  .rr__scale > :last-child { text-align: right; }
+  .rr__track { position: relative; display: block; height: 0.625rem; background: rgba(20, 18, 15, 0.09); }
+  .rr__fill { position: absolute; inset: 0; transform-origin: left center; transform: scaleX(var(--v)); background: var(--muted); }
+  .rr__fill--on { background: var(--cobalt); }
+  .rr__mark { position: absolute; left: 50%; top: -0.3rem; bottom: -0.3rem; width: 1px; background: var(--ink); }
+  .rr[data-enhanced] .rr__case.is-shown .rr__fill { animation: rr-grow 240ms var(--ease); }
+  @keyframes rr-grow { from { transform: scaleX(0); } to { transform: scaleX(var(--v)); } }
+
+  .rr__score { margin: var(--space-5) 0 0; color: var(--ink-2); }
+  .rr__score-n { font-family: var(--font-serif); font-size: var(--step-3); line-height: 1; letter-spacing: var(--tracking-title); color: var(--ink); margin-right: 0.2em; }
+
+  .rr__notes { margin-top: var(--space-6); display: grid; max-width: 54rem; border-bottom: var(--hairline); }
+  .rr__notes > div { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 9fr); column-gap: var(--space-6); row-gap: var(--space-1); padding-block: var(--space-3); border-top: var(--hairline); }
+  .rr__notes dt { color: var(--ink); font-weight: 500; }
+  .rr__notes dd { margin: 0; color: var(--ink-2); }
+
+  /* Phone: each row becomes a small block. Label and confidence share a line, the bar runs full
+     width beneath, the radiologist's label and the agreement close the block. */
+  @media (max-width: 720px) {
+    .rr__cases { grid-template-columns: 1fr; gap: 0; }
+    .rr__btn { grid-template-columns: 4.5rem minmax(0, 1fr); align-items: baseline; border-top-width: 1px; }
+    .rr__btn[aria-pressed='true'] { border-top-width: 2px; }
+    .rr__row--head { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    .rr__row {
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'label val' 'bar bar' 'truth verdict';
+      row-gap: 0.4rem; padding-block: 0.7rem;
+    }
+    .rr__c-label { grid-area: label; }
+    .rr__c-val { grid-area: val; }
+    .rr__c-bar { grid-area: bar; }
+    .rr__c-truth { grid-area: truth; }
+    .rr__c-truth::before { content: 'Radiologist: '; color: var(--muted); }
+    .rr__c-verdict { grid-area: verdict; justify-self: end; }
+    .rr__notes > div { grid-template-columns: 1fr; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .rr__case, .rr__fill { animation: none !important; }
+  }
+  @media print { .rr__cases { display: none; } .rr__case[hidden] { display: block; } }
+</style>

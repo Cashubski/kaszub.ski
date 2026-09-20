@@ -1,0 +1,14 @@
+---
+/** Body schematic for /work/rsna-kaggle: the earlier baseline image model, stage by stage (BRIEF.md §5.5); §11.5 supersedes it with the EfficientNetV2 and DINOv2 ensemble. */
+import Schematic from './Schematic.astro';
+const steps = [
+  { label: '2.5D stacks', detail: 'neighbouring slices grouped from the 384 px uint8 shards' },
+  { label: 'Slice encoder', detail: 'a timm backbone encodes each stack' },
+  { label: 'BiGRU', detail: 'reads the encoded slices in order, in both directions' },
+  { label: 'Attention pooling', detail: 'weighs the slices within a series' },
+  { label: 'Series aggregation', detail: 'combines the series of one study' },
+  { label: '12 logits', detail: 'one per gold label, trained with binary cross-entropy' },
+];
+---
+
+<Schematic columns={3} steps={steps} title="The earlier baseline, from slice stacks to 12 logits. The current EfficientNetV2 and DINOv2 ensemble grew out of it." note="Stages only, in reading order; not to scale." />

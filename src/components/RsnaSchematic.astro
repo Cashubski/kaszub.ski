@@ -1,0 +1,11 @@
+---
+import Schematic from './Schematic.astro';
+const steps = [
+  { label: 'Reports', detail: 'every training study has a free-text radiology report' },
+  { label: 'Labels', detail: 'only 58 of 4,407 studies carry the 12 gold labels, so labels are read from the reports' },
+  { label: 'Image model', detail: 'a 2.5D EfficientNetV2 and DINOv2 ensemble, 12 outputs; evolved from a timm and BiGRU baseline' },
+  { label: 'Image-only inference', detail: 'no report at test time; read against 58 held-out gold studies' },
+];
+---
+
+<Schematic steps={steps} title="The weak-supervision pipeline: report to labels to image model to image-only inference." note="Competition ongoing; no leaderboard position or medal." />

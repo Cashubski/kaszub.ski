@@ -1,0 +1,135 @@
+---
+title: "RSNA knee MRI challenge"
+editorialTitle: "Weak supervision for knee MRI: 58 gold-labelled studies, 4,407 reports"
+summary: "An ongoing entry to the 2026 RSNA Knee Abnormality Detection competition on Kaggle: radiology reports teach an EfficientNetV2 and DINOv2 ensemble that must read knee MRI from the images alone."
+category: research
+role: "Competitor: DICOM data engineering, weak-supervision pipeline, model design and training"
+years: "2026"
+status: "Ongoing competition; no leaderboard position or medal to report"
+evidence: ["Public benchmark"]
+seoDescription: "An ongoing entry to the 2026 RSNA knee MRI competition on Kaggle, with an interactive readout of the model against radiologist ground truth."
+technologies: ["PyTorch", "EfficientNetV2", "DINOv2", "timm", "2.5D slice stacks", "Weak supervision", "GroupKFold", "DICOM"]
+result: "Competition ongoing: no medal or leaderboard position. On 58 held-out gold studies my EfficientNetV2 and DINOv2 ensemble calls 83.5% of label cells correctly at a 0.50 threshold (my own validation, September 2026)."
+links:
+  - label: "Competition on Kaggle"
+    href: "https://www.kaggle.com/competitions/rsna-knee-abnormality-detection"
+    external: true
+  - label: "Kaggle profile"
+    href: "https://www.kaggle.com/michalkaszubski"
+    external: true
+plate:
+  figure: "83.5%"
+  caption: "of label cells called correctly at a 0.50 threshold across 58 held-out gold studies; my own validation, not a leaderboard score"
+  lines:
+    - value: "58 / 4,407"
+      context: "training studies carry the 12 gold labels; every study has a free-text report"
+    - value: "300+ GPU-hours"
+      context: "on 3× A100 80GB, for a 2.5D EfficientNetV2 and DINOv2 ensemble"
+    - value: "Ongoing"
+      context: "no leaderboard position and no medal is claimed"
+schematic: rsna
+order: 6
+featured: true
+schemaType: CreativeWork
+metrics:
+  - value: "58 of 4,407 training studies"
+    context: "carry the 12 gold labels; every training study has a free-text radiology report"
+    asOf: "15 September 2026"
+  - value: "83.5% of label cells correct"
+    context: "2.5D EfficientNetV2 and DINOv2 ensemble at a 0.50 threshold on 58 image-verified, held-out gold studies; own validation, not a competition score"
+    asOf: "September 2026"
+  - value: "3× A100 80GB, 300+ GPU-hours"
+    context: "compute used for the ensemble"
+    asOf: "September 2026"
+  - value: "No leaderboard result"
+    context: "Competition ongoing; no medal or leaderboard position is claimed"
+    asOf: "15 September 2026"
+---
+import EvidenceBand from '../../components/EvidenceBand.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import RsnaKaggleModel from '../../components/RsnaKaggleModel.astro';
+import RsnaReadout from '../../components/RsnaReadout.astro';
+
+The underlying scans are patient data and cannot be shown, so this page shows aggregate results and model outputs only.
+
+## The hypothesis
+
+The 2026 RSNA Knee Abnormality Detection competition is a research code competition on Kaggle: multimodal knee-MRI classification of a defined set of clinically important abnormalities. It is still running, so this page reports a method, its status and my own held-out validation. There is no medal or leaderboard position to report.
+
+My entry rests on a hypothesis about labels. Only 58 of the 4,407 training studies carry the 12 gold labels, which is far too few to train an image model on directly. But every training study comes with a free-text radiology report. If the reports can be turned into labels, the image model can learn from thousands of studies instead of dozens, and still run on the images alone when it is scored. The 58 gold studies are then worth more as a test than as training data.
+
+## What I did
+
+- Preprocessed about 500 GB of raw DICOM in shards on Kaggle, writing windowed, rescaled uint8 arrays at 384 pixels, and synced the result to a GPU cluster.
+- Laid the pipeline out as four stages: report, labels, image model, image-only inference.
+- Built a first baseline over 2.5D slice stacks: a timm slice encoder feeding a BiGRU, then attention pooling, series aggregation and 12 logits, trained with DistributedDataParallel on two Quadro GV100 GPUs with binary cross-entropy, mixed precision, a cosine schedule and AUC logged per label.
+- Moved from that baseline to the current model, a 2.5D ensemble of EfficientNetV2 and DINOv2, trained on 3× A100 80GB over more than 300 GPU-hours.
+- Split the data with GroupKFold at patient level, so validation never sees a patient the model trained on.
+- Held out the 58 image-verified gold studies and read the ensemble against them, label by label. The readout below is that comparison.
+
+## Decisions that mattered
+
+<dl class="decisions">
+  <div>
+    <dt>The report is the teacher</dt>
+    <dd>With 58 gold-labelled studies the supervised route is too thin to trust. Every study has a report, so the report supplies the training signal and the image model is the student. At inference the report is gone: the model that is scored sees the MRI and nothing else.</dd>
+  </div>
+  <div>
+    <dt>Preprocess once, in shards</dt>
+    <dd>About 500 GB of raw DICOM is windowed and rescaled to uint8 arrays at 384 pixels, shard by shard on Kaggle, and the result is synced to the GPU cluster. The training loop reads the prepared arrays.</dd>
+  </div>
+  <div>
+    <dt>Start with a baseline, then replace it</dt>
+    <dd>The first model was a timm slice encoder with a BiGRU reading the slices in order. It proved the data path and the per-label logging. The approach then evolved into an ensemble of two different image encoders, EfficientNetV2 and DINOv2, still over 2.5D slice stacks.</dd>
+  </div>
+  <div>
+    <dt>Split by patient, before anything else</dt>
+    <dd>GroupKFold at patient level, the same discipline as in my <a href="/work/miqa">MSc work on prostate MRI</a>. A split that lets one patient sit on both sides makes every later number unreliable, so it was settled first.</dd>
+  </div>
+  <div>
+    <dt>Look at every label, study by study</dt>
+    <dd>There are 12 labels and very few gold examples of each. A single averaged score would hide a label the model has not learned, so each label is tracked on its own and the readout shows whole studies, misses included.</dd>
+  </div>
+</dl>
+
+<RsnaKaggleModel />
+
+<RsnaReadout />
+
+<EvidenceBand
+  tone="shade"
+  title="Evidence so far"
+  intro="The competition is ongoing and I publish no leaderboard position or medal. What can be stated is my own held-out validation and what exists."
+>
+
+<div class="table-wrap" role="region" aria-label="State of the RSNA entry, September 2026" tabindex="0">
+
+| Part | State, September 2026 | Context |
+| --- | --- | --- |
+| Data engineering | done | about 500 GB of raw DICOM, preprocessed in shards on Kaggle to uint8 at 384 px, synced to a GPU cluster |
+| Baseline model | built, superseded | timm slice encoder, BiGRU, attention pooling, series aggregation, 12 logits; two Quadro GV100 GPUs |
+| Current model | trained | 2.5D EfficientNetV2 and DINOv2 ensemble; 3× A100 80GB, more than 300 GPU-hours |
+| Held-out validation | 83.5% of label cells correct | 58 image-verified gold studies, 12 labels each, threshold 0.50; weakest on synovitis and effusion |
+| Leaderboard result | none | competition still running; no position, score or medal is claimed |
+
+</div>
+
+</EvidenceBand>
+
+## Limitations and status
+
+Fifty-eight studies is a small test set, and the three cases in the readout are illustrations, not a sample. Label-cell accuracy at a fixed threshold is a blunt measure. Most labels are absent in most knees, so a model earns a good share of its cells by saying no, and 83.5% should be read with that in mind. The ensemble slips most on synovitis and effusion. None of this is a competition score: the competition is still running, and there is no leaderboard position or medal to report.
+
+## What I learned
+
+<div class="offset">
+
+<p class="pull">Weak supervision moves the difficulty from the images to the reports.</p>
+
+The question stops being how to train on 58 studies and becomes how far a label read from a report can be believed. The data engineering had to come first: until about 500 GB of DICOM is in a form the GPUs can consume, there is no model to discuss. The second lesson carried over from the MSc: the split comes first, because nothing measured afterwards can be trusted without it. The third is that a model is easier to judge one study at a time than through one averaged number.
+
+</div>
+
+## Competition and profile
+
+The <ExternalLink href="https://www.kaggle.com/competitions/rsna-knee-abnormality-detection">competition page on Kaggle</ExternalLink> describes the task and the data. My <ExternalLink href="https://www.kaggle.com/michalkaszubski">Kaggle profile</ExternalLink> is public. The training repository is private.

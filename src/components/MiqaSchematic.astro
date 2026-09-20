@@ -1,0 +1,14 @@
+---
+import Schematic from './Schematic.astro';
+const steps = [
+  { label: 'Data', detail: '1,027 prostate DWI acquisitions, 627 patients, single centre, anonymised' },
+  { label: 'Patient-level folds', detail: 'strict five-fold cross-validation, no patient in more than one fold' },
+  { label: 'Architectures', detail: 'ResNet-18/50, DenseNet-121, EfficientNet-B0, classical baselines' },
+  { label: 'Ensembles', detail: 'three-seed DenseNet-121; heterogeneous nine-model ensemble' },
+  { label: 'Uncertainty', detail: 'MC dropout, deep ensembles, calibration, correlated-error analysis' },
+  { label: 'Triage simulation', detail: 'defer the least-certain cases, retrospective, 70% coverage' },
+  { label: 'Distilled student', detail: 'one forward pass instead of nine' },
+];
+---
+
+<Schematic steps={steps} title="The MIQA method, from data to a distilled single model." note="Not to scale; no patient images are shown anywhere on this site." />

@@ -1,0 +1,52 @@
+---
+/**
+ * A numbered thesis figure for /work/miqa. The plots are white-ground matplotlib exports, so each
+ * is mounted unaltered as a print on a paper-deep plate (the plate carries the three-layer print
+ * shadow; the sheet itself a hairline edge and a short contact shadow). Nothing in the figure is
+ * recoloured or redrawn. `n` is the figure number used in the text; `span` sets how far the plate
+ * runs past the text column on wide screens.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+  src: ImageMetadata;
+  alt: string;
+  n: number;
+  caption: string;
+  span?: 'text' | 'wide' | 'xwide';
+  /** Narrow sheets (the near-square plots) are held to this share of the plate so they are not enlarged past reading size. */
+  sheet?: 'full' | 'narrow';
+}
+const { src, alt, n, caption, span = 'wide', sheet = 'full' } = Astro.props;
+const max = Math.min(1800, src.width);
+const widths = [480, 720, 1080, 1440, 1800].filter((w) => w < max).concat(max);
+const sizes = span === 'text' ? '(min-width: 1024px) 50vw, 100vw' : '(min-width: 1024px) 78vw, 100vw';
+---
+
+<figure class:list={['mfig', span === 'wide' && 'wide', span === 'xwide' && 'xwide']} id={`figure-${n}`}>
+  <div class="mfig__plate print print--lift">
+    <span class:list={['mfig__sheet', `mfig__sheet--${sheet}`]}>
+      <Image src={src} alt={alt} width={max} widths={widths} sizes={sizes} loading="lazy" decoding="async" />
+    </span>
+  </div>
+  <figcaption class="mfig__cap small">
+    <span class="mfig__n">Figure {n}</span>
+    <span class="muted">{caption}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .mfig__plate { display: grid; justify-items: center; padding: clamp(0.875rem, 3.2vw, 2.75rem); background: var(--paper-deep); }
+  .mfig__sheet {
+    display: block; width: 100%;
+    background: #fff;
+    border-radius: 1px;
+    box-shadow: 0 0 0 1px var(--edge), 0 1px 2px rgba(20, 18, 15, 0.10), 0 6px 18px rgba(20, 18, 15, 0.10);
+  }
+  .mfig__sheet--narrow { max-width: 46rem; }
+  .mfig__sheet :global(img) { display: block; width: 100%; height: auto; border-radius: inherit; }
+  .mfig__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); max-width: var(--measure); }
+  .mfig__n { color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums; }
+  @media print { .mfig__sheet { box-shadow: 0 0 0 1px #999; } }
+</style>
