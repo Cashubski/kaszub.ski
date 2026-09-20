@@ -315,7 +315,11 @@ a:hover { color: var(--cobalt-ink); text-decoration-color: currentColor; }
 
 /* --- Motion ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+  /* Movement is removed; fades (colour, opacity, shadow) are not motion and stay, so hovers never snap. */
+  *, *::before, *::after {
+    animation: none !important; scroll-behavior: auto !important;
+    transition-property: color, background-color, border-color, text-decoration-color, opacity, box-shadow, background-size, outline-color !important;
+  }
 }
 
 /* --- Print (site-wide; CV page adds its own) --------------------------------- */
