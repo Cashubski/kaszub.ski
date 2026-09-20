@@ -1,0 +1,114 @@
+/* Polish layer: gradual, eased hover states. Loaded last, so it refines without touching layout or the motion system.
+   Principle: nothing snaps. States arrive in about half a second and leave more slowly than they came (the base
+   transition is the exit, the :hover transition is the entrance). Hover-only styles sit behind (hover: hover) so touch
+   devices never get stuck states; the global reduced-motion rule in global.css switches all of it off. */
+:root {
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --hov-in: 0.5s;
+  --hov-out: 0.95s;
+  --plate: color-mix(in oklab, var(--paper) 55%, #ffffff);
+  --shadow-tab: 0 1px 1px rgba(20, 18, 15, 0.05), 0 6px 16px rgba(20, 18, 15, 0.09), 0 16px 34px rgba(20, 18, 15, 0.06);
+  --shadow-card: 0 1px 2px rgba(20, 18, 15, 0.04), 0 14px 36px rgba(20, 18, 15, 0.10), 0 44px 90px rgba(20, 18, 15, 0.09);
+}
+
+/* 1. Colour never snaps, anywhere. */
+:root :is(a, button, summary, .filter, .nav-link, .card__link, .wordmark) {
+  transition:
+    color var(--hov-out) var(--ease-soft),
+    text-decoration-color var(--hov-out) var(--ease-soft),
+    text-underline-offset var(--hov-out) var(--ease-soft),
+    background-color var(--hov-out) var(--ease-soft),
+    border-color var(--hov-out) var(--ease-soft),
+    box-shadow var(--hov-out) var(--ease-soft),
+    background-size var(--hov-out) var(--ease-soft);
+}
+@media (hover: hover) {
+  :root :is(a, button, summary, .filter, .nav-link, .card__link, .wordmark):hover { transition-duration: var(--hov-in); }
+  :root :is(.prose a, .row-link, .link-row a, .facts a, .meta a):hover { text-underline-offset: 0.32em; }
+}
+
+/* 2. Tabs (navigation and gallery filters): a soft plate with a gradual shadow rises behind the label. */
+:root .nav-link.nav-link, :root .filter.filter { position: relative; isolation: isolate; }
+:root .filter.filter { padding-inline: 0.7rem; margin-inline: -0.7rem; }
+:root .nav-link.nav-link::before, :root .filter.filter::before {
+  content: '';
+  position: absolute;
+  inset: 0.42rem 0.1rem;
+  z-index: -1;
+  border-radius: 3px;
+  background: var(--plate);
+  box-shadow: var(--shadow-tab);
+  opacity: 0;
+  transform: translateY(2px) scale(0.97);
+  transition: opacity var(--hov-out) var(--ease-soft), transform var(--hov-out) var(--ease-soft);
+  pointer-events: none;
+}
+:root .filter.filter::before { inset: 0.3rem 0; }
+:root .nav-link.nav-link::after { transition: opacity var(--hov-out) var(--ease-soft), transform var(--hov-out) var(--ease-soft); }
+@media (hover: hover) {
+  :root .nav-link.nav-link:hover::before, :root .filter.filter:hover::before,
+  :root .nav-link.nav-link:focus-visible::before, :root .filter.filter:focus-visible::before {
+    opacity: 1; transform: none; transition-duration: var(--hov-in);
+  }
+  :root .nav-link.nav-link:hover::after { transition-duration: var(--hov-in); }
+}
+/* The current tab rests on a faint plate, so the active state reads as "pressed in" rather than only coloured. */
+:root .filter.filter[aria-current='page']::before { opacity: 0.6; transform: none; box-shadow: 0 1px 1px rgba(20, 18, 15, 0.04), 0 3px 10px rgba(20, 18, 15, 0.06); }
+
+/* 3. Cards: the whole card responds. A lit panel with a gradual shadow fades in behind it, the print lifts a little
+      further and its shadow deepens slowly, the image eases forward inside its frame, and the title underline draws. */
+:root .card.card { isolation: isolate; }
+:root .card.card:not(.card--plate)::before {
+  content: '';
+  position: absolute;
+  inset: calc(-1 * var(--space-4)) calc(-1 * var(--space-4)) calc(-1 * var(--space-5));
+  z-index: -1;
+  border-radius: 4px;
+  background: var(--plate);
+  box-shadow: var(--shadow-card);
+  opacity: 0;
+  transform: scale(0.985);
+  transition: opacity var(--hov-out) var(--ease-soft), transform var(--hov-out) var(--ease-soft);
+  pointer-events: none;
+}
+.print--lift { transition: transform var(--hov-out) var(--ease-soft); }
+.print--lift::before { transition: opacity var(--hov-out) var(--ease-soft); }
+.card__media :is(img, picture) { transition: scale 1.4s var(--ease-soft); }
+:root .card__link.card__link {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 calc(100% - 0.12em);
+  background-size: 0% 1px;
+}
+:root .card__inspect { display: inline-block; transition: translate var(--hov-out) var(--ease-soft), color var(--hov-out) var(--ease-soft); }
+@media (hover: hover) {
+  :root .card.card:not(.card--plate):hover::before, :root .card.card:not(.card--plate):focus-within::before { opacity: 1; transform: none; transition-duration: var(--hov-in); }
+  .print--lift:hover, .lift:hover .print--lift { transform: translateY(-4px); transition-duration: 0.7s; }
+  .print--lift:hover::before, .lift:hover .print--lift::before { transition-duration: 0.7s; }
+  .lift:hover .card__media :is(img, picture) { scale: 1.025; }
+  :root .lift:hover .card__link.card__link { background-size: 100% 1px; transition-duration: 0.7s; }
+  :root .lift:hover .card__inspect { translate: 4px 0; transition-duration: var(--hov-in); }
+}
+
+/* 4. Rows and tables acknowledge the pointer quietly. */
+.ledger__row, .facts > div, .prose tbody tr, .decisions > div { transition: background-color var(--hov-out) var(--ease-soft); }
+@media (hover: hover) {
+  .ledger__row:hover { background-color: rgba(255, 255, 255, 0.035); transition-duration: var(--hov-in); }
+  .prose tbody tr:hover { background-color: color-mix(in oklab, var(--paper-deep) 45%, transparent); transition-duration: var(--hov-in); }
+}
+
+/* 5. Buttons: a resting hairline, a gradual shadow on hover, a small press on click. */
+:root button:not([class*='facade']) { transition: color var(--hov-out) var(--ease-soft), background-color var(--hov-out) var(--ease-soft), border-color var(--hov-out) var(--ease-soft), box-shadow var(--hov-out) var(--ease-soft), transform 0.25s var(--ease-soft); }
+@media (hover: hover) {
+  :root button:not([class*='facade']):hover { box-shadow: var(--shadow-tab); transition-duration: var(--hov-in); }
+}
+:root button:active { transform: translateY(1px) scale(0.99); }
+
+/* 6. Focus rings ease in instead of popping. */
+:root :focus-visible { transition: outline-offset 0.3s var(--ease-soft), outline-color 0.3s var(--ease-soft); }
+
+/* 7. Finishing touches on type rendering. */
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+h1, h2, h3, .display { text-wrap: balance; }
+p, li, dd, figcaption { text-wrap: pretty; }
+::selection { background: color-mix(in oklab, var(--cobalt) 22%, transparent); color: inherit; }
