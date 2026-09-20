@@ -1,0 +1,101 @@
+/* ============================================================================
+   kaszub.ski · design tokens
+   An exhibition catalogue photographed in low light: one paper, one ink, one
+   cobalt, two typefaces. Everything here is a decision.
+   ========================================================================== */
+:root {
+  /* --- Colour -------------------------------------------------------------
+     Paper: warm off-white inside the brief's F6F3EC to F8F6F1 band, with two
+     deeper warm tones for plates and section bands. Ink: near-black.
+     Cobalt #1B36C4 measures 8.06:1 on the paper and 7.4:1 on the deep paper.
+     Muted #625E56 measures 5.87:1 on paper and 5.1:1 on the deep paper. */
+  --paper: #F7F4ED;
+  --paper-shade: #F1EDE4;    /* section bands: slightly warmer, deeper paper */
+  --paper-deep: #EBE5D8;     /* plates, panels, typographic prints */
+  --ink: #151412;
+  --ink-2: #3F3C36;          /* body copy, slightly softer than headings */
+  --muted: #625E56;          /* secondary copy, captions, labels */
+  --cobalt: #1B36C4;
+  --cobalt-ink: #16299B;     /* hover state for cobalt text */
+  --rule: #D8D3C8;           /* hairline */
+  --rule-strong: #B4AE9F;    /* emphasised hairline */
+  --edge: rgba(20, 18, 15, 0.16);   /* hairline inner border on prints */
+  --focus: var(--cobalt);
+
+  /* --- Depth ----------------------------------------------------------------
+     Prints laid on paper under a lamp: three diffuse layers, deeper on hover.
+     The hover shadow is painted on a pseudo-element and faded in, so the only
+     transitioned properties are opacity and transform. */
+  --shadow-print: 0 1px 2px rgba(20, 18, 15, 0.06), 0 12px 32px rgba(20, 18, 15, 0.10), 0 40px 80px rgba(20, 18, 15, 0.08);
+  --shadow-print-hover: 0 2px 4px rgba(20, 18, 15, 0.08), 0 18px 44px rgba(20, 18, 15, 0.16), 0 56px 100px rgba(20, 18, 15, 0.12);
+  --shadow-panel: 0 1px 2px rgba(20, 18, 15, 0.05), 0 10px 28px rgba(20, 18, 15, 0.08), 0 32px 64px rgba(20, 18, 15, 0.06);
+
+  /* --- Type families: exactly two ---------------------------------------- */
+  --font-sans: 'Instrument Sans', 'Helvetica Neue', Arial, sans-serif;
+  --font-serif: 'Newsreader', Georgia, 'Times New Roman', serif;
+
+  /* --- Type scale (fluid, 390px to 1440px) --------------------------------
+     Body is 17px; the smallest text on the site is 15px. Steps at 3 and above
+     are display cuts of Newsreader with tight leading. */
+  --step--1: 0.9375rem;                                   /* 15px    small copy, labels, captions, metadata */
+  --step-0: 1.0625rem;                                    /* 17px    body */
+  --step-1: clamp(1.125rem, 1rem + 0.55vw, 1.375rem);     /* 18 to 22px  lede, summaries */
+  --step-2: clamp(1.375rem, 1.15rem + 1vw, 1.875rem);     /* 22 to 30px  card titles, small figures */
+  --step-3: clamp(1.75rem, 1.3rem + 1.9vw, 2.625rem);     /* 28 to 42px  section heads, prose h2 */
+  --step-4: clamp(2.125rem, 1.4rem + 3.2vw, 3.875rem);    /* 34 to 62px  page titles, ledger figures */
+  --step-5: clamp(3rem, 1.6rem + 7vw, 7.25rem);           /* 48 to 116px hero name */
+
+  --leading-tight: 0.98;
+  --leading-display: 1.08;
+  --leading-body: 1.55;
+  --tracking-display: -0.028em;
+  --tracking-title: -0.016em;
+
+  /* --- Space ------------------------------------------------------------- */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+  --space-8: clamp(3rem, 6vw, 5rem);
+  --space-9: clamp(4rem, 9vw, 8rem);
+
+  /* --- Grid --------------------------------------------------------------
+     12 columns, fluid gutter. Imagery bleeds to a viewport edge by cancelling
+     the page gutter with a negative margin of exactly --gutter. */
+  --gutter: clamp(1.25rem, 4vw, 4rem);
+  --col-gap: clamp(1rem, 2vw, 2rem);
+  --measure: 66ch;
+  --measure-narrow: 52ch;
+  --max-w: 1680px;
+
+  /* --- Shape and motion ---------------------------------------------------- */
+  --radius: 2px;
+  --hairline: 1px solid var(--rule);
+  --dur: 180ms;
+  --ease: cubic-bezier(0.2, 0.6, 0.2, 1);
+}
+
+/* Ink-dark register: a full-bleed section set in near-black with paper-coloured
+   type. The tokens are re-mapped inside it, so every component keeps working. */
+.ink {
+  --paper: #141311;
+  --paper-shade: #181715;
+  --paper-deep: #1E1C19;
+  --ink: #F1ECE2;
+  --ink-2: #D8D1C3;
+  --muted: #A8A193;
+  --cobalt: #B3C0F4;
+  --cobalt-ink: #D2DAF9;
+  --rule: rgba(241, 236, 226, 0.16);
+  --rule-strong: rgba(241, 236, 226, 0.36);
+  --edge: rgba(241, 236, 226, 0.18);
+  --focus: #F1ECE2;
+  --shadow-print: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px rgba(0, 0, 0, 0.42), 0 40px 80px rgba(0, 0, 0, 0.36);
+  --shadow-print-hover: 0 2px 4px rgba(0, 0, 0, 0.34), 0 18px 44px rgba(0, 0, 0, 0.5), 0 56px 100px rgba(0, 0, 0, 0.42);
+  --shadow-panel: var(--shadow-print);
+  background: var(--paper);
+  color: var(--ink);
+}

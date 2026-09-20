@@ -1,0 +1,332 @@
+/* ============================================================================
+   kaszub.ski · global styles (tokens.css and fonts.css are imported before this)
+   ========================================================================== */
+
+/* --- Reset (small, deliberate) ------------------------------------------- */
+*, *::before, *::after { box-sizing: border-box; }
+* { margin: 0; }
+html {
+  color-scheme: light;
+  background: var(--paper);
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+body {
+  min-height: 100dvh;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: var(--step-0);
+  line-height: var(--leading-body);
+  font-optical-sizing: auto;
+  /* Only upright faces ship: never fake an italic or a bold. */
+  font-synthesis: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  overflow-x: clip;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+}
+main { flex: 1 0 auto; }
+img, picture, video, svg { display: block; max-width: 100%; }
+img { height: auto; }
+button, input, select, textarea { font: inherit; color: inherit; }
+ul[role="list"], ol[role="list"] { list-style: none; padding: 0; }
+h1, h2, h3, h4 { font-weight: 400; line-height: var(--leading-display); overflow-wrap: anywhere; text-wrap: balance; }
+.display, .title, .serif { text-wrap: balance; }
+.lede, figcaption, .small { text-wrap: pretty; }
+p, li, dd, dt, figcaption { overflow-wrap: break-word; }
+hr { border: 0; border-top: var(--hairline); }
+::selection { background: var(--cobalt); color: var(--paper); }
+
+/* --- Atmosphere: static paper grain and a faint lamp-light vignette ----------
+   Both are fixed, non-interactive overlays painted over the whole viewport.
+   The grain is SVG fractal noise at a few percent; it never animates. */
+.grain, .vignette {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 60;
+}
+.grain {
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='260' height='260'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  1 0 0 0 0'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");
+  background-size: 260px 260px;
+}
+.vignette {
+  background: radial-gradient(ellipse 88% 78% at 50% 42%, rgba(20, 18, 15, 0) 52%, rgba(20, 18, 15, 0.075) 100%);
+}
+@media print { .grain, .vignette { display: none; } }
+
+/* Text for assistive technology only. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+
+/* --- Links and focus ------------------------------------------------------- */
+a {
+  color: var(--cobalt);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.18em;
+  text-decoration-color: color-mix(in srgb, var(--cobalt) 45%, transparent);
+}
+a:hover { color: var(--cobalt-ink); text-decoration-color: currentColor; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 3px; border-radius: var(--radius); }
+.skip-link {
+  position: absolute; left: var(--gutter); top: -100px; z-index: 100;
+  padding: 0.6rem 0.9rem; background: var(--ink); color: var(--paper);
+  font-size: var(--step--1); text-decoration: none;
+}
+.skip-link:focus-visible { top: var(--space-3); outline-color: var(--paper); }
+
+/* Inline links inside running text keep wrapping; vertical padding on an inline
+   box does not move the line but enlarges the hit box to about 34px. */
+.tap, .prose a, .facts a, .meta a { padding-block: 0.5em; }
+/* Standalone links set in a row: sentence-case words with a real underline. */
+.link-row { display: flex; flex-wrap: wrap; gap: 0 var(--space-5); }
+.link-row a, .row-link {
+  display: inline-flex; align-items: center;
+  min-height: 2.75rem; min-width: 2.75rem;
+  font-weight: 500;
+}
+
+/* External links get a small, quiet marker drawn with currentColor. */
+/* The marker is an inline box holding a word joiner, not an inline-block: an atomic inline always
+   allows a line break before it, which left the marker (and a following full stop) alone on a line. */
+.ext::after {
+  content: '\2060';
+  display: inline;
+  padding-left: 0.85em;
+  background-color: currentColor;
+  -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.5 9.5 9.5 2.5M4 2.5h5.5V8' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>") right 52% / 0.55em 0.55em no-repeat;
+  mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'><path d='M2.5 9.5 9.5 2.5M4 2.5h5.5V8' fill='none' stroke='black' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'/></svg>") right 52% / 0.55em 0.55em no-repeat;
+  opacity: 0.8;
+}
+
+/* --- Layout ------------------------------------------------------------------ */
+.container { width: 100%; max-width: var(--max-w); margin-inline: auto; padding-inline: var(--gutter); }
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); }
+.bleed-right { margin-right: calc(-1 * var(--gutter)); }
+.bleed-left { margin-left: calc(-1 * var(--gutter)); }
+.measure { max-width: var(--measure); }
+.measure-narrow { max-width: var(--measure-narrow); }
+.section { padding-block: var(--space-8); }
+.rule { border-top: var(--hairline); }
+.rule-strong { border-top: 1px solid var(--rule-strong); }
+.band { background: var(--paper-shade); }
+/* A light-to-shade tonal wash on the paper, as if lit from above. */
+.wash { background: linear-gradient(180deg, var(--paper) 0%, var(--paper-shade) 100%); }
+
+/* --- Typography roles ------------------------------------------------------- */
+.serif { font-family: var(--font-serif); font-weight: 400; }
+.display {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  letter-spacing: var(--tracking-display);
+  line-height: var(--leading-tight);
+  font-feature-settings: 'kern' 1, 'liga' 1;
+}
+.title { font-family: var(--font-serif); font-weight: 420; letter-spacing: var(--tracking-title); line-height: var(--leading-display); }
+.muted { color: var(--muted); }
+.lede { font-size: var(--step-1); line-height: 1.45; color: var(--ink-2); }
+.small { font-size: var(--step--1); line-height: 1.5; }
+.num { font-variant-numeric: tabular-nums; }
+/* A label is a short sans word or phrase, sentence case, at a real size. */
+.label { font-size: var(--step--1); line-height: 1.5; color: var(--muted); }
+.label--accent { color: var(--cobalt); font-weight: 500; }
+.figure-num { font-family: var(--font-serif); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'kern' 1; }
+
+/* --- Depth: a print laid on paper ------------------------------------------
+   .print wraps imagery, video, typographic plates and panels. It paints the
+   three-layer shadow, a hairline inner border, and on hover lifts by 2px
+   while a deeper shadow fades in (opacity and transform only). */
+.print {
+  position: relative;
+  isolation: isolate;
+  border-radius: var(--radius);
+  background: var(--paper-deep);
+  box-shadow: var(--shadow-print);
+  transition: transform var(--dur) var(--ease);
+}
+.print::before {
+  content: '';
+  position: absolute; inset: 0; z-index: -1;
+  border-radius: inherit;
+  box-shadow: var(--shadow-print-hover);
+  opacity: 0;
+  transition: opacity var(--dur) var(--ease);
+}
+.print::after {
+  content: '';
+  position: absolute; inset: 0; z-index: 2;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 1px var(--edge);
+  pointer-events: none;
+}
+.print > :is(img, video, picture), .print > picture > img { border-radius: inherit; }
+@media (hover: hover) {
+  .print--lift:hover, .lift:hover .print--lift { transform: translateY(-2px); }
+  .print--lift:hover::before, .lift:hover .print--lift::before { opacity: 1; }
+}
+.panel { padding: clamp(1.25rem, 3vw, 2.5rem); box-shadow: var(--shadow-panel); }
+
+/* --- Section headings (catalogue style) -------------------------------------- */
+.section-head {
+  display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); row-gap: var(--space-3);
+  align-items: end;
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--ink);
+  margin-bottom: var(--space-7);
+}
+.section-head h2 { grid-column: 1 / span 6; font-size: var(--step-4); }
+.section-head .aside { grid-column: 7 / -1; display: grid; gap: var(--space-2); justify-items: start; color: var(--ink-2); max-width: 44ch; }
+/* Heading and intro both hang from the rule. */
+.section-head--top { align-items: start; }
+@media (max-width: 900px) { .section-head h2, .section-head .aside { grid-column: 1 / -1; } }
+
+/* --- Labelled lists (metadata) --------------------------------------------- */
+.facts { font-size: var(--step--1); line-height: 1.5; }
+.facts > div { display: grid; grid-template-columns: 7.5rem 1fr; gap: var(--space-3); padding-block: 0.55rem; border-top: var(--hairline); }
+.facts > div:first-child { border-top: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { color: var(--ink); }
+@media (max-width: 480px) { .facts > div { grid-template-columns: 6rem 1fr; } }
+
+/* --- Prose (MDX case-study body) ------------------------------------------- */
+.prose { max-width: var(--measure); color: var(--ink-2); }
+.prose > * + * { margin-top: 1.25em; }
+.prose h2 {
+  font-family: var(--font-serif);
+  font-size: var(--step-3);
+  font-weight: 400;
+  letter-spacing: var(--tracking-title);
+  color: var(--ink);
+  margin-top: 2.4em;
+  padding-top: var(--space-4);
+  border-top: var(--hairline);
+  max-width: 24ch;
+}
+.prose h2:first-child { margin-top: 0; }
+.prose h3 { font-family: var(--font-sans); font-weight: 600; font-size: var(--step-0); line-height: 1.3; color: var(--ink); margin-top: 2em; }
+.prose p + p { margin-top: 1em; }
+.prose ul, .prose ol { padding-left: 1.25rem; }
+.prose li + li { margin-top: 0.45em; }
+.prose li::marker { color: var(--muted); }
+.prose strong { font-weight: 600; color: var(--ink); }
+/* No italic faces ship, so emphasis is weight, never a synthesised slant. */
+.prose em { font-style: normal; font-weight: 500; color: var(--ink); }
+.prose blockquote {
+  font-family: var(--font-serif); font-size: var(--step-2); line-height: 1.25; letter-spacing: var(--tracking-title);
+  color: var(--ink); padding-left: var(--space-5); border-left: 1px solid var(--cobalt); max-width: 30ch;
+}
+.prose code { font-variant-ligatures: none; font-feature-settings: 'liga' 0, 'calt' 0; font-family: inherit; font-weight: 500; color: var(--ink); background: var(--paper-deep); padding: 0.05em 0.3em; border-radius: var(--radius); }
+.prose pre { overflow-x: auto; background: var(--paper-deep); padding: var(--space-4); border-radius: var(--radius); }
+.prose table { width: 100%; border-collapse: collapse; font-size: var(--step--1); line-height: 1.45; font-variant-numeric: tabular-nums lining-nums; }
+.prose th, .prose td { text-align: left; padding: 0.6em 0.9em 0.6em 0; border-bottom: var(--hairline); vertical-align: top; }
+.prose th { font-weight: 600; color: var(--ink); border-bottom-color: var(--ink); }
+.prose td:first-child { color: var(--ink); }
+.prose td.num, .prose .num { font-variant-numeric: tabular-nums; }
+.prose .table-wrap { overflow-x: auto; }
+/* A table of figures: every column after the first is numeric and right-aligned, so magnitudes line up. */
+.prose .table-wrap--nums :is(th, td):nth-child(n + 2) { text-align: right; padding-right: 0; padding-left: 0.9em; white-space: nowrap; }
+.prose .table-wrap--nums table { max-width: 34rem; }
+
+/* Narrow screens: a table of prose cells is restacked, never scrolled sideways. Each row becomes a
+   small block: the first cell (muted) and the second (ink) share a line, the context runs full width
+   beneath. Two-column tables stack both cells. The header row is kept for assistive technology only;
+   scripts/postbuild.mjs writes explicit table roles so the semantics survive display: grid.
+   Tables of figures (.table-wrap--nums) stay tables: their cells are short numbers. */
+@media (max-width: 640px) {
+  .prose .table-wrap:not(.table-wrap--nums) { overflow-x: visible; }
+  .prose .table-wrap:not(.table-wrap--nums) :is(table, tbody) { display: block; }
+  .prose .table-wrap:not(.table-wrap--nums) thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .prose .table-wrap:not(.table-wrap--nums) tbody tr { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); column-gap: var(--space-4); row-gap: 0.2em; padding-block: 0.75em; border-bottom: var(--hairline); }
+  .prose .table-wrap:not(.table-wrap--nums) tbody tr:first-child { border-top: 1px solid var(--ink); }
+  .prose .table-wrap:not(.table-wrap--nums) td { display: block; padding: 0; border: 0; min-width: 0; }
+  .prose .table-wrap:not(.table-wrap--nums) td:first-child { color: var(--muted); }
+  .prose .table-wrap:not(.table-wrap--nums) td:nth-child(2) { color: var(--ink); font-weight: 500; }
+  .prose .table-wrap:not(.table-wrap--nums) td:nth-child(3) { grid-column: 1 / -1; color: var(--ink-2); }
+  /* Two-column tables: name over description. */
+  .prose .table-wrap:not(.table-wrap--nums) td:first-child:nth-last-child(2) { grid-column: 1 / -1; color: var(--ink); font-weight: 500; }
+  .prose .table-wrap:not(.table-wrap--nums) td:first-child:nth-last-child(2) + td { grid-column: 1 / -1; color: var(--ink-2); font-weight: 400; }
+}
+
+/* Decisions set as a two-column definition layout: the decision on the left, the reasoning on the right. */
+.prose .decisions { display: grid; border-bottom: var(--hairline); }
+.prose .decisions > div { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 8fr); column-gap: var(--space-6); row-gap: var(--space-1); padding-block: var(--space-4); border-top: var(--hairline); }
+.prose .decisions dt { font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.2; letter-spacing: var(--tracking-title); color: var(--ink); text-wrap: balance; }
+.prose .decisions dd { margin: 0; }
+@media (max-width: 560px) { .prose .decisions > div { grid-template-columns: 1fr; } }
+
+/* A narrow column pushed off the text's left edge, for the closing reflection. */
+.prose .offset { margin-left: clamp(0rem, 14%, 6rem); max-width: 46ch; }
+.prose .offset > * + * { margin-top: 1em; }
+.prose .offset .pull { margin-top: 0; padding-left: var(--space-5); border-left: 1px solid var(--cobalt); margin-left: calc(-1 * var(--space-5) - 1px); }
+@media (max-width: 560px) { .prose .offset { margin-left: 0; } .prose .offset .pull { margin-left: 0; } }
+
+/* A figure that runs wider than the text column on large screens. */
+@media (min-width: 1024px) {
+  .prose .figure--wide, .prose .wide { width: min(150%, calc(100vw - 2 * var(--gutter))); max-width: none; }
+}
+/* Runs from the text column's left edge to the right edge of the page grid (eleven of twelve columns). */
+@media (min-width: 1200px) {
+  .prose .xwide {
+    --page-w: calc(min(100vw, var(--max-w)) - 2 * var(--gutter));
+    width: calc(var(--page-w) - (var(--page-w) - 11 * var(--col-gap)) / 12 - var(--col-gap));
+    max-width: none;
+  }
+}
+/* An ink-dark full-bleed band inside the prose column: the ground is painted out to both viewport
+   edges with a spread shadow clipped to the band's own height, so nothing overflows the page. */
+.prose .inkband { margin-block: var(--space-8); padding-block: var(--space-8); box-shadow: 0 0 0 100vmax var(--paper); clip-path: inset(0 -100vmax); color: var(--ink-2); }
+.prose .inkband > * + * { margin-top: var(--space-5); }
+.prose .inkband > figure { margin-block: var(--space-6) 0; }
+.prose .inkband__title { margin-top: 0; border-top: 0; padding-top: 0; }
+/* Two columns on wide screens: a table or text on the left, imagery on the right. */
+.prose .spread { display: grid; gap: var(--space-7) var(--space-7); align-items: start; margin-top: var(--space-6); }
+.prose .spread > * { min-width: 0; margin: 0; }
+.prose .spread > * > :first-child { margin-top: 0; }
+@media (min-width: 1200px) {
+  .prose .spread { grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); }
+}
+/* Code excerpts run past the text measure so their longest lines fit, and sit off the text's left edge on wide screens. */
+@media (min-width: 721px) { .prose .msc { width: min(46rem, calc(100vw - 2 * var(--gutter))); max-width: none; } }
+@media (min-width: 1200px) { .prose .msc { margin-left: clamp(0rem, 14%, 6rem); } }
+/* Two matched pairs side by side from tablet width up; stacked on a phone. */
+.prose .pairs { display: grid; gap: var(--space-7) var(--space-6); }
+.prose .pairs > figure { margin: 0; }
+@media (min-width: 720px) { .prose .pairs { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* Shown only where there is room for it to be legible. */
+@media (max-width: 640px) { .prose .hide-narrow { display: none; } }
+@media print { .prose .inkband { box-shadow: none; clip-path: none; } }
+
+/* A small print shown at its own size, never enlarged. */
+.prose .figure--small { max-width: 580px; }
+/* A ruled note that follows a table drops its own top rule (the table's last row already draws one). */
+.prose p.ph.ph--flush { border-top: 0; margin-top: 0; }
+/* Imagery gets the same air above as below. Components set no margin of their own (the reset
+   zeroes it), so this rule is the only one that positions a figure inside the prose. */
+.prose figure, .prose .ph--figure { margin-block: 2.5em; }
+.prose hr { margin-block: 2.5em; }
+.prose a { font-weight: 500; }
+.prose .pull { text-wrap: balance; font-family: var(--font-serif); font-size: var(--step-2); line-height: 1.25; letter-spacing: var(--tracking-title); color: var(--ink); max-width: 30ch; margin-block: 1.6em; }
+
+/* --- Motion ------------------------------------------------------------------ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; }
+}
+
+/* --- Print (site-wide; CV page adds its own) --------------------------------- */
+@page { size: A4; margin: 15mm; }
+@media print {
+  html, body { background: #fff; color: #000; }
+  .site-head, .site-foot, .skip-link, body::before, body::after { display: none !important; }
+  .ext::after { display: none; }
+  a { color: #000; text-decoration: none; }
+  /* Printed case studies keep their link destinations. */
+  .prose a[href^="http"]::after { content: " (" attr(href) ")"; display: inline; width: auto; height: auto; margin: 0; padding: 0; background: none; -webkit-mask: none; mask: none; opacity: 1; font-weight: 400; overflow-wrap: anywhere; }
+  .no-print { display: none !important; }
+  .print { box-shadow: none; }
+}

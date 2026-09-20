@@ -1,0 +1,90 @@
+---
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '../styles/global.css';
+import '../styles/motion.css';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { site } from '../data/site';
+import { cleanPath, ogSlug } from '../lib/paths';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Route for canonical/OG (defaults to the current URL, normalised). */
+  path?: string;
+  ogType?: 'website' | 'article';
+  /** Override the generated OG image path. */
+  ogImage?: string;
+  ogImageAlt?: string;
+  /** One or more JSON-LD objects to emit. */
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Full <title> without the site suffix (used on the homepage). */
+  bareTitle?: boolean;
+  bodyClass?: string;
+  /** Keep the page out of search indexes and drop its canonical and og:url (the 404 page). */
+  noindex?: boolean;
+}
+
+const { title, description, ogType = 'website', jsonLd, bareTitle = false, bodyClass, noindex = false } = Astro.props;
+const path = Astro.props.path ?? cleanPath(Astro.url.pathname);
+const canonical = new URL(path, site.url).toString();
+const fullTitle = bareTitle ? title : `${title} | ${site.name}`;
+const ogImage = new URL(Astro.props.ogImage ?? `/og/${ogSlug(path)}.png`, site.url).toString();
+const ogImageAlt = Astro.props.ogImageAlt ?? `${title}, ${site.name}`;
+const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
+---
+
+<html lang="en-GB">
+  <head>
+    <meta charset="utf-8" />
+    {/* Motion gate: reveal styles only apply under .js; never under reduced motion; and the class is withdrawn if the observer has not reported within 2s. */}
+    <script is:inline>(function(h){if(!window.matchMedia||matchMedia('(prefers-reduced-motion: reduce)').matches)return;h.classList.add('js');setTimeout(function(){if(!h.dataset.motion)h.classList.remove('js')},2000)})(document.documentElement)</script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {noindex ? <meta name="robots" content="noindex" /> : <link rel="canonical" href={canonical} />}
+    <meta name="author" content={site.name} />
+    <meta name="color-scheme" content="light" />
+    <meta name="theme-color" content="#F7F4ED" />
+
+    <link rel="icon" href="/favicon.ico" sizes="32x32" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+
+    <link rel="preload" href="/fonts/newsreader-latin-opsz-normal.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/instrument-sans-latin-wght-normal.woff2" as="font" type="font/woff2" crossorigin />
+
+    <meta property="og:type" content={ogType} />
+    <meta property="og:site_name" content={site.shortName} />
+    <meta property="og:locale" content={site.locale} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    {!noindex && <meta property="og:url" content={canonical} />}
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content={ogImageAlt} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <meta name="twitter:image:alt" content={ogImageAlt} />
+
+    {ld.map((obj) => <script is:inline type="application/ld+json" set:html={JSON.stringify(obj).replace(/</g, '\\u003c')} />)}
+    <script>import '../scripts/motion.ts';</script>
+    <slot name="head" />
+  </head>
+  <body class={bodyClass}>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <Nav />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+  </body>
+</html>

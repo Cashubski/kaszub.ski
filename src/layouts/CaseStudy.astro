@@ -1,0 +1,204 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection, type CollectionEntry } from 'astro:content';
+import Base from './Base.astro';
+import MetaBlock from '../components/MetaBlock.astro';
+import Figure from '../components/Figure.astro';
+import Placeholder from '../components/Placeholder.astro';
+import MiqaSchematic from '../components/MiqaSchematic.astro';
+import RsnaSchematic from '../components/RsnaSchematic.astro';
+import ChefbotSchematic from '../components/ChefbotSchematic.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { categories, person, personId, site } from '../data/site';
+import { ogSlug, titleHtml } from '../lib/paths';
+
+interface Props { entry: CollectionEntry<'work'>; }
+const { entry } = Astro.props;
+const d = entry.data;
+const path = `/work/${entry.id}`;
+const cat = categories[d.category];
+const all = (await getCollection('work')).sort((a, b) => a.data.order - b.data.order);
+const idx = all.findIndex((e) => e.id === entry.id);
+const prev = idx > 0 ? all[idx - 1] : undefined;
+const next = idx < all.length - 1 ? all[idx + 1] : undefined;
+const externals = d.links.filter((l) => l.external);
+const square = d.cover ? d.cover.width === d.cover.height : false;
+const inset = Boolean(d.cover) && d.coverFit === 'inset';
+const description = d.seoDescription ?? d.summary;
+// Plate rhythm varies by standing and by asset: flagships get an ink-dark band with a bleeding
+// plate; an inset cover sits as a smaller print on a paper-deep plate in an offset column;
+// featured works a wide plate on paper; square artwork a medium print in an offset column; a
+// work with no authentic imagery and no schematic gets a short typographic placeholder plate.
+const plateMode = !d.cover && !d.schematic ? 'note' : inset ? 'inset' : d.flagship ? 'bleed' : square ? 'square' : 'wide';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': d.schemaType,
+  name: d.title,
+  headline: d.editorialTitle,
+  description: d.summary,
+  url: new URL(path, site.url).toString(),
+  image: new URL(`/og/${ogSlug(path)}.png`, site.url).toString(),
+  inLanguage: 'en-GB',
+  dateModified: site.revisedISO,
+  keywords: d.technologies.join(', '),
+  genre: cat.label,
+  // The Person node is defined on / and /about; consumers do not resolve @id across pages, so the name travels with it.
+  author: { '@type': 'Person', '@id': personId, name: person.name, url: `${site.url}/` },
+  creator: { '@type': 'Person', '@id': personId, name: person.name, url: `${site.url}/` },
+  // External profiles, competition pages and live sites are things the case study mentions; it is not the same thing as any of them.
+  ...(externals.length ? { mentions: externals.map((l) => ({ '@type': 'WebPage', name: l.label, url: l.href })) } : {}),
+  ...(d.schemaType === 'SoftwareApplication'
+    ? { ...(d.applicationCategory ? { applicationCategory: d.applicationCategory } : {}), operatingSystem: 'Web' }
+    : {}),
+};
+// Hero widths never exceed the source, so the width and height attributes stay truthful.
+const heroMax = d.cover ? Math.min(1800, d.cover.width) : 1800;
+const heroWidths = [480, 720, 1080, 1440, 1800].filter((w) => w < heroMax).concat(heroMax);
+---
+
+<Base title={d.title} description={description} path={path} ogType="article" jsonLd={jsonLd} ogImageAlt={`${d.editorialTitle}, a case study by ${person.name}`}>
+  <div class="progress" aria-hidden="true"></div>
+  <article class="cs">
+    <header class:list={['cs__head', { wash: plateMode === 'bleed' }]}>
+      <div class="container">
+        <div class="grid">
+          <h1 class="cs__title display" data-reveal="mask" set:html={titleHtml(d.editorialTitle)} />
+        </div>
+        <div class="grid cs__intro">
+          <p class="cs__summary serif" data-reveal>{d.summary}</p>
+          <div class="cs__meta" data-reveal><MetaBlock entry={entry} /></div>
+        </div>
+      </div>
+    </header>
+
+    <div class:list={['cs__plate', `cs__plate--${plateMode}`, { ink: plateMode === 'bleed' }]}>
+      <div class="container">
+        <div class="grid">
+          <div class="cs__plate-inner" data-reveal="block">
+            {d.cover && inset ? (
+              <Figure label={d.coverLabel ?? 'Figure'} caption={d.coverCaption ?? d.coverAlt} cover={entry.id} parallax={plateMode === 'bleed'}>
+                <span class="cs__inset print">
+                  <Image src={d.cover} alt={d.coverAlt ?? ''} width={1400} widths={[720, 1080, 1400]} sizes="(min-width: 1024px) 56vw, 100vw" loading="eager" decoding="async" fetchpriority="high" />
+                </span>
+              </Figure>
+            ) : d.cover ? (
+              <Figure label={d.coverLabel ?? 'Figure'} caption={d.coverCaption ?? d.coverAlt} cover={entry.id} parallax={plateMode === 'bleed'}>
+                <Image src={d.cover} alt={d.coverAlt ?? ''} width={heroMax} widths={heroWidths} sizes={square ? '(min-width: 1024px) 46vw, (min-width: 720px) 64vw, 100vw' : '(min-width: 1024px) 78vw, 100vw'} quality={square ? 70 : undefined} loading="eager" decoding="async" fetchpriority="high" />
+              </Figure>
+            ) : d.schematic === 'miqa' ? (
+              <MiqaSchematic />
+            ) : d.schematic === 'rsna' ? (
+              <RsnaSchematic />
+            ) : d.schematic === 'chefbot' ? (
+              <ChefbotSchematic />
+            ) : (
+              <Placeholder size="lead" text={d.leadPlaceholder?.text ?? 'Imagery to be supplied.'} note={d.leadPlaceholder?.note ?? d.status} />
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="grid">
+        <div class="cs__body prose">
+          <slot />
+        </div>
+        {externals.length > 0 && (
+          <div class="cs__links" data-reveal role="group" aria-label="Live evidence, code and demonstrations">
+            <p class="cs__links-title serif" data-rule="ink">Inspect</p>
+            <ul role="list">
+              {externals.map((l) => (
+                <li><ExternalLink href={l.href} class="row-link cs__ext">{l.label}</ExternalLink></li>
+              ))}
+            </ul>
+            <p class="small muted">External links open in a new tab.</p>
+          </div>
+        )}
+      </div>
+    </div>
+
+    <nav class="container cs__adjacent" aria-label="Adjacent works">
+      <div class="cs__adj-grid" data-rule="ink" data-reveal-group>
+        {prev ? (
+          <a href={`/work/${prev.id}`} class="cs__adj">
+            <span class="small muted">Previous work</span>
+            <span class="serif cs__adj-title">{prev.data.title}</span>
+          </a>
+        ) : <span class="cs__adj cs__adj--empty"><span class="small muted">First work in the catalogue</span></span>}
+        <a href="/work" class="cs__adj cs__adj--index">
+          <span class="small muted">All eight</span>
+          <span class="serif cs__adj-title">Index of works</span>
+        </a>
+        {next ? (
+          <a href={`/work/${next.id}`} class="cs__adj cs__adj--next">
+            <span class="small muted">Next work</span>
+            <span class="serif cs__adj-title">{next.data.title}</span>
+          </a>
+        ) : <span class="cs__adj cs__adj--empty cs__adj--next"><span class="small muted">Last work in the catalogue</span></span>}
+      </div>
+    </nav>
+  </article>
+</Base>
+
+<style>
+  .cs__head { padding-top: var(--space-8); }
+  .cs__head.wash { padding-bottom: var(--space-8); }
+  .cs__title { text-wrap: balance; grid-column: 1 / span 10; font-size: var(--step-4); max-width: 20ch; margin-bottom: var(--space-6); }
+  .cs__intro { row-gap: var(--space-6); align-items: start; }
+  .cs__summary { text-wrap: pretty; grid-column: 1 / span 6; font-size: var(--step-2); line-height: 1.25; letter-spacing: var(--tracking-title); color: var(--ink); max-width: 30ch; }
+  .cs__meta { grid-column: 8 / span 5; }
+
+  /* --- plate ---------------------------------------------------------------- */
+  .cs__plate { margin-top: var(--space-7); }
+  .cs__plate--bleed { padding-block: var(--space-8); margin-top: 0; }
+  .cs__plate--bleed .cs__plate-inner { grid-column: 2 / -1; margin-right: calc(-1 * var(--gutter)); }
+  .cs__plate--bleed .cs__plate-inner :global(.figure__media), .cs__plate--bleed .cs__plate-inner :global(.schema__plate) { border-radius: var(--radius) 0 0 var(--radius); }
+  .cs__plate--bleed .cs__plate-inner :global(.figure__cap), .cs__plate--bleed .cs__plate-inner :global(.schema__cap) { margin-right: var(--gutter); }
+  .cs__plate--wide .cs__plate-inner { grid-column: 1 / span 10; }
+  .cs__plate--square .cs__plate-inner { grid-column: 3 / span 6; }
+  /* Inset cover: the print keeps its own ratio, mounted on a paper-deep plate in an offset column. */
+  .cs__plate--inset .cs__plate-inner { grid-column: 2 / span 9; }
+  .cs__plate--inset .cs__plate-inner :global(.figure__media) { display: grid; padding: clamp(1.25rem, 5vw, 3.5rem); }
+  .cs__inset { display: block; }
+  .cs__inset :global(img) { width: 100%; height: auto; }
+  /* No imagery and no schematic: a short typographic placeholder in the body's column width. */
+  .cs__plate--note .cs__plate-inner { grid-column: 1 / span 7; }
+  .cs__plate-inner :global(figure) { margin: 0; }
+
+  /* --- body ----------------------------------------------------------------- */
+  .cs__body { grid-column: 2 / span 7; padding-top: var(--space-8); }
+  .cs__links { grid-column: 10 / span 3; padding-top: var(--space-8); align-self: start; display: grid; gap: var(--space-3); }
+  .cs__links-title { font-size: var(--step-2); letter-spacing: var(--tracking-title); border-top: 1px solid var(--ink); padding-top: var(--space-3); }
+  .cs__links ul { display: grid; gap: 0; }
+  .cs__links :global(.cs__ext) { overflow-wrap: anywhere; min-height: 2.5rem; }
+
+  /* --- adjacent ------------------------------------------------------------- */
+  .cs__adjacent { margin-top: var(--space-9); }
+  .cs__adj-grid { display: grid; grid-template-columns: 1fr auto 1fr; gap: var(--space-5); border-top: 1px solid var(--ink); padding-top: var(--space-4); }
+  .cs__adj { display: grid; gap: var(--space-1); text-decoration: none; color: var(--ink); min-height: 2.75rem; align-content: start; }
+  .cs__adj--next { text-align: right; }
+  .cs__adj-title { font-size: var(--step-2); letter-spacing: var(--tracking-title); line-height: 1.15; }
+  a.cs__adj:hover .cs__adj-title { color: var(--cobalt); }
+
+  @media (max-width: 1023.98px) {
+    .cs__title { grid-column: 1 / -1; }
+    .cs__summary { grid-column: 1 / span 10; }
+    .cs__meta { grid-column: 1 / -1; }
+    .cs__plate--bleed .cs__plate-inner, .cs__plate--wide .cs__plate-inner, .cs__plate--inset .cs__plate-inner { grid-column: 1 / -1; margin-right: 0; }
+    .cs__plate--note .cs__plate-inner { grid-column: 1 / span 9; }
+    .cs__plate--bleed .cs__plate-inner :global(.figure__media), .cs__plate--bleed .cs__plate-inner :global(.schema__plate) { border-radius: var(--radius); }
+    .cs__plate--bleed .cs__plate-inner :global(.figure__cap), .cs__plate--bleed .cs__plate-inner :global(.schema__cap) { margin-right: 0; }
+    .cs__plate--square .cs__plate-inner { grid-column: 1 / span 8; }
+    .cs__body { grid-column: 1 / span 10; }
+    .cs__links { grid-column: 1 / -1; padding-top: var(--space-6); margin-top: var(--space-6); }
+    .cs__links ul { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); }
+  }
+  @media (max-width: 720px) {
+    .cs__summary, .cs__body { grid-column: 1 / -1; }
+    .cs__plate--square .cs__plate-inner, .cs__plate--note .cs__plate-inner { grid-column: 1 / -1; }
+    .cs__adj-grid { grid-template-columns: 1fr 1fr; }
+    .cs__adj--index { grid-column: 1 / -1; order: 3; border-top: var(--hairline); padding-top: var(--space-3); }
+  }
+</style>
