@@ -1,0 +1,44 @@
+<!doctype html>
+<!-- Editable Open Graph card template (1200x630). Tokens in double braces: kicker (the line under the title), title, titleClass, summary, footer, fonts.
+     Two typefaces only: Newsreader for the title, Instrument Sans for everything else. -->
+<html lang="en-GB">
+<head>
+<meta charset="utf-8" />
+<style>
+  @font-face { font-family: 'Newsreader'; font-weight: 200 800; font-style: normal; src: url('{{fonts}}/newsreader-latin-opsz-normal.woff2') format('woff2-variations'); }
+  @font-face { font-family: 'Instrument Sans'; font-weight: 400 700; src: url('{{fonts}}/instrument-sans-latin-wght-normal.woff2') format('woff2-variations'); }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; overflow: hidden; }
+  body {
+    position: relative;
+    background: #F7F4ED; color: #151412;
+    font-family: 'Instrument Sans', sans-serif;
+    padding: 56px 64px 52px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    border-top: 8px solid #151412;
+  }
+  body::after {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse 90% 80% at 50% 40%, rgba(20,18,15,0) 55%, rgba(20,18,15,0.08) 100%);
+  }
+  .line { font-size: 26px; color: #625E56; margin-top: 22px; }
+  .title { font-family: 'Newsreader', serif; font-optical-sizing: auto; font-weight: 400; font-size: 78px; line-height: 1.02; letter-spacing: -0.025em; max-width: 1040px; margin-top: 0; text-wrap: balance; }
+  .title.long { font-size: 60px; }
+  .summary { font-size: 27px; line-height: 1.4; color: #3F3C36; max-width: 900px; margin-top: 18px; }
+  .foot { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid #151412; padding-top: 22px; font-size: 22px; color: #625E56; }
+  .foot .name { color: #151412; font-weight: 500; }
+  .foot .site { color: #1B36C4; }
+</style>
+</head>
+<body>
+  <div>
+    <h1 class="title {{titleClass}}">{{title}}</h1>
+    <p class="line">{{kicker}}</p>
+    <p class="summary">{{summary}}</p>
+  </div>
+  <div class="foot">
+    <span><span class="name">Michal Kaszubski</span>, {{footer}}</span>
+    <span class="site">kaszub.ski</span>
+  </div>
+</body>
+</html>
