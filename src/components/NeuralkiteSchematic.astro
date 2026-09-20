@@ -1,0 +1,14 @@
+---
+/** NeuralKite's workflow sequence, as named in BRIEF.md §5.3. Stage names only, in the brief's own nouns; no figures, no invented detail. */
+import Schematic from './Schematic.astro';
+const steps = [
+  { label: 'Map', detail: 'private companies in fragmented UK sectors: MSPs, accountancy firms, IT services' },
+  { label: 'Ownership discovery' },
+  { label: 'Screening' },
+  { label: 'Thesis-fit scoring', detail: 'targets scored against an acquisition thesis' },
+  { label: 'Shortlisting' },
+  { label: 'Dossier and export', detail: 'decision-ready dossiers, written by LLM agents, then exported' },
+];
+---
+
+<Schematic columns={3} steps={steps} title="The NeuralKite workflow, from a mapped sector to an exported dossier." note="Stage names only, as the product names them; not to scale." />

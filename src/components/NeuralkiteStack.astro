@@ -1,0 +1,90 @@
+---
+/**
+ * NeuralKite layered architecture (BRIEF.md §12.2): layer, component, what it does.
+ * Every row is read from /opt/neuraltake (module names, libraries and constants in the source).
+ * No volumes, accuracy figures, customers or infrastructure beyond what the code and the brief state.
+ * File and endpoint names are set in Instrument Sans with tabular figures; there is no monospace on this site.
+ */
+interface Row { layer: string; parts: string[]; does: string; }
+const rows: Row[] = [
+  {
+    layer: 'Interface',
+    parts: ['Next.js App Router, TypeScript', 'NextAuth, Stripe'],
+    does: 'Sign-in, billing, target lists, dossiers and sequences. The discovery and verification views read a stream of events and draw each step as it lands.',
+  },
+  {
+    layer: 'Streaming',
+    parts: ['Server-sent events from /api/email/discover-stream and verify-stream', 'verify-bulk for a whole dossier'],
+    does: 'One event per step: the MX lookup, the catch-all test, each format tried, each SMTP reply code. Proxy buffering is switched off in the response headers so events arrive as they happen.',
+  },
+  {
+    layer: 'Agents',
+    parts: ['Claude on the Anthropic SDK', 'targeting, research, discovery, composer'],
+    does: 'Score companies against the thesis on five axes, read the scraped pages into a dossier, catch the people that structured extraction missed, and draft a three-step sequence. Claude Haiku does extraction; Claude Sonnet does scoring, dossiers and drafting.',
+  },
+  {
+    layer: 'Discovery and verification',
+    parts: ['discovery.ts, email-protocol-probes.ts', 'Node’s net and dns modules, no third-party verifier'],
+    does: 'People extraction, email mining, format inference, MX and provider classification, the catch-all control, the SMTP recipient check, the protocol probes, the risk tier and the rationale trail.',
+  },
+  {
+    layer: 'Registry intelligence',
+    parts: ['Companies House REST API', 'classifier, domain discovery, governance signals'],
+    does: 'Officers and persons with significant control, paginated. A rules-based sector classifier, a name-to-website finder, and deal-trigger signals computed from tenure, ownership and board changes.',
+  },
+  {
+    layer: 'Scraping',
+    parts: ['Playwright, Cheerio'],
+    does: 'Reads the homepage, about, team and careers pages and recent posts, keeping both the HTML and a cleaned text version, and reports each page as a stage.',
+  },
+  {
+    layer: 'Data',
+    parts: ['Prisma on PostgreSQL', 'a separate pg pool to the Crunchbase warehouse'],
+    does: 'Application data in one database; the 2.8-million-company Crunchbase load in another, queried in SQL by the targeting agent. Companies House candidates are staged, then promoted to companies under an id that cannot collide with a Crunchbase one.',
+  },
+  {
+    layer: 'Sending',
+    parts: ['Nodemailer over the user’s own SMTP account', 'a self-hosted Postal server'],
+    does: 'A connection test when an account is added, presets for the common providers, a daily limit per account, paced batches, and delivery, open, click and bounce events back from Postal by webhook.',
+  },
+  {
+    layer: 'Secrets',
+    parts: ['AES-256-GCM, Node crypto'],
+    does: 'Stored SMTP passwords are encrypted with a fresh random IV per value and an authentication tag, and decrypted only at the moment of sending.',
+  },
+];
+---
+
+<div class="table-wrap wide nk-stack">
+  <table>
+    <thead>
+      <tr><th scope="col">Layer</th><th scope="col">Component</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <td>{r.layer}</td>
+          <td>{r.parts.map((p) => <span class="nk-part">{p}</span>)}</td>
+          <td>{r.does}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style is:global>
+  .prose .nk-stack table { table-layout: fixed; font-size: var(--step--1); }
+  .prose .nk-stack th:nth-child(1) { width: 21%; }
+  .prose .nk-stack th:nth-child(2) { width: 31%; }
+  .prose .nk-stack :is(th, td) { padding-block: 0.8em; padding-right: 1.6em; }
+  .prose .nk-stack td:first-child { font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.2; letter-spacing: var(--tracking-title); color: var(--ink); }
+  .prose .nk-stack td:nth-child(3) { padding-right: 0; line-height: 1.5; }
+  .nk-stack .nk-part { display: block; color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere; }
+  .nk-stack .nk-part + .nk-part { margin-top: 0.3em; font-weight: 400; color: var(--ink-2); }
+  /* Restacked on a phone by the global table rules; here the layer name leads and the other two cells run full width. */
+  @media (max-width: 640px) {
+    .prose .table-wrap.nk-stack:not(.table-wrap--nums) tbody tr { grid-template-columns: 1fr; row-gap: 0.4em; padding-block: 1em; }
+    .prose .table-wrap.nk-stack:not(.table-wrap--nums) td:first-child { color: var(--ink); }
+    .prose .table-wrap.nk-stack:not(.table-wrap--nums) td { grid-column: 1 / -1; }
+  }
+</style>

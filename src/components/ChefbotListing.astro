@@ -1,0 +1,36 @@
+---
+/**
+ * The lower part of the GPT store listing (conversation starters, capabilities, ratings histogram)
+ * as a narrow portrait print, with the reading of it in a text column beside. The slot carries the text.
+ */
+import { Image } from 'astro:assets';
+import detail from '../assets/work/chefbot/listing-detail.png';
+---
+
+<div class="cbl">
+  <figure class="cbl__fig">
+    <span class="cbl__print print print--lift">
+      <Image src={detail} alt="The ChefBot GPT store listing: four conversation starters, including Bored? Take a photo of your fridge and we'll make something!; capabilities listed as image generation, code interpreter and data analysis, web search and canvas; and a ratings histogram in which the five-star bar is by far the longest." width={720} widths={[360, 540, 720, 1074]} sizes="(min-width: 720px) 24rem, 100vw" loading="lazy" decoding="async" />
+    </span>
+    <figcaption class="cbl__cap small">
+      <span class="cbl__tag">Screenshot</span>
+      <span class="muted">GPT store listing: conversation starters, capabilities and ratings. Screenshot supplied September 2026, cropped to the panel.</span>
+    </figcaption>
+  </figure>
+  <div class="cbl__text"><slot /></div>
+</div>
+
+<style>
+  .cbl { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: var(--space-6) var(--space-7); align-items: start; margin-block: var(--space-7); }
+  .cbl__fig { margin: 0; }
+  .cbl__print { display: block; }
+  .cbl__print :global(img) { display: block; width: 100%; height: auto; }
+  .cbl__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); }
+  .cbl__tag { color: var(--ink); font-weight: 500; }
+  .cbl__text > :global(* + *) { margin-top: 1em; }
+  .cbl__text > :global(:first-child) { margin-top: 0; }
+  @media (max-width: 719.98px) {
+    .cbl { grid-template-columns: 1fr; }
+    .cbl__fig { max-width: 24rem; }
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+/**
+ * The six feedback emails OpenAI forwarded to the builder of ChefBot GPT, quoted exactly as
+ * written (spelling, capitals and punctuation untouched) and set as a ruled list: a short sans
+ * note on the left, the quotation on the right. Beneath, the emails themselves as small prints,
+ * cropped above the "Go to ChefBot GPT" button. None of the emails carries a name or an address.
+ */
+import { Image } from 'astro:assets';
+import fb1 from '../assets/work/chefbot/feedback-1.png';
+import fb2 from '../assets/work/chefbot/feedback-2.png';
+import fb3 from '../assets/work/chefbot/feedback-3.png';
+import fb4 from '../assets/work/chefbot/feedback-4.png';
+import fb5 from '../assets/work/chefbot/feedback-5.png';
+import fb6 from '../assets/work/chefbot/feedback-6.png';
+
+const quotes = [
+  { note: 'Cooking from what is there', text: 'I am able to make good food out of whatever I happen to have.', img: fb6 },
+  { note: 'Cooking from what is there', text: 'Fantastic work, I didn’t even know such a dish was possible with my ingredients! Amazing!', img: fb3 },
+  { note: 'Learning to cook', text: 'I love my chefbot GPT! it\'s giving me more confidence in the kitchen. There are things that I already know, but never felt truly confident in until the details were refined by my chefbot. absolutely love it!', img: fb4 },
+  { note: 'Ideas', text: 'Love it. It always surprises me with inspirational recipe.', img: fb5 },
+  { note: 'One word, in Spanish or Portuguese', text: 'Útil', translation: 'Useful', img: fb1 },
+  { note: 'A criticism', text: 'it\'s pretty good, it may just be that I don\'t know how to talk to it but I think it would be nice if it asked personalized question before making recommendation', img: fb2 },
+];
+---
+
+<div class="cbf">
+  <ol class="cbf__list" role="list">
+    {quotes.map((q) => (
+      <li class="cbf__row">
+        <p class="cbf__note small muted">{q.note}</p>
+        <blockquote class="cbf__quote">
+          <p>“{q.text}”</p>
+          {q.translation && <p class="cbf__tr small muted">In English: “{q.translation}”.</p>}
+        </blockquote>
+      </li>
+    ))}
+  </ol>
+
+  <figure class="cbf__fig">
+    <div class="cbf__prints">
+      {quotes.map((q) => (
+        <span class="cbf__print print">
+          <Image src={q.img} alt={`OpenAI email: You've received feedback for ChefBot GPT! The user wrote: ${q.text}`} width={560} widths={[360, 560, q.img.width].filter((w) => w <= q.img.width)} sizes="(min-width: 720px) 20rem, 100vw" loading="lazy" decoding="async" />
+        </span>
+      ))}
+    </div>
+    <figcaption class="cbf__cap small">
+      <span class="cbf__tag">Screenshots</span>
+      <span class="muted">The six feedback emails from OpenAI, each cropped above its button, screenshots supplied September 2026. The emails carry no name or address of the person who wrote.</span>
+    </figcaption>
+  </figure>
+</div>
+
+<style>
+  .cbf { margin-top: var(--space-6); }
+  .cbf .cbf__list { list-style: none; margin: 0; padding: 0; display: grid; border-bottom: 1px solid var(--ink); }
+  .cbf .cbf__row {
+    display: grid; grid-template-columns: minmax(0, 3fr) minmax(0, 8fr); column-gap: var(--space-6); row-gap: var(--space-1);
+    align-items: baseline; margin: 0; padding-block: var(--space-4) var(--space-5); border-top: var(--hairline);
+  }
+  .cbf .cbf__row:first-child { border-top: 1px solid var(--ink); }
+  .cbf__note { margin: 0; }
+  .cbf__quote { margin: 0; padding: 0; border: 0; max-width: none; font-family: var(--font-sans); font-size: var(--step-1); line-height: 1.4; letter-spacing: 0; color: var(--ink); }
+  .cbf__quote p { margin: 0; text-wrap: pretty; }
+  .cbf__quote .cbf__tr { margin-top: var(--space-2); }
+  .cbf__fig { margin: var(--space-7) 0 0; }
+  .cbf__prints { columns: 2; column-gap: var(--space-5); }
+  .cbf__print { display: block; break-inside: avoid; margin-bottom: var(--space-5); background: #fff; }
+  .cbf__print :global(img) { display: block; width: 100%; height: auto; }
+  .cbf__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-2); max-width: var(--measure); }
+  .cbf__tag { color: var(--ink); font-weight: 500; }
+  @media (max-width: 560px) {
+    .cbf .cbf__row { grid-template-columns: 1fr; }
+    .cbf__prints { columns: 1; }
+  }
+</style>

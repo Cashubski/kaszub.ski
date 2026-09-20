@@ -1,0 +1,146 @@
+---
+title: "ChefBot"
+editorialTitle: "ChefBot: from a photo of the fridge to a meal"
+summary: "A cooking assistant built on GPT that turns whatever is in the fridge into a meal, as one multi-step flow. 25,000+ conversations and a 4.7 rating from 100+ ratings on the GPT store."
+category: products
+role: "Designed the retrieval, prompt logic and multi-step tool flows; orchestration on GPT, not model training"
+status: "Live on the GPT store (a ChatGPT account is needed to open it); figures from the store listing, screenshots supplied September 2026"
+evidence: ["User adoption", "Production deployment"]
+seoDescription: "ChefBot, a cooking assistant built on GPT: fridge photo to recipe, dietary adaptation and PDF guide. 25,000+ conversations, rated 4.7 from 100+ ratings."
+technologies: ["GPT (custom GPT on ChatGPT)", "Prompt logic", "Retrieval", "Multi-step tool flows", "Image input", "Code interpreter", "Web search", "Image generation", "Canvas"]
+result: "25,000+ conversations and a 4.7 rating from 100+ ratings in the Lifestyle category of the GPT store (store listing, screenshot supplied September 2026). Conversations, not people."
+links:
+  - label: "ChefBot on the GPT store (requires a ChatGPT account)"
+    href: "https://chatgpt.com/g/g-FJXCOCAri-chefbot-gpt"
+    external: true
+cover: ../../assets/work/chefbot/store-listing.png
+coverFit: inset
+coverAlt: "The GPT store listing for ChefBot GPT, by Michal Kaszubski: a rating of 4.7 from 100+ ratings, the category Lifestyle and 25K+ conversations."
+coverCaption: "GPT store listing, screenshot supplied September 2026, cropped to the head of the panel. The count is of conversations, not people."
+coverLabel: "Screenshot"
+cardCaption: "Screenshot, GPT store listing, supplied September 2026"
+schematic: chefbot
+order: 5
+featured: true
+schemaType: SoftwareApplication
+applicationCategory: LifestyleApplication
+metrics:
+  - value: "25,000+ conversations"
+    context: "Shown as 25K+ on the GPT store listing. Conversations, not people."
+    asOf: "Screenshot supplied September 2026"
+  - value: "4.7 from 100+ ratings"
+    context: "GPT store rating; the histogram is overwhelmingly five-star."
+    asOf: "Screenshot supplied September 2026"
+---
+import { Image } from 'astro:assets';
+import EvidenceBand from '../../components/EvidenceBand.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import Figure from '../../components/Figure.astro';
+import ChefbotSchematic from '../../components/ChefbotSchematic.astro';
+import ChefbotListing from '../../components/ChefbotListing.astro';
+import ChefbotFeedback from '../../components/ChefbotFeedback.astro';
+import conversation from '../../assets/work/chefbot/conversation.png';
+
+## The problem
+
+A half-empty fridge and no plan is an ordinary evening problem, and it is a poor fit for a recipe site. Recipes start from a complete ingredient list; the person starts from three things on a shelf and whatever is in the cupboard. When nothing obvious can be made, the food is thrown away and dinner is ordered in.
+
+ChefBot starts from the other end. The person shows it what they have, and it works out a meal from that. The design intent is practical: food that gets cooked is food that is not wasted, and someone who is walked through a method a few times starts to learn it.
+
+## What I did
+
+- Designed the retrieval, the prompt logic and the multi-step tool flows of a cooking assistant built on GPT, and published it on the GPT store under my own name.
+- Made the central path one flow: a photo of the fridge, ingredient recognition, a recipe, dietary adaptation and a PDF guide, run from a single message.
+- Wrote the conversation starters as entry points to that flow, including “Bored? Take a photo of your fridge and we'll make something!”.
+- Iterated the experience using usage patterns and the written feedback that OpenAI forwards to a GPT’s builder.
+
+I did not train the underlying language model. ChefBot is built on GPT, and my work is the orchestration around it.
+
+<ChefbotSchematic />
+
+## Decisions that mattered
+
+<dl class="decisions">
+  <div>
+    <dt>Start from a photo</dt>
+    <dd>Typing out the contents of a fridge is a chore, and people forget half of it. A photo is one action. Recognising the ingredients is the first stage of the flow, so the person never has to write a list, though a typed list works too.</dd>
+  </div>
+  <div>
+    <dt>One flow, no hand-holding</dt>
+    <dd>Automated here means something specific: recognition, recipe, dietary adaptation and the PDF guide follow from one message, in order, without the person steering each step. The person stays free to interrupt and change course.</dd>
+  </div>
+  <div>
+    <dt>Sparse input is the normal case</dt>
+    <dd>A thin ingredient list is what the assistant is designed for. It is asked to make something good from what is there, and the conversation builds from whatever the person has.</dd>
+  </div>
+  <div>
+    <dt>Dietary needs change the recipe</dt>
+    <dd>A recipe someone cannot eat is no use to them. Dietary adaptation is a stage of the flow, and one of the four conversation starters asks for dietary needs outright.</dd>
+  </div>
+  <div>
+    <dt>End with something to keep</dt>
+    <dd>The last stage writes the recipe up as a PDF guide, so the result outlives the chat and can sit on a worktop while the person cooks.</dd>
+  </div>
+  <div>
+    <dt>Build on GPT, leave the weights alone</dt>
+    <dd>The effort went into the flow around the model. This is a designed product on a third-party model, and I describe it that way.</dd>
+  </div>
+</dl>
+
+## Reading the signals
+
+The signals shown on this page are coarse: a conversation count, a ratings histogram and short written feedback. They are still enough to work from, read analytically. Which starter leads into the full flow, where a first answer falls short, what people praise in their own words and what they ask for: each points at a part of the flow to change.
+
+<ChefbotListing>
+
+The listing shows what the assistant is given to work with: image generation, the code interpreter and data analysis, web search and canvas. The four starters are the front doors. Two lead straight into the flow above (the fridge photo and dietary needs) and two invite exploring a new cuisine.
+
+The ratings histogram is overwhelmingly five-star. A shorter bar of four-star ratings follows, and the three lower bars are slivers. I describe the shape and quote no percentages, because the listing publishes none.
+
+One feedback email, quoted in full below, asks for the assistant to put personalised questions before it recommends anything. That is the most useful kind of note: it names a step the flow could add.
+
+</ChefbotListing>
+
+<EvidenceBand
+  title="Evidence that it worked"
+  intro="All three figures are from the GPT store listing, from screenshots supplied in September 2026. The listing shows the two counts only as 25K+ and 100+, so they are given here as lower bounds."
+  items={[
+    { figure: '25,000+', unit: 'conversations', context: 'Shown as 25K+ on the listing. Conversations, not people: one person may have many. Screenshot supplied September 2026.' },
+    { figure: '4.7', unit: 'rating, from 100+ ratings', context: 'Out of five. The histogram is overwhelmingly five-star. Screenshot supplied September 2026.' },
+    { figure: 'Lifestyle', unit: 'GPT store category', context: 'Listed publicly as ChefBot GPT, by Michal Kaszubski. Screenshot supplied September 2026.' },
+  ]}
+>
+
+These figures show adoption: people chose to open ChefBot, and those who rated it rated it well. They do not measure food saved or skills learnt.
+
+</EvidenceBand>
+
+<Figure label="Screenshot" width="wide" caption="A real exchange with ChefBot GPT, opened from one of its conversation starters, screenshot supplied September 2026. Cropped to the conversation column; the recipe continues beyond the crop.">
+  <Image src={conversation} alt="A ChefBot GPT conversation. The starter reads: Feeling adventurous in the kitchen today? Let's explore a recipe from a cuisine you've never tried before. ChefBot suggests Georgian cuisine and gives a recipe for Adjarian khachapuri, a boat-shaped cheese bread, serving two to three, with a list of eleven ingredients in metric quantities." widths={[480, 720, 1080, 1440, 1680]} sizes="(min-width: 1024px) 70vw, 100vw" loading="lazy" decoding="async" />
+</Figure>
+
+## What people wrote
+
+OpenAI emails a GPT’s builder when someone leaves written feedback. These are six such emails, quoted exactly as written, slips included. They are the support for the claim that ChefBot is useful to people: several describe cooking from what was already in the kitchen, and one describes growing confidence. They are six voices, chosen by no method, so they illustrate the intent and do not measure it.
+
+<ChefbotFeedback />
+
+## Limitations and status
+
+ChefBot is live on the GPT store. It runs on a third-party platform that provides both its hosting and its model, so its availability is outside my control, and opening it requires a ChatGPT account. The figures are the rounded ones OpenAI shows on the listing, taken from screenshots supplied in September 2026. They count conversations, never people.
+
+Less food waste and learning to cook are what the assistant is designed for and what the quoted feedback describes. Neither has been measured. The single exchange shown above was opened from the new-cuisine starter, so this page does not yet show the fridge-photo flow running end to end.
+
+## What I learned
+
+<div class="offset">
+
+<p class="pull">With an assistant built on someone else’s model, the product is the flow.</p>
+
+What it asks for, what it does next without being told, and what it leaves the person holding at the end: those were my decisions, and they are what people responded to. I also learned how far a few honest sentences of feedback go. The criticism quoted above is worth more to the next version than another five-star rating.
+
+</div>
+
+## Try it
+
+ChefBot is on the GPT store: <ExternalLink href="https://chatgpt.com/g/g-FJXCOCAri-chefbot-gpt">ChefBot GPT on chatgpt.com</ExternalLink>. The link requires a ChatGPT account; without one the page reports that the GPT cannot be found.

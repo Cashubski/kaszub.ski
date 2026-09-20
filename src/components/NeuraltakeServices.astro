@@ -1,0 +1,56 @@
+---
+/**
+ * The nine NeuralTake service lines (BRIEF.md §13.1), as published on neuraltake.com/services
+ * (read from the site's source on 20 September 2026). Names are the site's own; the descriptions are
+ * condensed into this site's voice. The offer is described, not its results: the hours-saved figures the
+ * consultancy advertises are aims, so they are not repeated here.
+ */
+interface Row { name: string; kind: string; does: string; }
+const rows: Row[] = [
+  { name: 'Automation strategy consulting', kind: 'Advice', does: 'Every workflow that eats staff hours is mapped, then ranked into a phased roadmap: what to automate first, second and third, and why. It includes the plain calls not to automate something.' },
+  { name: 'Workflow audit', kind: 'Advice', does: 'Two weeks embedded, shadowing the people who do the work. The result is a written, evidence-backed punch list, which the firm keeps whether or not it hires NeuralTake.' },
+  { name: 'Fixed-fee pilot project', kind: 'Build', does: 'One workflow, scoped, priced and shipped in four to six weeks. If it does not justify itself there is no second workflow, and the firm keeps what was built.' },
+  { name: 'Process automation', kind: 'Build', does: 'A whole workflow replaced end to end: client onboarding, KYC, document review, CV screening, suitability reports, year-end packs. Live in the client’s stack in two to six weeks.' },
+  { name: 'Custom automation development', kind: 'Build', does: 'Software built into the firm’s practice-management, CRM, document and email tooling. Fixed fee, fixed timeline, fixed scope. The code lives in the client’s repository and runs on the client’s cloud.' },
+  { name: 'AI agents over your documents', kind: 'Build', does: 'Retrieval-augmented agents over engagement letters, playbooks and prior advice, answering with citations and taking multi-step actions, from intake through conflicts and KYC to the engagement letter. They run inside the client’s data perimeter.' },
+  { name: 'Forecasting and capacity analytics', kind: 'Data', does: 'Operational forecasts a management team plans around: workload by quarter, utilisation, attrition risk and revenue per matter, built from calendar, billing and time-capture data the firm already holds.' },
+  { name: 'Reporting and management information', kind: 'Data', does: 'Work in progress, lock-up, realisation, utilisation, pipeline and win rate, pulled live from practice-management and CRM systems and delivered as dashboards, PDFs or scheduled digests.' },
+  { name: 'Team training and adoption', kind: 'Handover', does: 'Recorded training, plain-English runbooks and thirty days of post-launch defect cover, so the people who own the workflow can run, change and extend it.' },
+];
+---
+
+<div class="table-wrap wide nt-table nt-services">
+  <table>
+    <thead>
+      <tr><th scope="col">Service line</th><th scope="col">Kind</th><th scope="col">What is delivered</th></tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <td>{r.name}</td>
+          <td>{r.kind}</td>
+          <td>{r.does}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style is:global>
+  .prose .nt-table table { table-layout: fixed; font-size: var(--step--1); }
+  .prose .nt-table :is(th, td) { padding-block: 0.8em; padding-right: 1.6em; }
+  .prose .nt-table td:first-child { font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.2; letter-spacing: var(--tracking-title); color: var(--ink); }
+  .prose .nt-table td:last-child { padding-right: 0; line-height: 1.5; }
+  .prose .nt-services th:nth-child(1) { width: 30%; }
+  .prose .nt-services th:nth-child(2) { width: 13%; }
+  .prose .nt-services td:nth-child(2) { color: var(--ink); font-weight: 500; }
+  .prose .nt-stack th:nth-child(1) { width: 21%; }
+  .prose .nt-stack th:nth-child(2) { width: 36%; }
+  .nt-stack .nt-part { display: block; color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere; }
+  .nt-stack .nt-part + .nt-part { margin-top: 0.3em; font-weight: 400; color: var(--ink-2); }
+  @media (max-width: 640px) {
+    .prose .table-wrap.nt-table:not(.table-wrap--nums) tbody tr { grid-template-columns: 1fr; row-gap: 0.4em; padding-block: 1em; }
+    .prose .table-wrap.nt-table:not(.table-wrap--nums) td:first-child { color: var(--ink); }
+    .prose .table-wrap.nt-table:not(.table-wrap--nums) td { grid-column: 1 / -1; }
+  }
+</style>

@@ -1,0 +1,134 @@
+---
+title: "NeuralTake"
+editorialTitle: "NeuralTake: one engineer from the first call to the running system"
+summary: "The AI consultancy I founded in London in 2024. It automates manual workflows for professional services firms: a two-week audit, then fixed-fee builds that live in the client’s own repository. I sell, scope, build and support the work."
+category: products
+role: "Founder and AI engineer; discovery, scoping, architecture, delivery, onboarding, support and roadmap"
+years: "2024 to present"
+status: "Active; signed B2B contracts delivered end to end. Clients and contract values are not published"
+evidence: ["Commercial validation", "Production deployment"]
+seoDescription: "NeuralTake, the AI consultancy I founded in London in 2024: workflow audits and fixed-fee automation builds, sold, scoped, built and supported by one engineer."
+technologies: ["Python", "Django", "TypeScript", "Next.js", "React", "PostgreSQL", "Anthropic SDK", "Stripe", "Docker", "nginx"]
+result: "Signed B2B contracts delivered end to end, among them AI Zuzi, a client platform now in production. Clients and contract values are not published."
+links:
+  - label: "neuraltake.com"
+    href: "https://neuraltake.com"
+    external: true
+  - label: "AI Zuzi, a client platform"
+    href: "/work/aizuzi"
+  - label: "NeuralKite, my own product"
+    href: "/work/neuralkite"
+cover: ../../assets/work/neuraltake-home.png
+coverFit: inset
+coverAlt: "The neuraltake.com homepage with the headline Reclaim Manual Workflows and a button to book a workflow audit."
+coverCaption: "neuraltake.com, the consultancy’s public site, September 2026: workflow audits and fixed-fee builds for professional services firms."
+coverLabel: "Screenshot"
+cardCaption: "Screenshot, neuraltake.com, September 2026"
+order: 2
+featured: true
+flagship: true
+schemaType: CreativeWork
+---
+import ExternalLink from '../../components/ExternalLink.astro';
+import EvidenceBand from '../../components/EvidenceBand.astro';
+import NeuraltakeMethod from '../../components/NeuraltakeMethod.astro';
+import NeuraltakeServices from '../../components/NeuraltakeServices.astro';
+import NeuraltakeStack from '../../components/NeuraltakeStack.astro';
+
+## The problem
+
+Professional services firms run on manual workflows: client onboarding, KYC, document review, CV screening, suitability reports, year-end packs. The firms NeuralTake works for are accountancy and legal practices, recruiters, compliance and advisory firms, financial advisers and insurance brokers. What they are usually offered is a platform to subscribe to. What they need is someone to watch how the work moves, and then replace the part that should not be done by hand.
+
+NeuralTake (Neuraltake Limited) is my consultancy, founded in London in 2024. What it sells is a method and the engineering to carry it out. The method fits in one drawing.
+
+<NeuraltakeMethod />
+
+## What I do
+
+I own every stage in that drawing: stakeholder discovery, scoping, requirements, architecture, delivery, onboarding, support and the roadmap afterwards. Nothing is handed from a salesperson to an analyst to a developer, because they are the same person.
+
+- I sell the work. NeuralTake has signed B2B contracts and delivered them end to end.
+- I run the audit: two weeks beside the people doing the work, then a ranked list in writing that the firm keeps whether or not it goes further.
+- I design and build the system in the client’s stack, in the client’s repository, on the client’s infrastructure. The site puts it bluntly: fire us tomorrow, nothing breaks.
+- I train the people who will own it, write the runbooks, and cover defects for thirty days after launch.
+
+Two pieces of work show what that produces. <a href="/work/aizuzi">AI Zuzi</a> is a client engagement: a social-media and content platform that I engineer for a client company, taken from an inherited prototype to a production system. <a href="/work/neuralkite">NeuralKite</a> is my own product: acquisition intelligence for UK private markets, with a mailbox verification engine written at socket level. Each has its own case study, with the engineering in detail.
+
+## Nine service lines
+
+The public offer is nine lines. Two are advice, four are builds, two are data work, and one is the handover that makes the rest stick.
+
+<NeuraltakeServices />
+
+## The engineering behind it
+
+A small consultancy is only as good as what its founder can build and keep running. This is the stack I work in, with the place each part is in use.
+
+<NeuraltakeStack kind="stack" />
+
+### The infrastructure I run
+
+I operate the servers as well as writing the software that runs on them.
+
+<NeuraltakeStack kind="infra" />
+
+## Decisions that mattered
+
+<dl class="decisions">
+  <div>
+    <dt>Sell the audit before the build</dt>
+    <dd>The first paid step is two weeks of watching the work. It produces a ranked list the client owns, and the build that follows is scoped from observation, not from a description of a process given by someone who no longer does it.</dd>
+  </div>
+  <div>
+    <dt>Fixed fee, fixed scope, fixed timeline</dt>
+    <dd>Scope, price and date are agreed before week one. That puts the risk of the estimate on me, where it belongs, and it forces the scope down to one workflow at a time.</dd>
+  </div>
+  <div>
+    <dt>The client owns the code</dt>
+    <dd>Everything is built in the client’s repository and deployed on their infrastructure. There is no NeuralTake platform to subscribe to, so nothing stops working if the relationship ends.</dd>
+  </div>
+  <div>
+    <dt>Say no in writing</dt>
+    <dd>The audit is expected to say which workflows should not be automated. Some problems are a process change, and a punch list that admits it is worth more than one that does not.</dd>
+  </div>
+  <div>
+    <dt>One owner from discovery to support</dt>
+    <dd>The person who scopes the work also builds it and answers for it afterwards. Requirements do not get lost between roles, and the architecture is chosen by someone who will have to support it.</dd>
+  </div>
+  <div>
+    <dt>Run my own infrastructure</dt>
+    <dd>Operating servers, databases and a mail server myself is how I know what a deployment costs to keep alive, and it is why the systems I hand over come with runbooks.</dd>
+  </div>
+</dl>
+
+<EvidenceBand
+  tone="shade"
+  title="Evidence that it works"
+  items={[
+    { figure: 'Signed', unit: 'B2B contracts, delivered end to end', context: 'AI software and consultancy work sold, scoped, built and supported under contract through NeuralTake. Stated September 2026. Clients and values are not published.' },
+    { figure: 'In production', unit: 'a client platform', context: 'AI Zuzi, engineered for a client company through NeuralTake and live at socials.aizuzi.com. Its figures are on its own page.' },
+    { figure: 'Live', unit: 'a product of my own', context: 'NeuralKite, publicly accessible at neuralkite.com, checked 15 September 2026. Customer and usage figures are not published.' },
+  ]}
+>
+
+The consultancy’s own site, neuraltake.com, was live when checked on 15 September 2026. The strongest evidence for the engineering is in the two linked case studies, where the code is described in detail.
+
+</EvidenceBand>
+
+## Limitations and status
+
+NeuralTake is a small consultancy. I do not name clients, I do not publish contract values or revenue, and I do not give a client count. The hours-saved figures on neuraltake.com describe what the method aims at; this page does not repeat them as results, because I have not published measurements from client engagements. The business is active.
+
+## What I learned
+
+<div class="offset">
+
+<p class="pull">Discovery decides whether software gets used. Architecture decides whether it can be supported.</p>
+
+Most of what goes wrong in client software goes wrong before any code is written, in a scope that nobody watched the work to produce. Most of what goes wrong afterwards is a system nobody on the client’s side can run. Doing every stage myself has made me a more careful engineer: I write the runbook knowing I may be the one reading it at a bad moment.
+
+</div>
+
+## Where to look
+
+<ExternalLink href="https://neuraltake.com">neuraltake.com</ExternalLink> is the consultancy’s public site. The engineering is in <a href="/work/aizuzi">the AI Zuzi case study</a> and <a href="/work/neuralkite">the NeuralKite case study</a>. Client work beyond what those pages describe is confidential and is not shown.

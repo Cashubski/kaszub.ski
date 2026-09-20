@@ -1,0 +1,96 @@
+---
+/**
+ * AI Zuzi layered architecture (BRIEF.md §13.2): layer, component, what it does.
+ * Every row was read from the private repository on 20 September 2026: requirements.txt,
+ * Frontend/package.json, backend/backend/settings.py, backend/SocialMediaPosts (views, urls, models,
+ * migrations, encfields, security, ssrf, taskscheduler, services) and .github/workflows/ci.yml.
+ * Counts were taken from the source, not from the repository's own documentation. No secrets, hosts,
+ * app ids, user data or client names. Names are set in Instrument Sans; there is no monospace here.
+ */
+interface Row { layer: string; parts: string[]; does: string; }
+const rows: Row[] = [
+  {
+    layer: 'Interface',
+    parts: ['React 18, Vite, Tailwind CSS, Radix primitives', 'react-i18next with five locales'],
+    does: 'Composer with a live phone preview, schedule calendar, media library, Creative Studio, assistant, statistics with a print-ready PDF report, a command palette and a system-status page. English, Polish, German, Dutch and Czech.',
+  },
+  {
+    layer: 'API',
+    parts: ['Django 5, Django REST Framework', '75 API view classes behind 82 URL patterns'],
+    does: 'One REST surface for the single-page app. Views authenticate with JWT; scoped rate limits sit on the AI, assistant, sign-in and MFA endpoints, counted in a cache every worker process shares.',
+  },
+  {
+    layer: 'Identity',
+    parts: ['SimpleJWT, pyotp, qrcode', 'a custom email-based user model with account types'],
+    does: 'Fifteen-minute access tokens and four-hour refresh tokens. A second factor by emailed one-time code or an authenticator app enrolled by QR code, with five attempts per challenge. The stock password-only sign-in route is shadowed, so the second factor cannot be skipped.',
+  },
+  {
+    layer: 'Publishing',
+    parts: ['APScheduler, one owner process', 'Meta Graph API, Instagram Business Login, six further task services, WordPress REST API'],
+    does: 'A post moves through create, init, check, publish and complete, or to error. Six Meta post types: image, carousel, reel, image story, video story and the publish step itself. Task services for YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, and blog publishing to WordPress.',
+  },
+  {
+    layer: 'Generation',
+    parts: ['OpenAI API for text, vision and assistant threads', 'xAI API for images and video'],
+    does: 'Post text from parameters, from an image or from a link; blog drafts with SEO fields; an assistant with threads, file search and a prompt library; image, composition, edit and video generation in Creative Studio, each priced in tokens.',
+  },
+  {
+    layer: 'Payments',
+    parts: ['Stripe Checkout, signed webhooks, invoices', 'a token ledger in the database'],
+    does: 'Token packages are bought through hosted checkout. The webhook verifies Stripe’s signature, credits the balance once per session id and writes a transaction row holding the balance after it.',
+  },
+  {
+    layer: 'Media',
+    parts: ['Cloudflare R2 through django-storages and boto3', 'Pillow'],
+    does: 'Uploads, generated media and brand logos live in object storage under public URLs that the platforms can fetch. Images are normalised to JPEG on the way in.',
+  },
+  {
+    layer: 'Data',
+    parts: ['PostgreSQL 16, psycopg 3', '26 models, 22 migrations'],
+    does: 'Persistent connections with health checks. The engine is chosen from the environment, and the settings refuse to start if a database engine is named and does not resolve to PostgreSQL.',
+  },
+  {
+    layer: 'Secrets',
+    parts: ['Fernet field encryption, from the cryptography package', 'log redaction, SSRF guard, CSP header'],
+    does: 'OAuth tokens, WordPress application passwords and TOTP secrets are encrypted in the column with a versioned marker, so rows can be encrypted in place and the migration re-run safely. User-supplied URLs are resolved and refused if they point at a private address, on every redirect hop.',
+  },
+  {
+    layer: 'Operations',
+    parts: ['GitHub Actions, pytest, Sentry', 'Apache with mod_wsgi, Let’s Encrypt, a Docker image'],
+    does: 'Every push runs 76 back-end tests and a front-end build; a push to main deploys only if both pass. Errors from both sides go to Sentry. A structured audit log records sign-in, MFA, publishing, generation, payment and media events.',
+  },
+];
+---
+
+<div class="table-wrap wide az-stack">
+  <table>
+    <thead>
+      <tr><th scope="col">Layer</th><th scope="col">Component</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <td>{r.layer}</td>
+          <td>{r.parts.map((p) => <span class="az-part">{p}</span>)}</td>
+          <td>{r.does}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style is:global>
+  .prose .az-stack table { table-layout: fixed; font-size: var(--step--1); }
+  .prose .az-stack th:nth-child(1) { width: 19%; }
+  .prose .az-stack th:nth-child(2) { width: 32%; }
+  .prose .az-stack :is(th, td) { padding-block: 0.8em; padding-right: 1.6em; }
+  .prose .az-stack td:first-child { font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.2; letter-spacing: var(--tracking-title); color: var(--ink); }
+  .prose .az-stack td:nth-child(3) { padding-right: 0; line-height: 1.5; }
+  .az-stack .az-part { display: block; color: var(--ink); font-weight: 500; font-variant-numeric: tabular-nums lining-nums; overflow-wrap: anywhere; }
+  .az-stack .az-part + .az-part { margin-top: 0.3em; font-weight: 400; color: var(--ink-2); }
+  @media (max-width: 640px) {
+    .prose .table-wrap.az-stack:not(.table-wrap--nums) tbody tr { grid-template-columns: 1fr; row-gap: 0.4em; padding-block: 1em; }
+    .prose .table-wrap.az-stack:not(.table-wrap--nums) td:first-child { color: var(--ink); }
+    .prose .table-wrap.az-stack:not(.table-wrap--nums) td { grid-column: 1 / -1; }
+  }
+</style>

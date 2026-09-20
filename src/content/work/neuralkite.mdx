@@ -1,0 +1,265 @@
+---
+title: "NeuralKite"
+editorialTitle: "NeuralKite: acquisition intelligence that can explain every address it gives you"
+summary: "A live acquisition-intelligence product for fragmented UK private markets. At its centre is an email discovery and verification engine that grades every address and keeps its reasons. Relevant to AI engineering, private-equity and finance roles."
+category: products
+role: "Product engineer, end to end: verification engine, data layer, scrapers, Claude agents, application and sending"
+status: "Live product; customer and usage figures not published (verified 15 September 2026)"
+evidence: ["Production deployment"]
+seoDescription: "A live acquisition-intelligence product for UK private markets, built around an email discovery and verification engine that explains every verdict."
+technologies: ["Next.js App Router", "TypeScript", "Anthropic SDK", "PostgreSQL", "Prisma", "SMTP and DNS protocols", "SSE streaming", "Companies House API", "Playwright", "Postal"]
+result: "Deployed and publicly accessible at neuralkite.com, verified 15 September 2026. Its verification engine grades every address into a risk tier with a written rationale. Customer and usage figures are not published."
+links:
+  - label: "neuralkite.com"
+    href: "https://neuralkite.com"
+    external: true
+cover: ../../assets/work/neuralkite/home.png
+coverFit: natural
+coverAlt: "The NeuralKite landing page: Find your next acquisition before anyone else, with sectors UK MSPs, accountancy firms and IT services."
+coverCaption: "neuralkite.com, the public landing page, September 2026."
+coverLabel: "Screenshot"
+order: 4
+featured: true
+schemaType: SoftwareApplication
+applicationCategory: BusinessApplication
+---
+import { Image } from 'astro:assets';
+import Figure from '../../components/Figure.astro';
+import LocalVideo from '../../components/LocalVideo.astro';
+import Placeholder from '../../components/Placeholder.astro';
+import ExternalLink from '../../components/ExternalLink.astro';
+import NeuralkiteSchematic from '../../components/NeuralkiteSchematic.astro';
+import NeuralkiteStack from '../../components/NeuralkiteStack.astro';
+import NeuralkitePipeline from '../../components/NeuralkitePipeline.astro';
+import stages from '../../assets/work/neuralkite/stages.jpg';
+
+The landing page above is the part of NeuralKite anyone can see. Most of the engineering sits behind it: a pipeline that finds the people who own and run a small private company, works out how to reach them, and says plainly how far each answer can be trusted.
+
+## The problem
+
+A fragmented sector is made of many small private companies, and small private companies publish very little about themselves. The live site names three such sectors: UK managed service providers, accountancy firms and IT services. Anyone screening one of them for acquisitions has to find the companies, work out who owns them, judge each against a thesis and write the case up before anyone can decide anything. Then they have to reach an owner, and the owner of a small firm rarely publishes a direct address.
+
+NeuralKite is a product for that sequence. It maps private companies, scores targets against an acquisition thesis and produces decision-ready dossiers, through five workflows: ownership discovery, screening, thesis-fit scoring, shortlisting and export. The hardest part to do honestly is the last step before outreach: an address that is a guess has to be labelled as a guess.
+
+<Placeholder kind="line" label="Status" text="Live product; customer and usage figures are not published. Nothing on this page should be read as a claim about customers, revenue or launch stage." />
+
+## What I did
+
+I built the product end to end. Everything described below is in the codebase; I have left out anything the code does not do.
+
+- Wrote the email discovery and verification engine from the socket up, on Node’s own net and dns modules: people extraction, email mining, format inference, a catch-all control, an SMTP recipient check, a set of protocol probes, risk tiers and a rationale trail.
+- Streamed discovery and verification to the browser over server-sent events, so each lookup, each format tried and each reply code appears as it happens.
+- Integrated the Companies House API for officers and persons with significant control, and wrote a rules-based sector classifier, a website finder and a governance-signal generator on top of it.
+- Stood up a self-hosted PostgreSQL warehouse, and loaded and analysed a 2.8-million-company Crunchbase dataset in it.
+- Built the Claude agents, on the Anthropic SDK, that score companies against a thesis, write the dossier and draft a short outreach sequence.
+- Built sending through the user’s own SMTP accounts and through a Postal mail server I host, with stored credentials encrypted.
+- Built the application around all of that in Next.js App Router and TypeScript, with Prisma, NextAuth and Stripe, and deployed it at neuralkite.com.
+
+## How it is layered
+
+<NeuralkiteStack />
+
+## Finding the person, and grading the address
+
+A dossier is only useful if it ends in someone to talk to. The discovery module takes the pages the scraper has read and returns a list of people, each with a role, an address where one can be found or inferred, a risk tier and the chain of evidence behind it.
+
+<NeuralkitePipeline />
+
+### People, from the most structured source to the least
+
+Four strategies run over each page and their results are merged by name. JSON-LD comes first: the module walks every script block of that type, including nested arrays and graph collections, and collects each Person object with its job title, address and profile links. It repairs one common fault on the way, several objects concatenated without an array around them. Then schema.org microdata. Then the DOM: elements whose class names suggest a team member, cards that pair a heading with a short caption, and LinkedIn profile anchors with a name beside them. Last, a Claude pass over the cleaned text catches layouts the heuristics miss, and is told to leave out testimonials and customers.
+
+A name has to survive a validator before it is kept: two to five capitalised words, mostly letters, and none of a long list of words that mean a heading or a job title has been mistaken for a person. Each person records which method found them and on which URL.
+
+Titles are then classified into owner, director, executive, partner, senior or employee. Founders, owners, directors, partners and chief executives are marked as principals and sorted to the top, because in an acquisition the principal is the person the dossier is for.
+
+### Addresses the company has already published
+
+Every scraped page is mined for addresses three ways: mailto links, plain text, and the obfuscated forms people write to dodge scrapers, such as a name followed by “(at)” and “(dot)”. When the same address turns up more than once, the more explicit source wins. An address is kept only if it sits on the company’s own domain or a subdomain of it, so a web agency’s or a supplier’s address in a footer never enters the record. Each mined address is matched to a person by comparing its local part with their cleaned name, and keeps the URL it came from.
+
+### The house format, inferred per domain
+
+Most companies build addresses one way. The module knows eight formats, from first.last to a first initial and surname. Every matched pair of person and published address is tested against them, and each match is a vote. The winning format becomes the domain’s fingerprint, stored with the number of samples behind it and up to five of those samples as evidence.
+
+Shared role mailboxes are excluded from the vote. An info or sales address says nothing about how the company spells a person’s address, so a list of 36 generic local parts is filtered out before counting.
+
+Names are cleaned before any address is built from them. Honorifics, post-nominal letters and generational suffixes are stripped, so a doctorate or a professional qualification after a surname cannot leak into a local part.
+
+### What the SMTP check does, precisely
+
+This is the part that deserves plain language. The check opens a TCP connection to the domain’s highest-priority mail server on port 25 and speaks the opening of an ordinary delivery: it waits for the greeting, sends EHLO, names a sender with MAIL FROM, then names the address in question with RCPT TO. The server’s reply to that last command is the whole result. The client then sends QUIT and closes the socket.
+
+It never sends the DATA command. No message is composed, none is transmitted, and nothing arrives in anyone’s inbox. It is the question every sending mail server asks before it delivers; this client stops once it has the answer. A reply of 250 means the server accepted the recipient. A 550, 551 or 553 means it refused. Anything else, a 252 or a temporary deferral for instance, means the server declined to say, and is recorded as inconclusive. The socket is abandoned after ten seconds.
+
+It is still a request to someone else’s server, so the code keeps it small. Candidates are tried one at a time and the loop stops at the first acceptance. On a catch-all domain no candidate is probed at all. The streaming and bulk endpoints pause between checks.
+
+### The control that makes a 250 mean something
+
+Some mail servers accept every recipient and sort it out later. On those, a 250 proves nothing. So before any real address is checked, the module runs the same recipient check once per domain on a control address: a random local part that cannot belong to anyone. If the server accepts it, the domain is catch-all. If it refuses, the server is selective, and only then is a later 250 on a real address allowed to count as verification. If the control gets no clean answer, that is recorded too, and a later 250 is described as supportive, not as proof.
+
+The MX records are also classified by provider: Google Workspace, Microsoft 365, the filtering gateways, the transactional senders, shared hosting, or self-hosted. Each class carries a note that goes into the trail. Catch-all is rare on the two big suites, so the control is reliable there. Filtering gateways often refuse or throttle probes from unfamiliar addresses, so a refusal from one is weak evidence. The code says so in the record instead of pretending otherwise.
+
+### Protocol probes: bounded, parallel and quiet when they fail
+
+Alongside the control, twelve probes run in parallel against the domain. The most useful is DKIM selector fingerprinting. A DKIM key lives at a selector chosen by whoever sends the mail, and vendors pick recognisable ones. The probe asks for 45 well-known selectors at once; each one that resolves to a real key names a vendor the company sends through, from its mail suite to its marketing and support tools. The SPF probe walks the include chain, up to six levels deep, and maps what it finds to vendors the same way. The rest read DMARC policy, MTA-STS and TLS reporting, BIMI, CAA records, SRV service records, the mail server’s reverse DNS, and the JMAP, WebFinger and CalDAV discovery endpoints.
+
+Four further probes run per address, also in parallel: Microsoft’s sign-in endpoint and Exchange Autodiscover, which can say whether an address is provisioned in a tenant and what its canonical form is; Google’s sign-in flow; and WebFinger for the exact account. None involves mail. The code treats them unevenly on purpose. A canonical address from Autodiscover replaces the guess. The Google signal is labelled supportive and not conclusive, because that endpoint changes often.
+
+Every probe has the same shape. DNS lookups are raced against a four-second timer and HTTP requests are aborted at five. Each returns an empty result on any error and never throws, and the bundle is gathered with each probe’s failure caught separately, so one slow name server cannot hold up or break a run. The whole domain bundle is bounded by its slowest member.
+
+### Risk tiers, and what each one means
+
+All of that is reduced to one tier per address. The order below is the order the code tests them in.
+
+<div class="table-wrap wide" role="region" aria-label="Risk tiers for a discovered address" tabindex="0">
+
+| Tier | Assigned when | What it means for the person using it |
+| --- | --- | --- |
+| Verified, two sources | the address is published on the company’s site, and a selective server accepted it | the strongest case: the company printed it and its own mail server recognises it |
+| Verified by SMTP | the address was built from a format, and a selective server accepted it | the mailbox exists; nobody has published it, so the person match rests on the name |
+| Site only | the address is published on the site, but SMTP did not confirm it | trustworthy as a source; the server was catch-all, blocked the probe or gave no clean answer |
+| Inferred format | the domain is catch-all, and the format was voted by real addresses found on the site | an informed guess: right format for this company, mailbox unconfirmed |
+| Catch-all | the domain is catch-all, and there was no format evidence | a guess, labelled as one; first.last is used because nothing better is known |
+| Format guess | built from a format, and either no candidate was accepted or one was while the control was inconclusive | the weakest usable tier: plausible, and not confirmed by anything that counts |
+
+</div>
+
+Two notes ride alongside the tier. An address that turns out to be a role mailbox is flagged as reaching a team, not a person. An address on one of 23 free providers is flagged as probably personal. A domain with no MX records is recorded as unable to receive mail at all.
+
+The numeric confidence beside each tier is a hand-set heuristic that orders results sensibly. It is not a measured accuracy and the product does not present it as one.
+
+### The rationale trail
+
+Every signal is appended to the person’s record as a typed, dated step: a one-line summary, a longer explanation, the source URL or sample addresses where there are any, and the SMTP code where there is one. There are 29 step types, from “taken from a mailto link” through “format voted by samples” and “control address refused, domain is selective” to “no confirmation; using the inferred format as best guess”. An operator who edits an address by hand leaves a step too.
+
+The wording changes with the evidence. The same 250 produces three different sentences depending on whether the control was refused, accepted or inconclusive. That is what I mean by triangulation: the site, the server, the control, the provider class and the probes are separate witnesses, and the verdict records which of them agreed.
+
+### Showing the work live
+
+Two endpoints stream over server-sent events. Discovery takes a name and a domain and emits the MX lookup, the catch-all test, then each format as it is tried, with its reply code, stopping at the first acceptance. Verification takes one address and streams the SMTP conversation itself, step by step: greeting received, EHLO accepted, sender accepted, recipient accepted or refused. A bulk endpoint verifies every address in a dossier, caching the MX lookup and the catch-all result per domain so each is asked once, and never lets an acceptance from a catch-all domain be written back as valid.
+
+The dossier run streams the same way, which is what the demonstration below shows: connecting, homepage, about, team, careers, finding people, emails, analysis.
+
+<Figure label="Still" width="wide" class="hide-narrow" caption="The stage row from the demonstration recording, part-way through a run: four stages complete, the fifth running, three to go. Cropped to the row alone; the illustrative company’s name and data are excluded.">
+  <Image src={stages} alt="A row of eight stage icons labelled Connecting, Homepage, About, Team, Careers, Finding People, Emails and AI Analysis. The first four are green, Careers is highlighted in blue and the last three are grey." width={1564} widths={[720, 1080, 1564]} sizes="(min-width: 1024px) 56vw, 100vw" loading="lazy" decoding="async" />
+</Figure>
+
+## The acquisition-intelligence layer
+
+<NeuralkiteSchematic />
+
+### Companies House, and a classifier that shows its sums
+
+The registry client calls the Companies House REST API for a company’s profile, its officers and its persons with significant control, following the pagination and surfacing the rate-limit response as a readable error. Bulk registry rows are staged in their own table and scored by a rules-based classifier that uses only registry fields: SIC codes in tiers, positive and negative name patterns, the accounts category as a proxy for size, company type and age. A company that is not active is gated out first. Every point gained or lost is written to a list of reasons, so a score of 60 can be read back as the SIC code, the name match and the accounts category that produced it. The file’s header records what changed between the first and second versions of the rules and why, mostly to cut false positives from software houses, agencies and one-person consultancies.
+
+### From a legal name to a website
+
+Registry data has no website field. The domain finder strips the legal suffixes from a company name, generates a handful of likely UK domains, fetches them in parallel with a five-second limit, and checks whether the page title matches the company. A reachable domain with a matching title is returned as verified at moderate confidence; a reachable one without a match is returned as unverified at low confidence. All the candidates it tried are returned with the answer, so a wrong match can be seen and corrected.
+
+### Governance signals
+
+Officer and ownership records are stored, then turned into things an acquirer looks for. Director tenure is computed from appointment and resignation dates. Ownership concentration is read from the control bands: sole owner, majority, split or corporate. Flags follow from those: sole director, founder-led where a controlling person is also a director, long tenure, small board, high director churn, a corporate owner. A second pass generates dated signals: a long-serving sole or majority owner, a new director appointed beside a long-serving one as a possible handover, a resignation or appointment in the last eighteen months. Each signal carries a score, a confidence and the registry facts behind it. They are described in the code as clues, and the dossier prompt passes them to the model labelled as official records.
+
+### The warehouse, the agents and the dossier
+
+The Crunchbase load sits in its own PostgreSQL database behind a small connection pool. The targeting agent turns a set of criteria into SQL against it, then has Claude score each batch of companies on five axes: thesis fit, ownership clarity, scale potential, financial signals and risk profile, each with its reasoning. The research agent scrapes the company’s site, runs people discovery, and asks Claude for the dossier: business model, ownership analysis, succession clues, risks, growth and revenue indicators, with the governance block included when there is one. A company with no website or an unparseable URL gets a dossier marked failed with the reason, not an invented one.
+
+### Sending, and the credentials that go with it
+
+Outreach goes out from the user’s own mailbox. They add an SMTP account, the connection is tested, the provider is detected, and sends go through Nodemailer under a daily limit per account, with the last error kept against the account when one fails. The composer drafts an initial message, a follow-up and a closing one from the dossier. The other route is a Postal mail server I host: the app calls its API, paces batches, and receives delivery, open, click and bounce events back by webhook.
+
+SMTP passwords are encrypted before they reach the database, with AES-256-GCM, a fresh random IV for each value and the authentication tag stored beside the ciphertext. They are decrypted in memory when a send needs them.
+
+## Decisions that mattered
+
+<dl class="decisions">
+  <div>
+    <dt>Ask the domain before asking about the person</dt>
+    <dd>The catch-all control runs once per domain, first. If the server accepts a mailbox that cannot exist, every later acceptance is worthless, so the code skips per-candidate probing entirely and goes straight to the inferred format, labelled as such.</dd>
+  </div>
+  <div>
+    <dt>Verified only means verified on a selective server</dt>
+    <dd>The verified flag is set when the server accepted the address and the control was cleanly refused. An acceptance with the control inconclusive is kept, at lower confidence, and described in the trail as supportive.</dd>
+  </div>
+  <div>
+    <dt>A refusal is not proof of absence</dt>
+    <dd>Many providers block recipient checks from addresses they do not know. When every candidate is refused the module does not mark the person unreachable. It falls back to the inferred format, or to first.last if there is none, and writes down that nothing confirmed it.</dd>
+  </div>
+  <div>
+    <dt>Bound every probe and let it fail quietly</dt>
+    <dd>Four seconds for DNS, five for HTTP, ten for an SMTP socket. Every probe returns an empty result on error. A research run must not hang or crash because one company’s name server is slow.</dd>
+  </div>
+  <div>
+    <dt>Role mailboxes do not vote</dt>
+    <dd>Generic local parts are excluded from format inference and from person matching. One info address among three real ones would otherwise corrupt the fingerprint for the whole domain.</dd>
+  </div>
+  <div>
+    <dt>Flag free providers, never chase them</dt>
+    <dd>An address on a consumer mail service is flagged as personal in the trail. The standalone verifier goes further: it does not probe free providers at all, and rejects known disposable domains outright.</dd>
+  </div>
+  <div>
+    <dt>Structured data first, the model last</dt>
+    <dd>What a site declares about itself in JSON-LD is more reliable than anything inferred, so it is read first and wins on conflict. The model runs last and only adds people nobody else found.</dd>
+  </div>
+  <div>
+    <dt>Only the company’s own domain</dt>
+    <dd>Mined addresses on any other domain are dropped at the point of extraction, before matching or voting.</dd>
+  </div>
+  <div>
+    <dt>Scores that can be read back</dt>
+    <dd>The registry classifier and the governance signals are rules, and every rule that fires leaves its name in the record. When a result looks wrong, the reason is on the page and the rule can be tuned.</dd>
+  </div>
+</dl>
+
+## Evidence that it worked
+
+The evidence here is the software. There are no customer, revenue or usage figures on this page, because none are published, and no accuracy figures, because I have not measured any that I would stand behind.
+
+<div class="table-wrap" role="region" aria-label="Evidence for NeuralKite" tabindex="0">
+
+| Measure | Value | Context |
+| --- | --- | --- |
+| Deployment | live at neuralkite.com | publicly accessible with sign-in and demo booking; verified 15 September 2026 |
+| Verification engine | six tiers, 29 step types | counted in the source: the risk tiers the code computes and the kinds of step a rationale trail can hold |
+| Protocol coverage | 45 DKIM selectors, 12 domain probes | constants in the probe module; a description of what is checked, not of how often it succeeds |
+| Data | 2.8 million companies | Crunchbase dataset loaded into the self-hosted PostgreSQL warehouse and analysed; a dataset size, not a usage figure |
+| Demonstration | recorded run, 82 seconds | the company-research stage run on a fictional example company; not real data |
+| Usage | not published | launch stage, customer numbers and revenue are not stated anywhere on this site |
+
+</div>
+
+<LocalVideo
+  src="/media/neuralkite-demo.mp4"
+  poster="/media/neuralkite-demo-poster.jpg"
+  width={1700}
+  height={1080}
+  title="NeuralKite product demonstration, 82 seconds"
+  still={stages}
+  stillAlt="The row of eight research stages from the demonstration."
+  coverTitle="A research run, stage by stage"
+  playLabel="Play the demonstration, 82 seconds"
+  label="Video, 82 seconds"
+  caption="Product demonstration using an illustrative example company; not real data. The recording shows the company-research stage only. The company, the people, the addresses and the funding history in it are invented for the recording. The cover shows the stage row only, and nothing loads until you press play."
+/>
+
+## Limitations and status
+
+NeuralKite is a live product whose commercial figures are not published, so this page can show what the software does and how it is built, and nothing about who uses it. The demonstration runs on an invented example company and should not be read as real output. No real person, address or company from the application appears on this page.
+
+The verification engine has limits that no amount of engineering removes. A mail server can accept a recipient and discard the mail later. The large providers and the filtering gateways often refuse to answer at all, so many addresses end in the lower tiers, correctly. The sign-in and discovery endpoints the per-address probes rely on belong to other companies and can change without notice, which is why the code treats them as supporting evidence. I have not published an accuracy figure because I do not have a labelled set that would make one honest.
+
+The registry classifier is tuned for managed service providers and IT services. The other sectors on the live site rely on the thesis scoring and the dossier, not on a classifier of their own.
+
+## What I learned
+
+<div class="offset">
+
+<p class="pull">The valuable output was never the address. It was the sentence explaining how far to trust it.</p>
+
+An unverifiable guess presented as a fact costs the user a bounced message and some of their sender reputation. The same guess with its tier and its trail is a decision they can make themselves. I also learned how much of network programming is deciding what silence means: a timeout, a deferral and a refusal are three different facts, and most of this module is the care taken not to confuse them.
+
+</div>
+
+## The live product
+
+<ExternalLink href="https://neuralkite.com">neuralkite.com</ExternalLink> is the live product, with sign-in and demo booking.
