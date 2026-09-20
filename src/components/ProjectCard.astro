@@ -1,0 +1,315 @@
+---
+/**
+ * Gallery card. Answers at a glance: what, role, evidence, result, where to inspect.
+ * Variants: 'plate' (homepage flagship; imagery bleeds to one viewport edge, text in a narrow
+ * offset column) and 'grid' (gallery; the parent sets the column span).
+ * The imagery is a print laid on the paper: shadow, hairline edge, a 2px lift on hover.
+ * A cover with `coverFit: inset` keeps its own ratio and sits as a smaller print on a
+ * paper-deep plate instead of filling the slot.
+ * Works without an authentic image get a typographic plate in one of two constructions:
+ * 'figure' sets one verified figure large in the serif, its context beneath and a short ruled
+ * list of further verified figures at the foot; 'line' sets a single serif sentence over a
+ * hairline and a dated sans context. A plate marked `ink` is set in the ink register on every page.
+ */
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import EvidenceLabel from './EvidenceLabel.astro';
+import { categories } from '../data/site';
+import { titleHtml } from '../lib/paths';
+
+interface Props {
+  entry: CollectionEntry<'work'>;
+  variant?: 'plate' | 'grid';
+  side?: 'left' | 'right';
+  size?: 'large' | 'small';
+  headingLevel?: 'h2' | 'h3';
+  eager?: boolean;
+  /** 'halves': the card sits in a half-width cell (the category pages), so the browser is told the true slot width. */
+  layout?: 'mixed' | 'halves';
+  /** On a phone, drop the 'Built with' row (the long homepage list of supporting cards). The experiments keep it: the API names are the point of those cards. */
+  brief?: boolean;
+  /** The true slot width for this cell, when the parent knows it better than the defaults below. */
+  sizes?: string;
+  /** The `sizes` value the enhanced gallery filter switches to when this card becomes a half-width cell. */
+  sizesHalves?: string;
+}
+const { entry, variant = 'grid', side = 'right', size = 'small', headingLevel = 'h3', eager = false, layout = 'mixed', brief = false, sizes: sizesProp, sizesHalves } = Astro.props;
+const d = entry.data;
+const href = `/work/${entry.id}`;
+const cat = categories[d.category];
+const Heading = headingLevel;
+const square = d.cover ? d.cover.width === d.cover.height : false;
+const inset = Boolean(d.cover) && d.coverFit === 'inset';
+const natural = Boolean(d.cover) && d.coverFit === 'natural';
+const compact = d.compact && variant !== 'plate';
+const plateKind = d.plate?.kind ?? 'figure';
+const linePlate = !d.cover && plateKind === 'line';
+const longFigure = (d.plate?.figure.length ?? 0) > 7;
+const builtLabel = 'Built with';
+const lines = d.plate?.lines ?? [];
+const plateAlt = d.plate
+  ? linePlate
+    ? `Typographic plate: ${d.plate.figure} ${d.plate.caption}`
+    : `Typographic plate: ${d.plate.figure}, ${d.plate.caption}${lines.length ? '. ' + lines.map((l) => `${l.value}, ${l.context}`).join('. ') : ''}.`
+  : '';
+const inkPlate = !d.cover && Boolean(d.plate?.ink);
+
+// Image geometry per variant. Sources are never upscaled by astro:assets.
+const want =
+  variant === 'plate'
+    ? { w: 1600, h: 1067, widths: [640, 960, 1280, 1600], sizes: side === 'left' ? '(min-width: 1024px) 56vw, 100vw' : '(min-width: 1024px) 62vw, 100vw', ratio: '3 / 2' }
+    : size === 'large'
+      ? { w: 1600, h: square ? 1600 : 1067, widths: [520, 800, 1200, 1600], sizes: '(min-width: 1024px) 62vw, (min-width: 640px) 48vw, 100vw', ratio: square ? '1 / 1' : '3 / 2' }
+      : compact
+        ? { w: 540, h: 540, widths: [180, 360, 540], sizes: '176px', ratio: '1 / 1' }
+        : layout === 'halves'
+          ? { w: 1280, h: square ? 1280 : 960, widths: [420, 640, 960, 1280], sizes: '(min-width: 640px) 48vw, 100vw', ratio: square ? '1 / 1' : '4 / 3' }
+          : { w: 960, h: square ? 960 : 720, widths: [420, 640, 960], sizes: '(min-width: 1024px) 30vw, (min-width: 640px) 48vw, 100vw', ratio: square ? '1 / 1' : '4 / 3' };
+// Never ask for a crop larger than the source can yield at the slot's ratio: astro:assets does not
+// upscale, and an oversize request silently falls back to the uncropped original (wrong ratio).
+const [rw, rh] = want.ratio.split('/').map((n) => Number(n.trim()));
+const maxW = d.cover ? Math.min(d.cover.width, Math.floor((d.cover.height * rw) / rh)) : want.w;
+const capW = Math.min(want.w, maxW);
+const capWidths = want.widths.filter((w) => w < capW).concat(capW);
+const geom = { ...want, w: capW, h: Math.round((capW * rh) / rw), widths: capWidths, sizes: sizesProp ?? want.sizes };
+// Both strings travel on the image, so the enhanced filter can tell the browser the new slot width.
+const sizeData = sizesHalves && !compact ? { 'data-sizes-mixed': geom.sizes, 'data-sizes-halves': sizesHalves } : {};
+const titleText = variant === 'plate' ? d.editorialTitle : d.title;
+// A 'figure' plate keeps the same ratio as a minimum (a padded spacer stacked under it) and
+// may grow taller for its lines; a hard aspect-ratio would widen the box instead. A 'line'
+// plate simply takes the height of its sentence.
+// A large 'figure' plate uses a shallower minimum (2:1), so its figures fill the plate without a void.
+const phRatio = variant === 'plate' || size === 'large' ? 0.5 : rh / rw;
+const mediaStyle = d.cover
+  ? `aspect-ratio: ${natural && d.cover ? `${d.cover.width} / ${d.cover.height}` : geom.ratio}`
+  : linePlate ? undefined : `--ph: ${(phRatio * 100).toFixed(3)}%`;
+// The cover travels to the case-study page (cross-document view transition): same name on both ends.
+const coverStyle = d.cover ? `${mediaStyle}; view-transition-name: cover-${entry.id}` : mediaStyle;
+const naturalW = d.cover ? Math.min(geom.w, d.cover.width) : geom.w;
+---
+
+<article class:list={['card', 'lift', `card--${variant}`, `card--${side}`, `card--${size}`, { 'card--compact': compact }]} data-category={d.category} data-slug={entry.id} data-reveal={variant === 'plate' ? 'block' : undefined}>
+  <div class:list={['card__media print print--lift', { 'card__media--type': !d.cover, 'card__media--inset': inset, ink: inkPlate }]} style={coverStyle} data-cover={d.cover ? '' : undefined} data-parallax={variant === 'plate' ? '' : undefined}>
+    {d.cover ? (
+      inset ? (
+        <span class="card__inset print">
+          <Image
+            src={d.cover}
+            alt={d.coverAlt ?? ''}
+            width={geom.w}
+            widths={geom.widths}
+            sizes={geom.sizes}
+          {...sizeData}
+            loading={eager ? 'eager' : 'lazy'}
+            decoding="async"
+            fetchpriority={eager ? 'high' : undefined}
+          />
+        </span>
+      ) : natural ? (
+        <Image
+          src={d.cover}
+          alt={d.coverAlt ?? ''}
+          width={naturalW}
+          widths={geom.widths.filter((w) => w <= naturalW)}
+          sizes={geom.sizes}
+          {...sizeData}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchpriority={eager ? 'high' : undefined}
+        />
+      ) : (
+        <Image
+          src={d.cover}
+          alt={d.coverAlt ?? ''}
+          width={geom.w}
+          height={geom.h}
+          widths={geom.widths}
+          sizes={geom.sizes}
+          {...sizeData}
+          fit="cover"
+          position={d.coverPosition}
+          loading={eager ? 'eager' : 'lazy'}
+          decoding="async"
+          fetchpriority={eager ? 'high' : undefined}
+        />
+      )
+    ) : linePlate ? (
+      <div class="plate-line" role="img" aria-label={plateAlt}>
+        <p class="plate-line__text" aria-hidden="true">{d.plate?.figure}</p>
+        <p class="plate-line__ctx small" aria-hidden="true">{d.plate?.caption}</p>
+      </div>
+    ) : (
+      <span class="plate-type__spacer" aria-hidden="true"></span>
+    )}
+    {!d.cover && !linePlate && (
+      <div class="plate-type" role="img" aria-label={plateAlt}>
+        <div class="plate-type__top" aria-hidden="true">
+          <p class:list={['plate-type__figure figure-num', { 'plate-type__figure--long': longFigure }]} data-count>{d.plate?.figure}</p>
+          <p class="plate-type__caption small">{d.plate?.caption}</p>
+        </div>
+        {lines.length > 0 && (
+          <ul class="plate-type__lines" role="list" aria-hidden="true">
+            {lines.map((l) => (
+              <li>
+                <span class="plate-type__val figure-num">{l.value}</span>
+                <span class="plate-type__ctx small">{l.context}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    )}
+  </div>
+  {variant === 'plate' && d.cover && d.cardCaption && <p class="card__cap small muted">{d.cardCaption}</p>}
+  <div class="card__body">
+    <Heading class="card__title title">
+      <a href={href} class="card__link" set:html={titleHtml(titleText)} />
+    </Heading>
+    <p class="card__meta small muted">{d.years ? `${cat.label}, ${d.years}` : cat.label}</p>
+    <p class="card__summary">{d.summary}</p>
+    <dl class="card__facts facts">
+      <div>
+        <dt>Role</dt>
+        <dd>{compact ? d.role.split(';')[0] : d.role}</dd>
+      </div>
+      <div class:list={[{ 'card__fact--extra': brief && d.category !== 'experiments' }]}>
+        <dt>{builtLabel}</dt>
+        <dd>{d.technologies.slice(0, 4).join(', ')}</dd>
+      </div>
+      <div>
+        <dt>Evidence</dt>
+        <dd class="card__evidence">{d.evidence.slice(0, 2).map((e) => <EvidenceLabel label={e} />)}{d.evidence.length === 0 && <span class="muted">None yet verified</span>}{d.evidenceNote && <span class="muted">({d.evidenceNote})</span>}</dd>
+      </div>
+      <div>
+        <dt>Result</dt>
+        <dd>{compact ? `${d.result.split(';')[0].replace(/\.$/, '')}.` : d.result}</dd>
+      </div>
+    </dl>
+    <a href={href} class="card__inspect row-link" aria-label={`Inspect ${d.title}`}>Inspect the work</a>
+  </div>
+</article>
+
+<style>
+  .card { position: relative; display: grid; align-content: start; }
+
+  /* --- media ---------------------------------------------------------------- */
+  .card__media { width: 100%; overflow: hidden; container-type: inline-size; }
+  /* A typographic plate keeps its ratio as a minimum (the spacer) but may grow to fit its lines. */
+  .card__media--type { overflow: visible; display: grid; }
+  .plate-type__spacer { grid-area: 1 / 1; padding-bottom: var(--ph, 66.667%); }
+  .card__media--type .plate-type { grid-area: 1 / 1; }
+  .card__media :global(img) { width: 100%; height: 100%; object-fit: cover; object-position: left top; }
+
+  /* A compact card: a small print rather than a full-width plate. */
+  .card--compact .card__media { max-width: 11rem; }
+  .card--compact .card__title { font-size: var(--step-1); }
+  /* The smaller title needs more padding to stay a comfortable tap height on a phone. */
+  .card--compact .card__link { padding-block: 0.5em; margin-block: -0.5em; }
+
+  /* An inset cover: a smaller print, at its own ratio, mounted on the paper-deep plate. */
+  .card__media--inset { display: grid; align-content: center; padding: clamp(1.25rem, 7cqw, 4rem); }
+  .card__inset { display: block; }
+  .card__media--inset :global(img) { height: auto; object-fit: contain; }
+  .card__title, .plate-line__text { text-wrap: balance; }
+
+  .plate-type {
+    min-height: 0;
+    display: flex; flex-direction: column; justify-content: space-between; gap: var(--space-6);
+    padding: clamp(1.1rem, 3.2vw, 2.25rem);
+    /* The figure's tight leading eats into the top edge; a little more top padding makes top and side read as equal. */
+    padding-top: calc(clamp(1.1rem, 3.2vw, 2.25rem) + 0.5rem);
+    border-radius: inherit;
+    background:
+      radial-gradient(120% 90% at 100% 100%, rgba(20, 18, 15, 0.04), rgba(20, 18, 15, 0) 60%),
+      var(--paper-deep);
+    color: var(--ink);
+  }
+  .ink .plate-type {
+    background:
+      radial-gradient(110% 80% at 0% 0%, rgba(241, 236, 226, 0.05), rgba(241, 236, 226, 0) 60%),
+      var(--paper-deep);
+  }
+  .plate-type__top { display: grid; gap: var(--space-3); justify-items: start; }
+  .plate-type__figure { font-size: clamp(2.75rem, 22cqw, 8rem); line-height: 0.95; letter-spacing: -0.03em; overflow-wrap: normal; margin-left: -0.03em; }
+  .plate-type__figure--long { font-size: clamp(2rem, 13cqw, 5.5rem); }
+  .card--plate .plate-type__figure { font-size: clamp(3.5rem, 18cqw, 12rem); }
+  .card--plate .plate-type__figure--long { font-size: clamp(2.5rem, 12cqw, 8rem); }
+  .plate-type__caption { max-width: 34ch; color: var(--ink-2); padding-top: var(--space-2); border-top: 1px solid var(--rule-strong); }
+  .plate-type__lines { display: grid; gap: 0; }
+  .plate-type__lines li {
+    display: grid; grid-template-columns: minmax(5.5rem, max-content) 1fr; column-gap: var(--space-4);
+    align-items: baseline; padding-block: var(--space-3); border-top: 1px solid var(--rule);
+  }
+  .plate-type__lines li:last-child { padding-bottom: 0; }
+  .plate-type__val { font-size: var(--step-2); line-height: 1.1; letter-spacing: -0.01em; color: var(--ink); }
+  .plate-type__ctx { max-width: 34ch; color: var(--ink-2); }
+  @container (max-width: 22rem) {
+    .plate-type__lines li { grid-template-columns: 1fr; row-gap: var(--space-1); }
+  }
+
+  /* The 'line' construction: one serif sentence, a hairline, a dated sans context. */
+  .plate-line {
+    display: grid; gap: var(--space-5); align-content: start;
+    padding: clamp(1.25rem, 3.6vw, 2.5rem) clamp(1.1rem, 3.2vw, 2.25rem);
+    border-radius: inherit;
+    background:
+      linear-gradient(160deg, rgba(20, 18, 15, 0) 55%, rgba(20, 18, 15, 0.04) 100%),
+      var(--paper-deep);
+    color: var(--ink);
+  }
+  .plate-line__text {
+    font-family: var(--font-serif);
+    font-size: clamp(1.5rem, 7.5cqw, 2.5rem);
+    line-height: 1.12;
+    letter-spacing: var(--tracking-title);
+    max-width: 20ch;
+  }
+  .card--plate .plate-line__text { font-size: clamp(1.75rem, 5.5cqw, 3.25rem); }
+  .plate-line__ctx { max-width: 38ch; color: var(--ink-2); padding-top: var(--space-3); border-top: 1px solid var(--rule-strong); }
+
+  /* --- body ----------------------------------------------------------------- */
+  .card__body { display: grid; gap: var(--space-3); padding-top: var(--space-5); align-content: start; }
+  .card__title { font-size: var(--step-2); max-width: 22ch; }
+  .card--plate .card__title, .card--large .card__title { font-size: var(--step-3); }
+  /* The whole card is the hit area (the ::after below); the anchor's own box is also padded to a
+     comfortable tap height, with the padding cancelled by margins so the heading rhythm is unchanged. */
+  .card__link { display: inline-block; color: var(--ink); text-decoration: none; padding-block: 0.3em; margin-block: -0.3em; }
+  .card__link::after { content: ''; position: absolute; inset: 0; z-index: 1; }
+  .card__link:hover { color: var(--cobalt); }
+  /* Where :has() is supported the focus ring is drawn round the whole card; elsewhere the link keeps its own outline. */
+  @supports selector(:has(*)) {
+    .card__link:focus-visible { outline: none; }
+    .card:has(.card__link:focus-visible) { outline: 2px solid var(--focus); outline-offset: 8px; border-radius: var(--radius); }
+  }
+  .card__meta { margin-top: calc(-1 * var(--space-2)); }
+  .card__summary { color: var(--ink-2); max-width: 46ch; }
+  .card__facts { margin-top: var(--space-2); max-width: 52ch; }
+  .card__facts > div:first-child { border-top: var(--hairline); }
+  .card__evidence { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+  @media (max-width: 640px) { .card__fact--extra { display: none !important; } }
+  .card__inspect { position: relative; z-index: 2; justify-self: start; }
+
+  /* --- plate variant (homepage flagships) ----------------------------------- */
+  .card--plate { grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--col-gap); row-gap: var(--space-5); }
+  .card--plate .card__media { grid-row: 1; }
+  .card--plate .card__cap { grid-column: 1 / -1; grid-row: 2; margin-top: calc(-1 * var(--space-2)); }
+  .card--plate .card__body { padding-top: 0; }
+  .card--plate .card__summary { font-size: var(--step-1); line-height: 1.4; }
+  @media (min-width: 1024px) {
+    .card--plate.card--right .card__media { grid-column: 5 / -1; margin-right: calc(-1 * var(--gutter)); border-radius: var(--radius) 0 0 var(--radius); }
+    .card--plate.card--right .card__body { grid-column: 1 / span 4; grid-row: 1; padding-right: var(--space-4); }
+    .card--plate.card--left .card__media { grid-column: 1 / span 7; margin-left: calc(-1 * var(--gutter)); border-radius: 0 var(--radius) var(--radius) 0; }
+    .card--plate.card--left .card__body { grid-column: 9 / -1; grid-row: 1; }
+    /* The caption sits directly under the print: the text column spans both rows, so its height never pushes the caption down. */
+    .card--plate:has(.card__cap) { grid-template-rows: auto 1fr; }
+    .card--plate:has(.card__cap) .card__body { grid-row: 1 / span 2; }
+    .card--plate.card--left .card__cap { grid-column: 1 / span 7; align-self: start; margin-top: 0; }
+    .card--plate.card--right .card__cap { grid-column: 5 / -1; align-self: start; margin-top: 0; }
+    .card--plate .card__body { align-self: end; }
+    /* A typographic plate takes the height of its own figures and does not stretch to the text column, which would open a void. */
+    .card--plate .card__media--type { align-self: start; }
+  }
+  @media (max-width: 1023.98px) {
+    .card--plate .card__media, .card--plate .card__body { grid-column: 1 / -1; }
+  }
+</style>

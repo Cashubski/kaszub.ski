@@ -1,0 +1,58 @@
+---
+/** Case-study metadata: a compact labelled list in the small sans (years, category, role, status, evidence, technologies, links). */
+import type { CollectionEntry } from 'astro:content';
+import EvidenceLabel from './EvidenceLabel.astro';
+import ExternalLink from './ExternalLink.astro';
+import { categories } from '../data/site';
+
+interface Props { entry: CollectionEntry<'work'>; }
+const { entry } = Astro.props;
+const d = entry.data;
+const cat = categories[d.category];
+---
+
+<dl class="meta facts">
+  {d.years && (
+    <div>
+      <dt>Years</dt>
+      <dd>{d.years}</dd>
+    </div>
+  )}
+  <div>
+    <dt>Category</dt>
+    <dd><a href={cat.path}>{cat.label}</a></dd>
+  </div>
+  <div>
+    <dt>Role</dt>
+    <dd>{d.role}</dd>
+  </div>
+  <div>
+    <dt>Status</dt>
+    <dd>{d.status}</dd>
+  </div>
+  <div>
+    <dt>Evidence</dt>
+    <dd class="meta__labels">{d.evidence.map((e) => <EvidenceLabel label={e} />)}{d.evidence.length === 0 && <span class="muted">None yet verified</span>}{d.evidenceNote && <span class="muted">({d.evidenceNote})</span>}</dd>
+  </div>
+  <div>
+    <dt>Technologies</dt>
+    <dd>{d.technologies.join(', ')}</dd>
+  </div>
+  {d.links.length > 0 && (
+    <div>
+      <dt>Links</dt>
+      <dd class="meta__links">
+        {d.links.map((l) =>
+          l.external ? <ExternalLink href={l.href}>{l.label}</ExternalLink> : <a href={l.href} download={l.download ? true : undefined}>{l.label}</a>,
+        )}
+      </dd>
+    </div>
+  )}
+</dl>
+
+<style>
+  .meta { border-top: 1px solid var(--ink); }
+  .meta > div:first-child { border-top: 0; }
+  .meta__labels { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+  .meta__links { display: flex; flex-wrap: wrap; gap: 0 var(--space-4); }
+</style>

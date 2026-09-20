@@ -1,0 +1,117 @@
+---
+/**
+ * Click-to-load YouTube facade. Nothing is requested from YouTube until the visitor clicks;
+ * without JavaScript the still is a plain link to the video on YouTube, never a dead control;
+ * the thumbnail is self-hosted through astro:assets. Uses youtube-nocookie.com.
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import ExternalLink from './ExternalLink.astro';
+/** `lang` marks a title that is not in the page language (the Polish versions), so it is pronounced correctly. */
+interface Props { id: string; title: string; thumb: ImageMetadata; meta?: string; lang?: string; }
+const { id, title, thumb, meta, lang } = Astro.props;
+const watch = `https://www.youtube.com/shorts/${id}`;
+// Three Polish stills are 405 px wide: width, height and srcset never claim more than the source holds.
+const tw = Math.min(540, thumb.width);
+const th = Math.round((tw * 16) / 9);
+const tWidths = [360, 540].filter((w) => w < tw).concat(tw);
+---
+
+<div class="facade" data-yt={id} data-title={title} data-lang={lang}>
+  <div class="facade__frame print print--lift">
+    <a href={watch} rel="noopener noreferrer" class="facade__btn" aria-labelledby={`fp-${id} ft-${id}`} data-labelledby-js={`fp-${id} ft-${id} fn-${id}`}>
+      <Image src={thumb} alt="" width={tw} height={th} widths={tWidths} sizes="(min-width: 720px) 18rem, 45vw" loading="lazy" decoding="async" />
+      <span class="facade__play" id={`fp-${id}`} data-play-label>Watch on YouTube</span>
+      <span hidden id={`fn-${id}`}>(loads the player from youtube-nocookie.com)</span>
+    </a>
+  </div>
+  <p class="facade__meta small">
+    <span class="facade__title" id={`ft-${id}`} lang={lang}>{title}</span>
+    {meta && <span class="muted facade__stat">{meta}</span>}
+    <ExternalLink href={watch} class="facade__link" id={`fl-${id}`} labelledby={`fl-${id} ft-${id}`}>Open on YouTube</ExternalLink>
+  </p>
+</div>
+
+<script>
+  // Progressive enhancement: without JavaScript the still is an ordinary link to the video on YouTube.
+  // With it, the link becomes a button that swaps in the youtube-nocookie player. Playback starts on
+  // that click and at no other time (autoplay=1 only ever follows the visitor's own press).
+  document.querySelectorAll<HTMLElement>('.facade').forEach((box) => {
+    const btn = box.querySelector<HTMLAnchorElement>('.facade__btn');
+    if (!btn) return;
+    btn.setAttribute('role', 'button');
+    if (btn.dataset.labelledbyJs) btn.setAttribute('aria-labelledby', btn.dataset.labelledbyJs);
+    const label = btn.querySelector<HTMLElement>('[data-play-label]');
+    if (label) label.textContent = 'Play';
+    const load = () => {
+      const id = box.dataset.yt;
+      if (!id) return;
+      const frame = document.createElement('iframe');
+      frame.src = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0`;
+      frame.title = box.dataset.title || 'YouTube video';
+      if (box.dataset.lang) frame.lang = box.dataset.lang;
+      frame.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+      frame.allowFullscreen = true;
+      frame.className = 'facade__iframe';
+      btn.replaceWith(frame);
+      frame.focus();
+    };
+    btn.addEventListener('click', (ev) => {
+      if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey) return;
+      ev.preventDefault();
+      load();
+    });
+    // A button answers to Space as well as Enter.
+    btn.addEventListener('keydown', (ev) => {
+      if (ev.key === ' ' || ev.key === 'Spacebar') { ev.preventDefault(); load(); }
+    });
+  });
+</script>
+
+<style>
+  /* Four rows shared with the neighbouring facade through subgrid (frame, title, count, link), so a title that wraps
+     on one side does not push the other side's count and link out of line. */
+  .facade { display: grid; grid-template-rows: subgrid; grid-row: span 4; row-gap: 0.1rem; }
+  .facade__frame { aspect-ratio: 9 / 16; overflow: hidden; }
+  .facade__btn {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: 0;
+    background: var(--paper-deep);
+    color: inherit; text-decoration: none;
+    cursor: pointer;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+  /* The button fills a frame that clips its overflow, so the focus ring is drawn inside the button. */
+  .facade__btn:focus-visible { outline: 2px solid var(--paper); outline-offset: -6px; }
+  .facade__btn:focus-visible::after { content: ''; position: absolute; inset: 0; box-shadow: inset 0 0 0 4px var(--ink), inset 0 0 0 8px var(--ink); pointer-events: none; }
+  .facade__btn:focus-visible :global(img) { opacity: 0.85; }
+  .facade__btn :global(img) { width: 100%; height: 100%; object-fit: cover; transition: opacity var(--dur) var(--ease); }
+  .facade__btn:hover :global(img) { opacity: 0.9; }
+  .facade__play {
+    /* Lower-left corner, clear of the character's face, which is the subject of the still. */
+    position: absolute;
+    left: var(--space-3);
+    bottom: var(--space-3);
+    display: inline-flex; align-items: center;
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    line-height: 1.2; text-align: left;
+    background: var(--ink);
+    color: var(--paper);
+    font-weight: 500;
+    font-size: var(--step--1);
+    border-radius: var(--radius);
+    box-shadow: 0 6px 18px rgba(20, 18, 15, 0.3);
+  }
+  :global(.facade__iframe) { width: 100%; height: 100%; aspect-ratio: 9 / 16; border: 0; border-radius: var(--radius); background: var(--ink); display: block; }
+  .facade__meta { display: contents; }
+  .facade__title { margin-top: var(--space-3); font-size: var(--step--1); line-height: 1.5; }
+  .facade__stat { font-size: var(--step--1); line-height: 1.5; }
+  .facade__title { color: var(--ink); }
+  .facade :global(.facade__link) { display: inline-flex; min-height: 2.25rem; align-items: center; font-weight: 500; justify-self: start; }
+</style>

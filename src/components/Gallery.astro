@@ -1,0 +1,188 @@
+---
+/**
+ * The filterable index of works. Works without JavaScript: each filter is a real link to a
+ * pre-filtered page (/work, /research, /products, /experiments). With JavaScript the filter
+ * toggles `hidden` on cards, updates aria-current, the title and the URL without a reload.
+ */
+import type { CollectionEntry } from 'astro:content';
+import ProjectCard from './ProjectCard.astro';
+import { categories, indexPage, type CategoryKey } from '../data/site';
+
+interface Props { entries: CollectionEntry<'work'>[]; active: 'all' | CategoryKey; }
+const { entries, active } = Astro.props;
+const sorted = [...entries].sort((a, b) => a.data.order - b.data.order);
+const count = (k: 'all' | CategoryKey) => (k === 'all' ? sorted.length : sorted.filter((e) => e.data.category === k).length);
+// Each filter carries the heading, lede and description of its own page, so the enhanced (no-reload)
+// filter can leave the document exactly as a fresh load of that URL would.
+const filters: { key: 'all' | CategoryKey; label: string; href: string; title: string; lede: string; description: string }[] = [
+  { key: 'all', label: 'All works', href: indexPage.path, title: indexPage.title, lede: indexPage.intro, description: indexPage.description },
+  ...(Object.keys(categories) as CategoryKey[]).map((k) => ({ key: k, label: categories[k].label, href: categories[k].path, title: categories[k].title, lede: categories[k].intro, description: categories[k].description })),
+];
+const visible = count(active);
+// The first two cards shown sit inside the first desktop viewport, so they load eagerly.
+// The mixed layout's grid spans differ per cell (see the CSS below), so each card is told its true slot width.
+// An inset cover (cell 2) is a smaller print inside its plate. Filtered views are halves.
+const mixedVw = [54, 30, 38, 30, 30, 30, 30, 54];
+const halves = '(min-width: 640px) 48vw, 100vw';
+const sizesFor = (i: number) => (active === 'all' ? `(min-width: 1024px) ${mixedVw[i] ?? 38}vw, ${halves}` : halves);
+const firstTwo = new Set(sorted.filter((e) => active === 'all' || e.data.category === active).slice(0, 2).map((e) => e.id));
+---
+
+<div class="gallery" data-gallery data-active={active}>
+  <nav class="filters" aria-label="Filter works by category" data-reveal="fade" data-rule="ink">
+    <p class="filters__lead small muted">Filter by category</p>
+    <ul role="list" class="filters__list" data-slide=".filter">
+      {filters.map((f) => (
+        <li>
+          <a
+            href={f.href}
+            class="filter"
+            data-filter={f.key}
+            data-title={f.title}
+            data-lede={f.lede}
+            data-description={f.description}
+            aria-current={f.key === active ? 'page' : undefined}
+          >
+            {f.label} <span class="filter__n">{count(f.key)}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="small muted filters__status" data-status aria-live="polite">{visible} {visible === 1 ? 'work' : 'works'} shown</p>
+  </nav>
+
+  <div class="gallery__grid">
+    {sorted.map((e, i) => (
+      <div
+        class="cell"
+        data-reveal="block"
+        data-category={e.data.category}
+        hidden={active !== 'all' && e.data.category !== active}
+      >
+        <ProjectCard entry={e} variant="grid" size={i < 2 ? 'large' : 'small'} headingLevel="h2" layout={active === 'all' ? 'mixed' : 'halves'} sizes={sizesFor(i)} sizesHalves={halves} eager={firstTwo.has(e.id)} />
+      </div>
+    ))}
+  </div>
+</div>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-gallery]');
+  if (root) {
+    const links = Array.from(root.querySelectorAll<HTMLAnchorElement>('a[data-filter]'));
+    const cells = Array.from(root.querySelectorAll<HTMLElement>('.cell[data-category]'));
+    const status = root.querySelector<HTMLElement>('[data-status]');
+    const pathFor = (key: string) => links.find((l) => l.dataset.filter === key)?.pathname ?? '/work';
+    const keyFor = (path: string) => links.find((l) => l.pathname === path.replace(/\.html$/, ''))?.dataset.filter ?? 'all';
+
+    const apply = (key: string, replay = false) => {
+      let n = 0;
+      for (const c of cells) {
+        const show = key === 'all' || c.dataset.category === key;
+        c.hidden = !show;
+        if (show) n++;
+        // The card's slot changes with the layout, so the browser is told the new width before it picks a candidate.
+        c.querySelectorAll<HTMLImageElement>('img[data-sizes-halves]').forEach((img) => {
+          const next = key === 'all' ? img.dataset.sizesMixed : img.dataset.sizesHalves;
+          if (next && img.sizes !== next) img.sizes = next;
+        });
+      }
+      for (const l of links) {
+        if (l.dataset.filter === key) l.setAttribute('aria-current', 'page');
+        else l.removeAttribute('aria-current');
+      }
+      if (status) status.textContent = `${n} ${n === 1 ? 'work' : 'works'} shown`;
+      const link = links.find((l) => l.dataset.filter === key);
+      const t = link?.dataset.title;
+      if (link && t) {
+        document.title = document.title.replace(/^[^|]+\|/, `${t} |`);
+        const h1 = document.querySelector<HTMLElement>('[data-gallery-h1]');
+        const lede = document.querySelector<HTMLElement>('[data-gallery-lede]');
+        if (h1) h1.textContent = t;
+        if (lede && link.dataset.lede) lede.textContent = link.dataset.lede;
+        // Head: canonical, og:url, titles and descriptions follow the filter's own page.
+        const url = new URL(link.pathname, 'https://kaszub.ski').toString();
+        document.querySelector('link[rel="canonical"]')?.setAttribute('href', url);
+        document.querySelector('meta[property="og:url"]')?.setAttribute('content', url);
+        const og = new URL(`/og/${link.pathname.replace(/^\//, '')}.png`, 'https://kaszub.ski').toString();
+        for (const sel of ['meta[property="og:image"]', 'meta[name="twitter:image"]']) document.querySelector(sel)?.setAttribute('content', og);
+        for (const sel of ['meta[property="og:title"]', 'meta[name="twitter:title"]']) document.querySelector(sel)?.setAttribute('content', document.title);
+        if (link.dataset.description) {
+          for (const sel of ['meta[name="description"]', 'meta[property="og:description"]', 'meta[name="twitter:description"]']) document.querySelector(sel)?.setAttribute('content', link.dataset.description);
+        }
+        // Primary navigation: the current page moves with the filter.
+        document.querySelectorAll<HTMLAnchorElement>('.site-head .nav-link').forEach((n) => {
+          const on = n.pathname.replace(/\.html$/, '') === link.pathname;
+          n.classList.toggle('is-active', on);
+          if (on) n.setAttribute('aria-current', 'page');
+          else n.removeAttribute('aria-current');
+        });
+      }
+      root.dataset.active = key;
+      // The cards that remain are dealt again: back to the hidden state, one reflow, then revealed in order
+      // (the states and timing are in src/styles/motion.css; without the js class this does nothing visible).
+      if (replay) {
+        const shown = cells.filter((c) => !c.hidden);
+        shown.forEach((c, i) => { c.classList.remove('is-in'); c.style.setProperty('--d', `${Math.min(i, 5) * 60}ms`); c.style.setProperty('--t', '0.6s'); });
+        void root.offsetWidth;
+        shown.forEach((c) => c.classList.add('is-in'));
+      }
+    };
+
+    for (const l of links) {
+      l.addEventListener('click', (ev) => {
+        if (ev.metaKey || ev.ctrlKey || ev.shiftKey || ev.altKey || ev.button !== 0) return;
+        ev.preventDefault();
+        const key = l.dataset.filter ?? 'all';
+        apply(key, true);
+        history.pushState({ key }, '', pathFor(key));
+      });
+    }
+    window.addEventListener('popstate', () => apply(keyFor(location.pathname), true));
+  }
+</script>
+
+<style>
+  .filters {
+    display: flex; flex-wrap: wrap; align-items: center;
+    gap: var(--space-2) var(--space-6);
+    border-top: 1px solid var(--ink);
+    border-bottom: var(--hairline);
+    padding-block: var(--space-2);
+    margin-bottom: var(--space-8);
+  }
+  .filters__lead { flex: none; }
+  .filters__list { display: flex; flex-wrap: wrap; gap: 0 var(--space-5); }
+  .filter {
+    display: inline-flex; align-items: baseline; gap: 0.4em;
+    min-height: 2.75rem; align-items: center;
+    color: var(--ink); font-weight: 500;
+    text-decoration-color: transparent;
+  }
+  .filter:hover { color: var(--cobalt); text-decoration-color: currentColor; }
+  .filter[aria-current='page'] { color: var(--cobalt); text-decoration-color: currentColor; }
+  .filter__n { color: var(--muted); font-weight: 400; font-size: var(--step--1); }
+  .filters__status { margin-left: auto; }
+
+  /* Varied card sizes on one 12-column grid: the two flagships lead, then uneven
+     pairs with offsets. Filtered views fall back to halves. */
+  .gallery__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--space-9);
+  }
+  .cell { grid-column: span 12; min-width: 0; }
+  @media (min-width: 640px) { .cell { grid-column: span 6; } }
+  @media (min-width: 1024px) {
+    .cell { grid-column: span 6; }
+    .gallery[data-active='all'] .cell:nth-child(1) { grid-column: 1 / span 7; }
+    .gallery[data-active='all'] .cell:nth-child(2) { grid-column: 8 / span 5; align-self: end; }
+    /* No row of three equal columns: an uneven pair with a drop, then an offset pair, then a compact card beside the last, wide one. */
+    .gallery[data-active='all'] .cell:nth-child(3) { grid-column: 1 / span 5; }
+    .gallery[data-active='all'] .cell:nth-child(4) { grid-column: 8 / span 4; margin-top: var(--space-9); }
+    .gallery[data-active='all'] .cell:nth-child(5) { grid-column: 2 / span 4; }
+    .gallery[data-active='all'] .cell:nth-child(6) { grid-column: 8 / span 4; align-self: end; }
+    .gallery[data-active='all'] .cell:nth-child(7) { grid-column: 1 / span 4; }
+    .gallery[data-active='all'] .cell:nth-child(8) { grid-column: 6 / span 7; }
+  }
+</style>

@@ -1,0 +1,9 @@
+---
+/** External link: visible marker, opens in a new tab (announced to assistive technology by a hidden suffix), rel="noopener noreferrer". Used consistently site-wide. */
+interface Props { href: string; class?: string; ariaLabel?: string; id?: string; labelledby?: string; }
+const { href, class: cls, ariaLabel, id, labelledby } = Astro.props;
+---
+
+<a href={href} target="_blank" rel="noopener noreferrer" class:list={['ext', cls]} aria-label={ariaLabel} id={id} aria-labelledby={labelledby}>
+  <slot /><span class="visually-hidden"> (opens in a new tab)</span>
+</a>

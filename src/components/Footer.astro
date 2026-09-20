@@ -1,0 +1,64 @@
+---
+import { person, site } from '../data/site';
+import ExternalLink from './ExternalLink.astro';
+const year = new Date(site.factsDateISO).getFullYear();
+---
+
+<footer class="site-foot ink">
+  <div class="container">
+    <div class="foot-grid" data-reveal-group>
+      <div class="foot-id">
+        <p class="serif foot-name">{person.name}</p>
+        <p class="foot-role">{person.role}</p>
+        <p class="muted">{person.location}</p>
+      </div>
+      <nav class="foot-links" aria-label="Footer">
+        <ul role="list">
+          <li><ExternalLink href={person.github} class="row-link">GitHub</ExternalLink></li>
+          <li><ExternalLink href={person.linkedin} class="row-link">LinkedIn</ExternalLink></li>
+          <li><a class="row-link" href="/cv">Curriculum vitae</a></li>
+          <li><a class="row-link" href="/work">Index of works</a></li>
+          <li><a class="row-link" href="/about">About</a></li>
+        </ul>
+        <p class="small muted contact">
+          {person.email ? <a href={`mailto:${person.email}`} class="tap">{person.email}</a> : <>To get in touch, <ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</>}
+        </p>
+      </nav>
+      <div class="colophon small muted">
+        <p>Typeset in Newsreader and Instrument Sans. Built as a static site with Astro. No analytics, no cookies, nothing loaded from third parties until you ask for it.</p>
+        <p>&copy; {year} {person.name}</p>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-foot {
+    margin-top: var(--space-9);
+    padding-block: var(--space-8) var(--space-8);
+    box-shadow: inset 0 1px 0 rgba(241, 236, 226, 0.08);
+  }
+  .foot-grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--col-gap);
+    row-gap: var(--space-6);
+  }
+  .foot-id { grid-column: 1 / span 5; }
+  .foot-links { grid-column: 6 / span 3; }
+  .colophon { grid-column: 9 / span 4; display: grid; gap: var(--space-3); align-content: start; max-width: 40ch; }
+  .foot-name { font-size: var(--step-3); letter-spacing: var(--tracking-title); line-height: 1.05; margin-bottom: var(--space-3); }
+  .foot-role { color: var(--ink-2); }
+  .foot-links ul { display: grid; gap: 0; justify-items: start; }
+  .foot-links a { color: var(--ink); text-decoration-color: var(--rule-strong); }
+  .foot-links a:hover { color: var(--cobalt); }
+  .contact { margin-top: var(--space-4); }
+  @media (max-width: 900px) {
+    .foot-id { grid-column: 1 / -1; }
+    .foot-links { grid-column: 1 / span 5; }
+    .colophon { grid-column: 6 / -1; }
+  }
+  @media (max-width: 560px) {
+    .foot-links, .colophon { grid-column: 1 / -1; }
+  }
+</style>

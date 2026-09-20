@@ -1,0 +1,19 @@
+---
+/** One of the seven fixed evidence labels: small sans, sentence case, accent-coloured. Never a chip. */
+import type { EVIDENCE } from '../content.config';
+interface Props { label: (typeof EVIDENCE)[number]; }
+const { label } = Astro.props;
+---
+
+<span class="evidence">{label}</span>
+
+<style>
+  .evidence {
+    display: inline;
+    color: var(--cobalt);
+    font-size: var(--step--1);
+    font-weight: 500;
+    line-height: 1.5;
+    white-space: nowrap;
+  }
+</style>

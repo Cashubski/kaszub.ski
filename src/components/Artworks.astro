@@ -1,0 +1,57 @@
+---
+/** A strip of square artworks laid out as prints with alternating offsets, each captioned. */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+interface Item { image: ImageMetadata; alt: string; caption: string; }
+interface Props { items: Item[]; caption?: string; }
+const { items, caption } = Astro.props;
+---
+
+<figure class:list={['art xwide', { 'art--four': items.length === 4 }]}>
+  <ul class="art__strip" role="list" style={`--n:${items.length}`}>
+    {items.map((it) => (
+      <li class="art__item">
+        <div class="print print--lift">
+          <Image src={it.image} alt={it.alt} width={640} height={640} widths={[320, 480, 640]} sizes="(min-width: 1200px) 17vw, (min-width: 720px) 22vw, 45vw" loading="lazy" decoding="async" />
+        </div>
+        <p class="small muted art__cap">{it.caption}</p>
+      </li>
+    ))}
+  </ul>
+  {caption && (
+    <figcaption class="art__fcap small">
+      <span class="art__label">Artwork</span>
+      <span class="muted">{caption}</span>
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  /* The strip is a list inside the prose: cancel the prose list indent and item spacing so it aligns with the text edge. */
+  .art .art__strip { padding: 0; list-style: none; }
+  .art .art__strip > .art__item { margin-top: 0; }
+  .art__strip { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-6) var(--space-5); }
+  .art__item { display: grid; gap: var(--space-3); align-content: start; }
+  .art .art__strip > .art__item:nth-child(3n + 2) { margin-top: var(--space-6); }
+  .art__item :global(img) { width: 100%; height: auto; }
+  .art__fcap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-5); max-width: var(--measure); }
+  .art__label { color: var(--ink); font-weight: 500; flex: none; }
+  /* Four prints never leave one alone in a row: two by two, then four across. */
+  .art--four .art__strip { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 40rem; }
+  .art.art--four .art__strip > .art__item:nth-child(3n + 2) { margin-top: 0; }
+  .art.art--four .art__strip > .art__item:nth-child(2n) { margin-top: var(--space-6); }
+  @media (min-width: 900px) { .art--four .art__strip { grid-template-columns: repeat(4, minmax(0, 1fr)); max-width: none; } }
+  /* Wide screens: the prints run as one staggered row across the page grid. */
+  @media (min-width: 1200px) {
+    .art__strip { grid-template-columns: repeat(var(--n, 5), minmax(0, 1fr)); }
+    .art .art__strip > .art__item:nth-child(3n + 2) { margin-top: 0; }
+    .art .art__strip > .art__item:nth-child(2n) { margin-top: var(--space-7); }
+  }
+  @media (max-width: 480px) {
+    .art__strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .art .art__strip > .art__item:nth-child(3n + 2) { margin-top: 0; }
+    .art .art__strip > .art__item:nth-child(2n) { margin-top: var(--space-5); }
+    /* An odd count: the last print (the strongest track) sits centred across both columns, so the odd one out looks intended. */
+    .art .art__strip > .art__item:last-child:nth-child(odd) { grid-column: 1 / -1; width: calc(50% - var(--space-5) / 2); justify-self: center; margin-top: var(--space-3); }
+  }
+</style>

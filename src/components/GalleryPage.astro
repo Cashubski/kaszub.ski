@@ -1,0 +1,38 @@
+---
+/** Shared body for /work and the three category pages. */
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Gallery from './Gallery.astro';
+import { categories, indexPage, type CategoryKey } from '../data/site';
+
+interface Props { active: 'all' | CategoryKey; }
+const { active } = Astro.props;
+const entries = await getCollection('work');
+const views = {
+  all: { title: indexPage.title, heading: indexPage.title, description: indexPage.description, intro: indexPage.intro, path: indexPage.path },
+  ...Object.fromEntries((Object.keys(categories) as CategoryKey[]).map((k) => [k, { title: categories[k].title, heading: categories[k].title, description: categories[k].description, intro: categories[k].intro, path: categories[k].path }])),
+} as Record<'all' | CategoryKey, { title: string; heading: string; description: string; intro: string; path: string }>;
+const meta = views[active];
+---
+
+<Base title={meta.title} description={meta.description} path={meta.path}>
+  <section class="container gp">
+    <header class="gp__head grid">
+      <h1 class="gp__title display" data-gallery-h1 data-reveal="mask">{meta.heading}</h1>
+      <p class="gp__intro lede" data-gallery-lede data-reveal>{meta.intro}</p>
+    </header>
+    <Gallery entries={entries} active={active} />
+  </section>
+</Base>
+
+<style>
+  .gp { padding-top: var(--space-8); }
+  .gp__head { row-gap: var(--space-5); margin-bottom: var(--space-7); align-items: end; }
+  /* Sized so that 'Index of works' sets on one line from 1024px up and on a 320px phone. */
+  .gp__title { grid-column: 1 / span 8; font-size: clamp(2.5rem, 1.2rem + 6vw, 6.5rem); }
+  .gp__intro { grid-column: 9 / span 4; max-width: 42ch; }
+  @media (min-width: 1024px) { .gp__title { white-space: nowrap; } }
+  @media (max-width: 900px) {
+    .gp__title, .gp__intro { grid-column: 1 / -1; }
+  }
+</style>

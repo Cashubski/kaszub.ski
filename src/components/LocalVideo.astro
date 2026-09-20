@@ -1,0 +1,103 @@
+---
+/**
+ * Self-hosted video: preload="none", poster, controls, no autoplay. Sits as a print on the paper.
+ * With JavaScript a cover is laid over the player at rest: the permitted still on the site's deep
+ * paper, a serif title and a sentence-case play button, so the frame never reads as an empty black
+ * player. Pressing it removes the cover and starts the video. Without JavaScript the native player
+ * and its poster are shown as they are. There is no direct link to the file: the recording is only
+ * ever offered under its 'not real data' caption (BRIEF.md §5.3).
+ */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+interface Props { src: string; poster: string; width: number; height: number; caption: string; label?: string; title: string; still?: ImageMetadata; stillAlt?: string; coverTitle?: string; playLabel?: string; }
+const { src, poster, width, height, caption, label = 'Video', title, still, stillAlt = '', coverTitle, playLabel = 'Play the video' } = Astro.props;
+---
+
+<figure class="lv">
+  <div class="lv__frame print" data-lv style={`aspect-ratio:${width} / ${height}`}>
+    <video
+      class="lv__video"
+      controls
+      preload="none"
+      playsinline
+      poster={poster}
+      width={width}
+      height={height}
+      aria-label={title}
+    >
+      <source src={src} type="video/mp4" />
+    </video>
+    {still && (
+      <div class="lv__cover" data-lv-cover hidden>
+        {coverTitle && <p class="lv__title serif">{coverTitle}</p>}
+        <div class="lv__still print">
+          <Image src={still} alt={stillAlt} width={1564} widths={[720, 1080, 1564]} sizes="(min-width: 1024px) 60vw, 90vw" loading="lazy" decoding="async" />
+        </div>
+        <button type="button" class="lv__play" data-lv-play>{playLabel}</button>
+      </div>
+    )}
+  </div>
+  <figcaption class="lv__cap small">
+    <span class="lv__label">{label}</span>
+    <span class="muted">{caption}</span>
+  </figcaption>
+</figure>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-lv]').forEach((frame) => {
+    const cover = frame.querySelector<HTMLElement>('[data-lv-cover]');
+    const video = frame.querySelector<HTMLVideoElement>('video');
+    const play = frame.querySelector<HTMLButtonElement>('[data-lv-play]');
+    if (!cover || !video || !play) return;
+    // While the cover is shown the player underneath is out of the tab order and cannot be operated,
+    // so keyboard focus never lands on a control the cover hides.
+    const reveal = () => {
+      cover.hidden = true;
+      video.inert = false;
+      video.controls = true;
+      video.removeAttribute('tabindex');
+    };
+    cover.hidden = false;
+    video.inert = true;
+    video.controls = false;
+    video.setAttribute('tabindex', '-1');
+    play.addEventListener('click', () => {
+      reveal();
+      video.focus();
+      void video.play();
+    });
+    // Safety net: however playback starts, the cover never stays over a playing video.
+    video.addEventListener('play', reveal);
+  });
+</script>
+
+<style>
+  .lv__frame { position: relative; overflow: hidden; }
+  .lv__video { width: 100%; height: 100%; background: var(--paper-deep); border-radius: var(--radius); }
+  .lv__cover {
+    position: absolute; inset: 0; z-index: 1;
+    display: grid; align-content: center; justify-items: start; gap: clamp(0.75rem, 3cqw, 2rem);
+    padding: clamp(1rem, 5%, 3.5rem);
+    background: linear-gradient(180deg, var(--paper-deep) 0%, #E4DDCD 100%);
+    border-radius: inherit;
+  }
+  .lv__cover[hidden] { display: none; }
+  .lv__title { font-size: var(--step-3); line-height: 1.08; letter-spacing: var(--tracking-title); color: var(--ink); max-width: 22ch; }
+  .lv__still { width: 100%; overflow: hidden; }
+  .lv__still :global(img) { width: 100%; height: auto; }
+  .lv__play {
+    min-height: 2.75rem; padding: 0.7rem 1.2rem; border: 0; border-radius: var(--radius); cursor: pointer;
+    background: var(--ink); color: var(--paper); font-weight: 500; font-size: var(--step--1);
+    box-shadow: 0 6px 18px rgba(20, 18, 15, 0.22);
+    transition: opacity var(--dur) var(--ease);
+  }
+  .lv__play:hover { opacity: 0.88; }
+  .lv__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); max-width: var(--measure); }
+  .lv__label { color: var(--ink); font-weight: 500; flex: none; }
+  @media (max-width: 560px) {
+    .lv__title { font-size: var(--step-1); }
+    .lv__cover { gap: var(--space-3); }
+    /* Eight stage icons are illegible at this width, and the same still is shown legibly above the video. */
+    .lv__still { display: none; }
+  }
+</style>

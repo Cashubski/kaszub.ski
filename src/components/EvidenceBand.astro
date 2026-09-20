@@ -1,0 +1,71 @@
+---
+/**
+ * The evidence section of a flagship case study, set as an ink-dark full-bleed band: serif
+ * figures, sans context, hairline rules. It sits inside the prose column; the band's ground is
+ * painted out to both viewport edges with a spread shadow clipped to the band's own height, so
+ * nothing overflows the page.
+ */
+interface Item { figure: string; unit: string; context: string; }
+/** `tone`: 'ink' is the near-black register; 'shade' is the deeper paper, for a page that already has an ink band. */
+/** `items` may be empty for a work with no figures yet: the band then carries its prose (and any table) alone. */
+interface Props { title: string; intro?: string; items?: Item[]; tone?: 'ink' | 'shade'; }
+const { title, intro, items = [], tone = 'ink' } = Astro.props;
+---
+
+<section class:list={['eband', tone === 'ink' ? 'ink' : 'eband--shade']}>
+  <h2 class="eband__title">{title}</h2>
+  {intro && <p class="eband__intro">{intro}</p>}
+  {items.length > 0 && (<dl class="eband__list">
+    {items.map((it) => (
+      <div class="eband__row">
+        <dt class="eband__figure figure-num">{it.figure}</dt>
+        <dd class="eband__text">
+          <span class="eband__unit">{it.unit}</span>
+          <span class="eband__ctx small muted">{it.context}</span>
+        </dd>
+      </div>
+    ))}
+  </dl>)}
+  <div class="eband__after"><slot /></div>
+</section>
+
+<style>
+  .eband {
+    position: relative;
+    margin-block: var(--space-8);
+    padding-block: var(--space-8);
+    box-shadow: 0 0 0 100vmax var(--paper);
+    clip-path: inset(0 -100vmax);
+    color: var(--ink-2);
+  }
+  .eband--shade { background: var(--paper-shade); box-shadow: 0 0 0 100vmax var(--paper-shade); }
+  .eband--shade .eband__row, .eband--shade .eband__row:last-child { border-color: var(--rule-strong); }
+  .eband .eband__title { margin-top: 0; border-top: 0; padding-top: 0; }
+  .eband__intro { margin-top: var(--space-4); }
+  .eband__list { margin-top: var(--space-6); display: grid; }
+  .eband__row {
+    display: grid; grid-template-columns: minmax(9rem, 2fr) 3fr; column-gap: var(--space-6);
+    align-items: baseline; padding-block: var(--space-4) var(--space-5);
+    border-top: 1px solid var(--rule);
+  }
+  .eband__row:last-child { border-bottom: 1px solid var(--rule); }
+  .eband__figure { font-size: var(--step-4); line-height: 1; letter-spacing: -0.025em; color: var(--ink); }
+  .eband__text { display: grid; gap: var(--space-1); }
+  .eband__unit { font-size: var(--step-1); line-height: 1.3; color: var(--ink); }
+  .eband__after:empty { display: none; }
+  .eband__after { margin-top: var(--space-6); }
+  @media (min-width: 1024px) {
+    /* The band's list runs wider than the text column. */
+    .eband__list { width: min(150%, calc(100vw - 2 * var(--gutter))); }
+  }
+  @media (min-width: 1200px) {
+    /* To the right edge of the page grid, the same measure as .xwide in global.css. */
+    .eband__list { --page-w: calc(min(100vw, var(--max-w)) - 2 * var(--gutter)); width: calc(var(--page-w) - (var(--page-w) - 11 * var(--col-gap)) / 12 - var(--col-gap)); }
+  }
+  @media (max-width: 560px) {
+    .eband__row { grid-template-columns: 1fr; row-gap: var(--space-2); }
+  }
+  @media print {
+    .eband { box-shadow: none; clip-path: none; }
+  }
+</style>

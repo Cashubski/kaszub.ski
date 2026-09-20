@@ -1,0 +1,32 @@
+---
+/**
+ * A captioned figure. The media sits as a print on the paper (shadow, hairline
+ * inner border, 2px lift on hover). `label` is a short word before the caption
+ * ("Screenshot", "Schematic", "Artwork"); `width` is set by the parent layout.
+ */
+interface Props { caption?: string; label?: string; width?: 'text' | 'wide' | 'bleed'; class?: string; flat?: boolean; /** Slug of the work whose card cover morphs into this figure between pages. */ cover?: string; parallax?: boolean; }
+const { caption, label, width = 'text', class: cls, flat = false, cover, parallax = false } = Astro.props;
+---
+
+<figure class:list={['figure', `figure--${width}`, cls]}>
+  <div class:list={['figure__media', { 'print print--lift': !flat }]} style={cover ? `view-transition-name: cover-${cover}` : undefined} data-cover={cover ? '' : undefined} data-parallax={parallax ? '' : undefined}>
+    <slot />
+  </div>
+  {(caption || label) && (
+    <figcaption class="figure__cap small">
+      {label && <span class="figure__label">{label}</span>}
+      {caption && <span class="muted">{caption}</span>}
+    </figcaption>
+  )}
+</figure>
+
+<style>
+  .figure__media :global(img), .figure__media :global(video) { width: 100%; height: auto; }
+  .figure__cap {
+    display: grid; justify-items: start; gap: 0.15rem;
+    padding-top: var(--space-3);
+    margin-top: var(--space-4);
+    max-width: var(--measure);
+  }
+  .figure__label { color: var(--ink); font-weight: 500; flex: none; }
+</style>

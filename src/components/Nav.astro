@@ -1,0 +1,95 @@
+---
+import { nav, site } from '../data/site';
+import { isActive, isSection } from '../lib/paths';
+const current = Astro.url.pathname;
+---
+
+<header class="site-head">
+  <div class="container head-row">
+    <a class="wordmark serif" href="/" aria-label={`${site.name}, home`}>Michal Kaszubski</a>
+    <nav aria-label="Primary">
+      <ul role="list" data-slide=".nav-link" data-slide-hover>
+        {nav.map((item) => {
+          const active = isActive(current, item.href);
+          const section = !active && isSection(current, item.href);
+          return (
+            <li>
+              <a
+                href={item.href}
+                aria-current={active ? 'page' : undefined}
+                class:list={['nav-link', { 'is-active': active, 'is-section': section }]}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<style>
+  /* The bottom hairline appears once the page has scrolled (src/styles/motion.css). */
+  .site-head { border-top: 2px solid var(--ink); border-bottom: 1px solid transparent; }
+  .head-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-1) var(--space-6);
+    min-height: 4.25rem;
+    padding-block: var(--space-2);
+  }
+  .wordmark {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 1.5rem;
+    letter-spacing: var(--tracking-title);
+  }
+  .wordmark:hover { color: var(--cobalt); }
+  nav ul { display: flex; flex-wrap: wrap; gap: 0 var(--space-2); margin-left: calc(-1 * var(--space-3)); }
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 2.75rem;
+    padding-inline: var(--space-3);
+    color: var(--ink);
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: 500;
+    position: relative;
+  }
+  .nav-link::after {
+    content: '';
+    position: absolute;
+    left: var(--space-3);
+    right: var(--space-3);
+    bottom: 0.6rem;
+    height: 1px;
+    background: currentColor;
+    opacity: 0;
+    transform: translateY(2px);
+    transition: opacity var(--dur) var(--ease), transform var(--dur) var(--ease);
+  }
+  .nav-link:hover { color: var(--cobalt); }
+  .nav-link:hover::after, .nav-link.is-active::after, .nav-link.is-section::after { opacity: 1; transform: none; }
+  .nav-link.is-active { color: var(--cobalt); }
+  .nav-link.is-section::after { opacity: 0.5; }
+  @media (max-width: 640px) {
+    .head-row { padding-block: var(--space-2) var(--space-1); }
+    .wordmark { font-size: 1.35rem; }
+    nav { width: 100%; }
+    /* Six items set as two rows of three equal columns, so both rows start on the same three edges. */
+    nav ul { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0 var(--space-4); margin-left: 0; }
+    @media (max-width: 359.98px) { nav ul { grid-template-columns: repeat(3, auto); justify-content: space-between; gap: 0 var(--space-2); } }
+    .nav-link { min-height: 2.25rem; min-width: 2.75rem; padding-inline: 0; text-underline-offset: 0.3em; text-decoration-thickness: 1px; }
+    /* The drawn underline would span the padded tap area; on phones the current page gets a text underline instead. */
+    .nav-link::after { display: none; }
+    .nav-link.is-active, .nav-link.is-section { text-decoration: underline; }
+    .nav-link.is-section { text-decoration-color: color-mix(in srgb, currentColor 50%, transparent); }
+  }
+</style>

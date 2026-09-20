@@ -1,0 +1,89 @@
+---
+/**
+ * Method schematic drawn with hairlines: serif step names, sans detail, a drawn arrow
+ * between steps. Reflows from a row to a column on phones. Always labelled as a schematic.
+ */
+interface Step { label: string; detail?: string; }
+/** `columns` fixes the row length on screens wider than a phone, so the arrow after the last step of each row can be dropped. */
+interface Props { steps: Step[]; title: string; note?: string; columns?: 3 | 6; class?: string; }
+const { steps, title, note, columns, class: cls } = Astro.props;
+---
+
+<figure class:list={['schema', columns && `schema--c${columns}`, cls]} aria-label={title}>
+  <div class="schema__plate print panel">
+    <ol class="schema__flow" role="list">
+      {steps.map((s) => (
+        <li class="schema__step">
+          <span class="schema__label">{s.label}</span>
+          {s.detail && <span class="schema__detail small muted">{s.detail}</span>}
+        </li>
+      ))}
+    </ol>
+  </div>
+  <figcaption class="schema__cap small">
+    <span class="schema__tag">Schematic</span>
+    <span class="muted">{title}{note ? ` ${note}` : ''}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .schema__plate { background: var(--paper-deep); }
+  .schema__flow {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(8.5rem, 1fr));
+    gap: var(--space-6) var(--space-5);
+  }
+  .schema__step {
+    position: relative;
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--ink);
+    min-width: 0;
+  }
+  .schema__step:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: calc(-1 * var(--space-5) + 0.15rem);
+    top: 0.35rem;
+    width: 1.1rem; height: 1.1rem;
+    background: var(--cobalt);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1 8h13M9.5 3.5 14 8l-4.5 4.5' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1 8h13M9.5 3.5 14 8l-4.5 4.5' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+  }
+  .schema__label { font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.2; color: var(--ink); letter-spacing: var(--tracking-title); }
+  .schema__detail { line-height: 1.45; }
+  .schema__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); max-width: var(--measure); }
+  .schema__tag { color: var(--ink); font-weight: 500; flex: none; }
+  /* Fixed rows: an arrow never hangs off the end of a row pointing at nothing. */
+  @media (min-width: 561px) {
+    .schema--c3 .schema__flow, .schema--c6 .schema__flow { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .schema--c3 .schema__step:nth-child(3n)::after, .schema--c6 .schema__step:nth-child(3n)::after { display: none; }
+  }
+  /* At a row break the flow continues: a down arrow sits in the row gap above the first step of the next row, in the same stroke. */
+  @media (min-width: 561px) {
+    .schema--c3 .schema__step:nth-child(3n + 1):not(:first-child)::before, .schema--c6 .schema__step:nth-child(3n + 1):not(:first-child)::before {
+      content: '';
+      position: absolute;
+      left: 0; top: calc(-1 * var(--space-6) + 0.4rem);
+      width: 1.1rem; height: 1.1rem;
+      transform: rotate(90deg);
+      background: var(--cobalt);
+    -webkit-mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1 8h13M9.5 3.5 14 8l-4.5 4.5' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+    mask: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><path d='M1 8h13M9.5 3.5 14 8l-4.5 4.5' fill='none' stroke='black' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round'/></svg>") center / contain no-repeat;
+    }
+  }
+  @media (min-width: 1200px) {
+    .schema--c6 .schema__step:nth-child(3n + 1):not(:first-child)::before { display: none; }
+    .schema--c6 .schema__flow { grid-template-columns: repeat(6, minmax(0, 1fr)); }
+    .schema--c6 .schema__step:nth-child(3n):not(:last-child)::after { display: block; }
+  }
+  /* Inside .prose the list picks up list spacing; reset it so the rules align. */
+  .schema .schema__flow { padding-left: 0; margin: 0; list-style: none; }
+  .schema .schema__step { margin: 0; }
+  @media (max-width: 560px) {
+    .schema__flow { grid-template-columns: 1fr; gap: var(--space-7); }
+    .schema__step:not(:last-child)::after { right: auto; left: 0; top: auto; bottom: calc(-1 * var(--space-7) + 0.9rem); transform: rotate(90deg); }
+  }
+</style>
