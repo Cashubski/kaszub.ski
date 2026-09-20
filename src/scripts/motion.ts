@@ -1,3 +1,4 @@
+import Lenis from 'lenis';
 /**
  * kaszub.ski motion system. No dependencies; CSS does the animating (src/styles/motion.css), this
  * file only decides WHEN: it tags elements, watches them with one IntersectionObserver and adds
@@ -183,3 +184,16 @@ function init() {
 init();
 // If Astro's client router is ever enabled, the same init runs after each swap; every step above is idempotent.
 d.addEventListener('astro:page-load', init);
+
+
+/* Inertia scrolling. Wheel and trackpad input is eased; touch keeps the platform's own momentum. Off under
+   reduced motion. The window is still scrolled natively, so sticky elements, scroll-driven CSS, anchors and the
+   IntersectionObserver reveals all keep working. */
+(() => {
+  const w = window as unknown as { __lenis?: Lenis };
+  if (w.__lenis || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const lenis = new Lenis({ lerp: 0.085, wheelMultiplier: 0.95, smoothWheel: true, syncTouch: false, anchors: { offset: -80 } });
+  w.__lenis = lenis;
+  const raf = (t: number) => { lenis.raf(t); requestAnimationFrame(raf); };
+  requestAnimationFrame(raf);
+})();

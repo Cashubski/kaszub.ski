@@ -6,9 +6,9 @@
   --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
   --hov-in: 0.7s;
   --hov-out: 1.1s;
-  --plate: color-mix(in oklab, var(--paper) 30%, #ffffff);
+  --plate: #FFFEFB;
   --shadow-tab: 0 1px 1px rgba(20, 18, 15, 0.07), 0 6px 16px rgba(20, 18, 15, 0.13), 0 18px 38px rgba(20, 18, 15, 0.10);
-  --shadow-card: 0 1px 2px rgba(20, 18, 15, 0.06), 0 16px 40px rgba(20, 18, 15, 0.15), 0 52px 110px rgba(20, 18, 15, 0.14);
+  --shadow-card: 0 0 0 1px rgba(20, 18, 15, 0.07), 0 2px 4px rgba(20, 18, 15, 0.06), 0 22px 48px rgba(20, 18, 15, 0.20), 0 64px 120px rgba(20, 18, 15, 0.20);
 }
 
 /* 1. Colour never snaps, anywhere. */
@@ -57,7 +57,7 @@
 
 /* 3. Cards: the whole card responds. A lit panel with a gradual shadow fades in behind it, the print lifts a little
       further and its shadow deepens slowly, the image eases forward inside its frame, and the title underline draws. */
-:root .card.card { isolation: isolate; }
+:root .card.card { isolation: isolate; transition: translate var(--hov-out) var(--ease-soft); }
 :root .card.card:not(.card--plate)::before {
   content: '';
   position: absolute;
@@ -82,6 +82,7 @@
 }
 :root .card__inspect { display: inline-block; transition: translate var(--hov-out) var(--ease-soft), color var(--hov-out) var(--ease-soft); }
 @media (hover: hover) {
+  :root .card.card:not(.card--plate):hover, :root .card.card:not(.card--plate):focus-within { translate: 0 -8px; transition-duration: var(--hov-in); }
   :root .card.card:not(.card--plate):hover::before, :root .card.card:not(.card--plate):focus-within::before { opacity: 1; transform: none; transition-duration: var(--hov-in); }
   .print--lift:hover, .lift:hover .print--lift { transform: translateY(-7px); transition-duration: 0.8s; }
   .print--lift:hover::before, .lift:hover .print--lift::before { transition-duration: 0.7s; }
@@ -128,3 +129,10 @@ p, li, dd, figcaption { text-wrap: pretty; }
 @media (hover: hover) {
   :root .card--plate:hover::before, :root .card--plate:focus-within::before { opacity: 1; transform: none; transition-duration: var(--hov-in); }
 }
+
+/* 9. Inertia scrolling (Lenis): the classes it sets, per its documentation. */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }
+html.lenis { scroll-behavior: auto !important; }
