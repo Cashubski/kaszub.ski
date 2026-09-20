@@ -1,0 +1,150 @@
+/* ============================================================================
+   kaszub.ski · motion (BRIEF.md §12.1). Timing lives here; src/scripts/motion.ts only adds `.is-in`.
+   Every hidden state sits under `.js` (set by the inline script in <head>, withheld under
+   prefers-reduced-motion) and inside a no-preference media query, so without JS, with reduced
+   motion, or in print, the page is simply fully visible. Animated properties: opacity, transform,
+   translate, filter, clip-path and stroke-dashoffset. Nothing here changes layout.
+   ========================================================================== */
+:root {
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-draw: cubic-bezier(0.5, 0, 0.15, 1);
+}
+
+/* --- Header: sticky, condensing, hairline after scroll (works without the js class) ------------ */
+.site-head { position: relative; }
+@media (min-width: 640.02px) {
+  html { scroll-padding-top: 4.5rem; }
+  .site-head { position: sticky; top: -14px; z-index: 50; background: var(--paper); }
+  .site-head .head-row { transition: transform 0.35s var(--ease-out); }
+  .site-head .wordmark { transform-origin: 0 50%; transition: transform 0.35s var(--ease-out), color var(--dur) var(--ease); }
+  .site-head.is-scrolled .head-row { transform: translateY(6px); }
+  .site-head.is-scrolled .wordmark { transform: scale(0.9); }
+}
+.site-head::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
+  background: var(--rule-strong);
+  box-shadow: 0 8px 24px rgba(20, 18, 15, 0.07);
+  opacity: 0; transform: scaleX(0.6); transform-origin: 50% 50%;
+  transition: opacity 0.35s var(--ease-out), transform 0.6s var(--ease-out);
+}
+.site-head.is-scrolled::after { opacity: 1; transform: none; }
+/* Without JS the same hairline is tied to the first 48px of scroll, where scroll-driven CSS exists. */
+@supports (animation-timeline: scroll()) {
+  /* The timeline sits in its own rule: the CSS minifier otherwise folds it into the `animation` shorthand, which browsers reject. */
+  .site-head:not(.is-scrolled)::after { animation: head-line linear both; }
+  html .site-head:not(.is-scrolled)::after { animation-timeline: scroll(root block); animation-range: 0 48px; }
+  @keyframes head-line { to { opacity: 1; transform: none; } }
+}
+
+/* --- Sliding underline (nav, gallery filters) ---------------------------------------------------- */
+[data-slide] { position: relative; }
+.ind {
+  position: absolute; left: 0; top: 0; width: 1px; height: 1px;
+  background: var(--cobalt); transform-origin: 0 0; opacity: 0; pointer-events: none;
+}
+.ind-on > .ind { transition: transform 0.35s var(--ease-out), width 0.35s var(--ease-out), opacity 0.2s linear; }
+@media (max-width: 640px) { .site-head .ind { display: none; } }
+
+/* --- Reading progress (case studies) ----------------------------------------------------------- */
+.progress {
+  position: fixed; left: 0; right: 0; top: 0; height: 2px; z-index: 70;
+  background: var(--cobalt); transform-origin: 0 50%;
+  transform: scaleX(var(--progress, 0)); pointer-events: none;
+}
+@media print { .progress { display: none; } }
+
+@media (prefers-reduced-motion: no-preference) {
+  /* --- Page to page: a soft cross-fade; header stays put; underline and covers travel ------------ */
+  @view-transition { navigation: auto; }
+  ::view-transition-old(root) { animation: vt-out 0.18s linear both; }
+  ::view-transition-new(root) { animation: vt-in 0.36s var(--ease-out) 0.06s both; }
+  .site-head { view-transition-name: site-head; }
+  .nav-link:is(.is-active, .is-section)::after { view-transition-name: nav-ind; }
+  .js .ind-on .nav-link::after { view-transition-name: none; }
+  .js .site-head .ind-on > .ind { view-transition-name: nav-ind; }
+  ::view-transition-group(nav-ind) { animation-duration: 0.4s; animation-timing-function: var(--ease-out); }
+  [data-cover] { view-transition-class: cover; }
+  ::view-transition-group(.cover) { animation-duration: 0.55s; animation-timing-function: var(--ease-out); }
+  ::view-transition-old(.cover), ::view-transition-new(.cover) { height: 100%; object-fit: cover; object-position: left top; }
+  @keyframes vt-out { to { opacity: 0; } }
+  @keyframes vt-in { from { opacity: 0; } }
+
+  /* With the indicator running, the static underline steps aside. */
+  .js .site-head .ind-on .nav-link::after { opacity: 0 !important; }
+  .js .filters .ind-on .filter, .js .filters.ind-on .filter { text-decoration-color: transparent; }
+
+  /* --- Reveals ------------------------------------------------------------------------------------- */
+  .js :is([data-reveal], [data-reveal-group] > *):not([data-reveal='off'], [data-reveal='mask']) {
+    transition:
+      opacity var(--t, 0.8s) var(--ease-out) var(--d, 0s),
+      transform var(--t, 0.8s) var(--ease-out) var(--d, 0s),
+      filter var(--t, 0.8s) var(--ease-out) var(--d, 0s);
+  }
+  .js :is([data-reveal], [data-reveal-group] > *):not([data-reveal='off'], [data-reveal='mask'], .is-in) {
+    opacity: 0; transform: translateY(18px); filter: blur(6px);
+  }
+  /* Large blocks are never blurred (a blur the size of a figure costs frames on a phone). */
+  .js :is([data-reveal='block'], [data-reveal-group='block'] > *):not(.is-in) { transform: translateY(26px); filter: none; }
+  .js :is([data-reveal='fade'], [data-reveal-group='fade'] > *):not(.is-in) { transform: none; filter: none; }
+  .js tr[data-reveal]:not(.is-in) { transform: translateY(8px); filter: none; }
+
+  /* Display headings: each word rises from a clipped baseline. The clip travels with the word, so the
+     mask line stays where the baseline is; no overflow box, no change to line breaking or metrics. */
+  .js [data-reveal='mask']:not(.is-split) { opacity: 0; }
+  .js .mw {
+    display: inline-block;
+    clip-path: inset(-12% -6% -22% -6%);
+    transition: transform 0.64s var(--ease-out), clip-path 0.64s var(--ease-out), opacity 0.3s linear;
+    transition-delay: calc(var(--i) * var(--ms, 60ms) + var(--d, 0s));
+  }
+  .js [data-reveal='mask']:not(.is-in) .mw { transform: translateY(102%); clip-path: inset(-12% -6% 102% -6%); opacity: 0; }
+
+  /* Hairlines draw from the left. The border keeps its width (transparent), so nothing moves. */
+  @media screen { .js [data-rule] { position: relative; border-top-color: transparent !important; } }
+  .js [data-rule]::before {
+    content: ''; position: absolute; left: 0; right: 0; top: -1px; height: 1px;
+    background: var(--rule); transform: scaleX(0); transform-origin: 0 50%;
+    transition: transform 1.1s var(--ease-draw) var(--d, 0s);
+  }
+  .js [data-rule='ink']::before { background: var(--ink); }
+  .js [data-rule].is-in::before { transform: none; }
+
+  /* Imagery settles inside its frame: the clip shrinks exactly as the scale relaxes, so the visible
+     edge of the print never moves. The print's shadow arrives with the block's opacity. */
+  .js [data-reveal] :is(.print, .figure__media) img {
+    transition: transform 1.3s var(--ease-out) var(--d, 0s), clip-path 1.3s var(--ease-out) var(--d, 0s);
+  }
+  .js [data-reveal]:not(.is-in) :is(.print, .figure__media) img { transform: scale(1.04); clip-path: inset(1.923%); }
+  /* The deeper (hover) shadow is present as the print lands, then eases back: a print being laid down. */
+  .js [data-reveal].is-in .print--lift::before { animation: shadow-settle 1.5s var(--ease-out) var(--d, 0s) backwards; }
+  @keyframes shadow-settle { from { opacity: 0.9; } to { opacity: 0; } }
+
+  /* --- SVG: strokes draw, bars grow, labels follow --------------------------------------------- */
+  .js .dr-s { stroke-dasharray: 1; transition: stroke-dashoffset 1.3s var(--ease-draw) var(--d, 0s), opacity 0.25s linear var(--d, 0s); }
+  .js .dr-f { transition: opacity 0.6s linear var(--d, 0s); }
+  .js :is(.dr-bx, .dr-by) { transform-box: fill-box; transition: transform 0.9s var(--ease-out) var(--d, 0s); }
+  .js .dr-bx { transform-origin: 0 50%; }
+  .js .dr-by { transform-origin: 50% 100%; }
+  .js [data-draw]:not(.is-in) .dr-s { stroke-dashoffset: 1; opacity: 0; }
+  .js [data-draw]:not(.is-in) .dr-f { opacity: 0; }
+  .js [data-draw]:not(.is-in) .dr-bx { transform: scaleX(0); }
+  .js [data-draw]:not(.is-in) .dr-by { transform: scaleY(0); }
+
+  /* --- Scroll-driven: parallax (24px of travel) and reading progress --------------------------- */
+  [data-parallax] { translate: 0 var(--py, 0px); }
+  @supports (animation-timeline: view()) {
+    [data-parallax] { animation: parallax linear both; }
+    html [data-parallax] { animation-timeline: view(); animation-range: cover; }
+    .progress { animation: progress linear both; }
+    html .progress { animation-timeline: scroll(root block); }
+    @keyframes parallax { from { translate: 0 12px; } to { translate: 0 -12px; } }
+    @keyframes progress { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+  }
+}
+@media (prefers-reduced-motion: reduce) { .progress { display: none; } }
+
+@media print {
+  .js [data-reveal], .js [data-reveal-group] > *, .js .mw, .js .dr { opacity: 1 !important; transform: none !important; filter: none !important; clip-path: none !important; stroke-dashoffset: 0 !important; }
+  .js [data-rule]::before { display: none; }
+  .site-head { position: static; }
+}
