@@ -1,0 +1,64 @@
+---
+/** Cumulative views per channel across the whole export window. */
+import ShortsChart from './ShortsChart.astro';
+import { analytics as a, linear, path, num, pct, dayNumber, longDate, type Variant } from './shorts-scale';
+
+const variants: Variant[] = [{ key: 'wide', W: 640, H: 340 }, { key: 'narrow', W: 340, H: 300 }];
+const d0 = dayNumber(a.en.range.start), d1 = dayNumber(a.en.range.end);
+const marchEnd = dayNumber('2026-03-31');
+const ticksY = [0, 100000, 200000, 300000, 400000, 500000];
+const monthTicks = [['2026-05-01', 'May'], ['2026-06-01', 'Jun'], ['2026-07-01', 'Jul'], ['2026-08-01', 'Aug'], ['2026-09-01', 'Sep']];
+
+const draw = (v: Variant) => {
+  const m = { t: 30, r: v.key === 'wide' ? 24 : 12, b: 30, l: v.key === 'wide' ? 58 : 44 };
+  const x = linear(d0, d1, m.l, v.W - m.r), y = linear(0, 520000, v.H - m.b, m.t);
+  const line = (k: 'en' | 'pl') => path(a[k].timeline.cumulative.map((p) => [x(dayNumber(p.day)), y(p.views)] as [number, number]));
+  return { m, x, y, en: line('en'), pl: line('pl') };
+};
+const end = { en: a.en.views.channel_total_daily_report, pl: a.pl.views.channel_total_daily_report };
+const desc = `Both lines rise steeply between 12 and 23 March 2026 and are then almost flat. CleverFacts ends at ${num(end.en)} views and Ogarnik at ${num(end.pl)}. By 31 March, ${pct(a.en.timeline.share_by_end_march, 1)} of CleverFacts views and ${pct(a.pl.timeline.share_by_end_march, 1)} of Ogarnik views had already arrived.`;
+---
+
+<ShortsChart
+  finding={`Nearly all of the views arrived in the first three weeks: ${pct(a.en.timeline.share_by_end_march)} in English and ${pct(a.pl.timeline.share_by_end_march)} in Polish by 31 March.`}
+  caption={`Cumulative views per channel, daily to mid April and weekly after that. In the last 28 full days of the export the channels averaged ${a.en.timeline.per_day_last_28} and ${a.pl.timeline.per_day_last_28} views a day.`}
+  tableLabel="Cumulative views as a table"
+>
+  {variants.map((v) => {
+    const g = draw(v);
+    const wide = v.key === 'wide';
+    return (
+      <svg class={`sc-${v.key}`} viewBox={`0 0 ${v.W} ${v.H}`} role="img" aria-labelledby={`sc-cum-t-${v.key} sc-cum-d-${v.key}`}>
+        <title id={`sc-cum-t-${v.key}`}>Cumulative views per channel, 11 March to 19 September 2026</title>
+        <desc id={`sc-cum-d-${v.key}`}>{desc}</desc>
+        {ticksY.map((t) => (
+          <g>
+            <line class={t === 0 ? 'sc-axis' : 'sc-grid'} x1={g.m.l} x2={v.W - g.m.r} y1={g.y(t)} y2={g.y(t)} />
+            <text x={g.m.l - 8} y={g.y(t) + 4.5} text-anchor="end">{t === 0 ? '0' : `${t / 1000}k`}</text>
+          </g>
+        ))}
+        <text x={g.m.l} y={v.H - 8} text-anchor="start">11 Mar</text>
+        {monthTicks.filter((_, i) => wide || i % 2 === 0).map(([iso, label]) => (
+          <text x={g.x(dayNumber(iso))} y={v.H - 8} text-anchor="middle">{label}</text>
+        ))}
+        <line class="sc-ref" x1={g.x(marchEnd)} x2={g.x(marchEnd)} y1={g.y(0)} y2={g.y(wide ? 330000 : 345000)} />
+        <text class="sc-ink" x={g.x(marchEnd) + 8} y={g.y(wide ? 330000 : 345000) + 11}>31 March</text>
+        <path class="sc-line sc-pl" d={g.pl} />
+        <path class="sc-line sc-en" d={g.en} />
+        <circle class="sc-fill-en sc-ring" cx={g.x(d1)} cy={g.y(end.en)} r="4.5" />
+        <circle class="sc-fill-pl sc-ring" cx={g.x(d1)} cy={g.y(end.pl)} r="4.5" />
+        <text class="sc-strong" x={g.x(d1) - 2} y={g.y(end.en) - 12} text-anchor="end">CleverFacts {num(end.en)}</text>
+        <text class="sc-strong" x={g.x(d1) - 2} y={g.y(end.pl) - 12} text-anchor="end">Ogarnik {num(end.pl)}</text>
+      </svg>
+    );
+  })}
+  <table slot="table">
+    <thead><tr><th>Date</th><th>CleverFacts</th><th>Ogarnik</th></tr></thead>
+    <tbody>
+      {a.en.timeline.cumulative.filter((_, i) => i % 3 === 0 || i === a.en.timeline.cumulative.length - 1).map((p) => {
+        const q = a.pl.timeline.cumulative.find((r) => r.day === p.day);
+        return <tr><td>{longDate(p.day)}</td><td>{num(p.views)}</td><td>{q ? num(q.views) : ''}</td></tr>;
+      })}
+    </tbody>
+  </table>
+</ShortsChart>

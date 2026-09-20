@@ -1,0 +1,148 @@
+---
+/**
+ * Cash Nova pipeline schematic, drawn as inline SVG in the site's two typefaces (BRIEF.md §11.1).
+ * Stages and documented ElevenLabs endpoints only: no counts, costs, model versions or infrastructure.
+ * Two drawings from one data set: a two-lane plan view for wide screens and a single-column one for
+ * narrow screens, so the type never scales below a readable size. Same hairline-and-arrow language
+ * as Schematic.astro: a top rule per stage, serif stage names, cobalt arrows in the gaps.
+ */
+interface Node { id: string; label: string; eps?: string[]; detail: string; }
+const nodes: Record<string, Node> = {
+  brief: { id: 'brief', label: 'Album brief', detail: 'One set of style descriptors for the release, with limits on tempo, key and instrumentation.' },
+  plan: { id: 'plan', label: 'Composition plan', eps: ['POST /v1/music/plan'], detail: 'A plan per track: global styles, then sections with their own styles, lengths and lines. The brief is written into every plan.' },
+  compose: { id: 'compose', label: 'Compose', eps: ['POST /v1/music', 'POST /v1/music/detailed'], detail: 'Audio composed from the plan. The detailed call returns the track’s metadata with the audio.' },
+  cast: { id: 'cast', label: 'Script and cast', detail: 'Spoken lines, each given to a voice by its voice_id.' },
+  speak: { id: 'speak', label: 'Spoken parts', eps: ['POST /v1/text-to-dialogue', 'POST /v1/text-to-speech/{voice_id}'], detail: 'Dialogue for exchanges between speakers, text to speech for a single voice.' },
+  sequence: { id: 'sequence', label: 'Sequencing', detail: 'A running order across the album, so tracks made separately play as one record.' },
+  artwork: { id: 'artwork', label: 'Artwork and identity', detail: 'A cover for each release, with the Cash Nova bio and credits.' },
+  publish: { id: 'publish', label: 'ElevenMusic', detail: 'Released to the public artist profile. Followers, discovery and playlist placement are read here.' },
+};
+
+const DETAIL = 15, LEAD = 21, EP_LEAD = 21, CHAR = 0.48 * DETAIL;
+function wrap(text: string, width: number): string[] {
+  const max = Math.floor(width / CHAR);
+  const out: string[] = []; let line = '';
+  for (const word of text.split(' ')) {
+    if (line && (line + ' ' + word).length > max) { out.push(line); line = word; } else { line = line ? line + ' ' + word : word; }
+  }
+  if (line) out.push(line);
+  return out;
+}
+interface Placed extends Node { x: number; y: number; w: number; lines: string[]; h: number; lane?: string; }
+function place(id: string, x: number, y: number, w: number, lane?: string): Placed {
+  const n = nodes[id]; const lines = wrap(n.detail, w); const eps = n.eps?.length ?? 0;
+  return { ...n, x, y, w, lines, lane, h: 30 + eps * EP_LEAD + (eps ? 8 : 0) + lines.length * LEAD };
+}
+
+/* Wide drawing: five columns, two lanes. */
+const A = 34, B = 252, GAP = 46;
+const cx = [0, 211, 462, 783, 1014], cw = [165, 205, 275, 185, 186];
+const wide: Placed[] = [
+  place('brief', cx[0], A, cw[0]),
+  place('plan', cx[1], A, cw[1], 'Music'),
+  place('compose', cx[2], A, cw[2]),
+  place('cast', cx[1], B, cw[1], 'Voices'),
+  place('speak', cx[2], B, cw[2]),
+  place('sequence', cx[3], A, cw[3]),
+  place('artwork', cx[3], B, cw[3]),
+  place('publish', cx[4], A, cw[4]),
+];
+const wideH = Math.max(...wide.map((n) => n.y + n.h)) + 6;
+const g = (i: number) => cx[i] + cw[i]; // right edge of column i
+const mid = (i: number) => g(i) + GAP / 2;
+const widePaths = [
+  `M${g(0) + 7} ${A}H${cx[1] - 8}`,
+  `M${mid(0)} ${A}V${B}H${cx[1] - 8}`,
+  `M${g(1) + 7} ${A}H${cx[2] - 8}`,
+  `M${g(1) + 7} ${B}H${cx[2] - 8}`,
+  `M${g(2) + 7} ${A}H${cx[3] - 8}`,
+  `M${g(2) + 7} ${B}H${mid(2)}V${A}`,
+  `M${g(3) + 7} ${A}H${cx[4] - 8}`,
+  `M${g(3) + 7} ${B}H${mid(3)}V${A}`,
+];
+const wideHeads = [[cx[1] - 8, A], [cx[1] - 8, B], [cx[2] - 8, A], [cx[2] - 8, B], [cx[3] - 8, A], [cx[4] - 8, A]].map(([x, y]) => ({ x, y, r: 0 }));
+
+/* Narrow drawing: one column. The brief feeds two indented lanes down a left rail; their outputs return down a right rail. */
+const NW = 360, IN = 34, LW = 292, RAIL_L = 8, RAIL_R = 348, FULL = 326, STEP = 48;
+let y = 12;
+const narrow: Placed[] = [];
+const put = (id: string, x: number, w: number, lane?: string) => { if (lane) y += 22; const p = place(id, x, y, w, lane); narrow.push(p); y += p.h + STEP; return p; };
+const nb = put('brief', 0, FULL);
+const np = put('plan', IN, LW, 'Music');
+const nc = put('compose', IN, LW);
+const nk = put('cast', IN, LW, 'Voices');
+const ns = put('speak', IN, LW);
+const nq = put('sequence', 0, FULL);
+const na = put('artwork', 0, FULL);
+const nu = put('publish', 0, FULL);
+const narrowH = y - STEP + 6;
+const down = (a: Placed, b: Placed) => `M${a.x + 8} ${a.y + a.h + 8}V${b.y - 9}`;
+const narrowPaths = [
+  `M${RAIL_L} ${nb.y + nb.h + 8}V${nk.y}H${IN - 8}`,
+  `M${RAIL_L} ${np.y}H${IN - 8}`,
+  down(np, nc), down(nk, ns), down(nq, na), down(na, nu),
+  `M${IN + LW + 7} ${nc.y}H${RAIL_R}V${nq.y}H${FULL + 9}`,
+  `M${IN + LW + 7} ${ns.y}H${RAIL_R}`,
+];
+const narrowHeads = [
+  { x: IN - 8, y: np.y, r: 0 }, { x: IN - 8, y: nk.y, r: 0 },
+  { x: nc.x + 8, y: nc.y - 9, r: 90 }, { x: ns.x + 8, y: ns.y - 9, r: 90 }, { x: na.x + 8, y: na.y - 9, r: 90 }, { x: nu.x + 8, y: nu.y - 9, r: 90 },
+  { x: FULL + 9, y: nq.y, r: 180 },
+];
+const drawings = [
+  { cls: 'cn-svg cn-svg--wide', w: 1200, h: wideH, items: wide, paths: widePaths, heads: wideHeads },
+  { cls: 'cn-svg cn-svg--narrow', w: NW, h: narrowH, items: narrow, paths: narrowPaths, heads: narrowHeads },
+];
+const title = 'The Cash Nova pipeline';
+const desc = 'An album brief of shared style descriptors feeds two lanes. Music: a composition plan per track from POST /v1/music/plan, then audio from POST /v1/music or POST /v1/music/detailed. Voices: a script with a voice per line, then spoken parts from POST /v1/text-to-dialogue and POST /v1/text-to-speech/{voice_id}. Both lanes meet at sequencing, which sets the running order of the album. The sequenced album and its artwork and identity are released to ElevenMusic, where audience response is read.';
+---
+
+<div class="inkband ink">
+  <h3 class="inkband__title cn-title">How a release moves through it</h3>
+  <p>One brief per album feeds two lanes, music and voices. They meet at sequencing, and the finished release goes to ElevenMusic with its artwork.</p>
+  <figure class="cn-schema xwide">
+    {drawings.map((d, i) => (
+      <svg class={d.cls} viewBox={`0 0 ${d.w} ${d.h}`} role="img" aria-labelledby={`cn-t${i} cn-d${i}`} xmlns="http://www.w3.org/2000/svg">
+        <title id={`cn-t${i}`}>{title}</title>
+        <desc id={`cn-d${i}`}>{desc}</desc>
+        <g class="cn-links">
+          {d.paths.map((p) => <path d={p} />)}
+          {d.heads.map((h) => <path d="M-5 -4.5L0 0L-5 4.5" transform={`translate(${h.x} ${h.y}) rotate(${h.r})`} />)}
+        </g>
+        {d.items.map((n) => (
+          <g transform={`translate(${n.x} ${n.y})`}>
+            {n.lane && <text class="cn-lane" x="0" y="-12">{n.lane}</text>}
+            <line class="cn-rule" x1="0" y1="0" x2={n.w} y2="0" />
+            <text class="cn-label" x="0" y="28">{n.label}</text>
+            {(n.eps ?? []).map((e, k) => <text class="cn-ep" x="0" y={52 + k * EP_LEAD}>{e}</text>)}
+            {n.lines.map((l, k) => <text class="cn-detail" x="0" y={52 + (n.eps?.length ?? 0) * EP_LEAD + (n.eps ? 8 : 0) + k * LEAD}>{l}</text>)}
+          </g>
+        ))}
+      </svg>
+    ))}
+    <figcaption class="cn-cap small">
+      <span class="cn-tag">Schematic</span>
+      <span class="muted">The Cash Nova pipeline, from album brief to the public profile. Stages and documented endpoints only.</span>
+    </figcaption>
+  </figure>
+</div>
+
+<style is:global>
+  .prose .cn-title { font-family: var(--font-serif); font-weight: 400; font-size: var(--step-2); line-height: 1.15; letter-spacing: var(--tracking-title); color: var(--ink); }
+  .prose .inkband > .cn-schema { margin-top: var(--space-7); }
+  .cn-svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .cn-svg--wide { display: none; }
+  .cn-svg--narrow { max-width: 24rem; }
+  @media (min-width: 1200px) {
+    .cn-svg--wide { display: block; }
+    .cn-svg--narrow { display: none; }
+  }
+  .cn-svg text { font-family: var(--font-sans); font-size: 15px; fill: var(--muted); }
+  .cn-svg .cn-label { font-family: var(--font-serif); font-size: 21px; letter-spacing: -0.016em; fill: var(--ink); }
+  .cn-svg .cn-ep { font-weight: 500; fill: var(--ink); font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'liga' 0, 'calt' 0; }
+  .cn-svg .cn-lane { font-size: 14px; fill: var(--cobalt); }
+  .cn-rule { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .cn-links path { fill: none; stroke: var(--cobalt); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+  .cn-cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-5); max-width: var(--measure); }
+  .cn-tag { color: var(--ink); font-weight: 500; }
+</style>

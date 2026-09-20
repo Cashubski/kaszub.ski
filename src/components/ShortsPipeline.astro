@@ -1,0 +1,111 @@
+---
+/**
+ * Pipeline schematic for CleverFacts and Ogarnik, drawn as SVG in the site's two typefaces.
+ * Components are the ones permitted in BRIEF.md §11.1; stages only, no counts, costs or infrastructure.
+ */
+interface Node { x: number; y: number; w: number; label: string; detail: string[]; }
+const title = 'The pipeline: one concept becomes an English and a Polish video, and both channels are measured through the YouTube APIs.';
+
+const wide = (() => {
+  const W = 640, cw = 142, gap = 24;
+  const col = (i: number) => i * (cw + gap);
+  const r1 = 34, r1b = 124, r2 = 270;
+  const nodes: Node[] = [
+    { x: col(0), y: r1, w: cw, label: 'Concept', detail: ['One educational idea,', 'hook and script'] },
+    { x: col(1), y: r1, w: cw, label: 'Video', detail: ['Google Veo on', 'Vertex AI'] },
+    { x: col(2), y: r1, w: cw, label: 'English voice', detail: ['ElevenLabs', 'text to speech'] },
+    { x: col(3), y: r1, w: cw, label: 'CleverFacts', detail: ['English channel'] },
+    { x: col(2), y: r1b, w: cw, label: 'Polish dub', detail: ['ElevenLabs dubbing:', 'translate and re-voice'] },
+    { x: col(3), y: r1b, w: cw, label: 'Ogarnik', detail: ['Polish channel'] },
+    { x: col(0), y: r2, w: cw, label: 'Export', detail: ['YouTube Data and', 'Analytics APIs, OAuth'] },
+    { x: col(1), y: r2, w: cw, label: 'Tables', detail: ['CSV reports and a', 'manifest per channel'] },
+    { x: col(2), y: r2, w: cw, label: 'Aggregates', detail: ['Python: medians, shares,', 'matched pairs, to JSON'] },
+    { x: col(3), y: r2, w: cw, label: 'Charts', detail: ['Inline SVG drawn at', 'build time, on this page'] },
+  ];
+  const a = (i: number, y: number) => `M${col(i) + cw + 4} ${y + 9} h${gap - 9}`;
+  const arrows = [a(0, r1), a(1, r1), a(2, r1), a(2, r1b)];
+  const arrows2 = [a(0, r2), a(1, r2), a(2, r2)];
+  // fork from Video down to the Polish row, and the return from the channels to measurement
+  const fork = `M${col(1) + cw + 12} ${r1 + 9} V${r1b + 9} H${col(2) - 5}`;
+  const back = `M${col(3) + cw / 2} ${r1b + 62} V${r2 - 34} H${cw / 2} V${r2 - 8}`;
+  return { W, H: 346, nodes, arrows: [...arrows, ...arrows2], lines: [fork, back], groups: [{ x: 0, y: 14, text: 'Production, through generation APIs' }, { x: 0, y: r2 - 46, text: 'Measurement, through the YouTube APIs'}] };
+})();
+
+const narrow = (() => {
+  const W = 340, half = 158, R = W - half;
+  const H1 = 52, H2 = 69; // node heights with one and two detail lines
+  const rows: { h: number; nodes: Omit<Node, 'y'>[]; group?: string }[] = [
+    { h: H1, nodes: [{ x: 0, w: W, label: 'Concept', detail: ['One educational idea, hook and script'] }] },
+    { h: H1, nodes: [{ x: 0, w: W, label: 'Video', detail: ['Google Veo on Vertex AI, long-running operation'] }] },
+    { h: H2, nodes: [{ x: 0, w: half, label: 'English voice', detail: ['ElevenLabs', 'text to speech'] }, { x: R, w: half, label: 'Polish dub', detail: ['ElevenLabs dubbing:', 'translate, re-voice'] }] },
+    { h: H1, nodes: [{ x: 0, w: half, label: 'CleverFacts', detail: ['English channel'] }, { x: R, w: half, label: 'Ogarnik', detail: ['Polish channel'] }] },
+    { h: H1, group: 'Measurement, through the YouTube APIs', nodes: [{ x: 0, w: W, label: 'Export', detail: ['YouTube Data API v3, Analytics API v2, OAuth 2.0'] }] },
+    { h: H1, nodes: [{ x: 0, w: W, label: 'Tables', detail: ['CSV reports and a manifest per channel'] }] },
+    { h: H1, nodes: [{ x: 0, w: W, label: 'Aggregates', detail: ['Python: medians, shares, matched pairs, to JSON'] }] },
+    { h: H1, nodes: [{ x: 0, w: W, label: 'Charts', detail: ['Inline SVG drawn at build time, on this page'] }] },
+  ];
+  const nodes: Node[] = [], arrows: string[] = [];
+  const groups = [{ x: 0, y: 14, text: 'Production, through generation APIs' }];
+  let y = 30;
+  rows.forEach((row, i) => {
+    if (row.group) { groups.push({ x: 0, y: y + 14, text: row.group }); y += 30; }
+    row.nodes.forEach((n) => nodes.push({ ...n, y }));
+    const next = rows[i + 1];
+    if (next) {
+      const xs = next.nodes.length > row.nodes.length ? next.nodes.map((n) => n.x) : row.nodes.map((n) => n.x);
+      xs.forEach((x) => arrows.push(`M${x + 8} ${y + row.h + 8} v16`));
+      y += row.h + 36;
+    } else y += row.h;
+  });
+  return { W, H: y + 6, nodes, arrows, lines: [] as string[], groups };
+})();
+const variants = [{ key: 'wide', ...wide }, { key: 'narrow', ...narrow }];
+---
+
+<figure class="sp" aria-label={title}>
+  <div class="sp__plate print panel">
+    {variants.map((v) => (
+      <svg class={`sp-${v.key}`} viewBox={`0 0 ${v.W} ${v.H}`} role="img" aria-labelledby={`sp-t-${v.key} sp-d-${v.key}`}>
+        <title id={`sp-t-${v.key}`}>Pipeline schematic</title>
+        <desc id={`sp-d-${v.key}`}>A concept becomes a video through Google Veo on Vertex AI. The English version is voiced with ElevenLabs text to speech and published on CleverFacts; the Polish version is translated and dubbed with ElevenLabs dubbing and published on Ogarnik. Both channels are exported through the YouTube Data API v3 and the YouTube Analytics API v2 with OAuth 2.0 into CSV tables, aggregated in Python into a JSON file, and drawn as inline SVG charts on this page.</desc>
+        <defs>
+          <marker id={`sp-arrow-${v.key}`} viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M1 1 L8 5 L1 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+          </marker>
+        </defs>
+        {v.groups.map((g) => <text class="sp-group" x={g.x} y={g.y}>{g.text}</text>)}
+        {v.nodes.map((n) => (
+          <g>
+            <line class="sp-rule" x1={n.x} x2={n.x + n.w} y1={n.y} y2={n.y} />
+            <text class="sp-label" x={n.x} y={n.y + 24}>{n.label}</text>
+            {n.detail.map((d, i) => <text class="sp-detail" x={n.x} y={n.y + 44 + i * 17}>{d}</text>)}
+          </g>
+        ))}
+        {v.lines.map((d) => <path class="sp-flow" d={d} marker-end={`url(#sp-arrow-${v.key})`} />)}
+        {v.arrows.map((d) => <path class="sp-flow" d={d} marker-end={`url(#sp-arrow-${v.key})`} />)}
+      </svg>
+    ))}
+  </div>
+  <figcaption class="sp__cap small">
+    <span class="sp__tag">Schematic</span>
+    <span class="muted">{title} Stages and interfaces only.</span>
+  </figcaption>
+</figure>
+
+<style>
+  .sp { margin-block: var(--space-7); }
+  .sp__plate { background: var(--paper-deep); }
+  .sp svg { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-sans); }
+  .sp .sp-narrow { display: none; max-width: 27.5rem; margin-inline: auto; }
+  @media (max-width: 680px) {
+    .sp .sp-wide { display: none; }
+    .sp .sp-narrow { display: block; }
+  }
+  .sp-rule { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+  .sp-label { font-family: var(--font-serif); font-size: 19px; fill: var(--ink); letter-spacing: -0.01em; }
+  .sp-detail { font-size: 13px; fill: var(--muted); }
+  .sp-group { font-size: 14px; fill: var(--ink-2); }
+  .sp-flow { fill: none; stroke: var(--cobalt); stroke-width: 1.3; stroke-linecap: round; stroke-linejoin: round; }
+  .sp__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); max-width: var(--measure); }
+  .sp__tag { color: var(--ink); font-weight: 500; }
+</style>

@@ -1,0 +1,220 @@
+---
+title: "CleverFacts and Ogarnik"
+editorialTitle: "One pipeline, two languages, 727,000 views"
+summary: "An automated pipeline that turns one short-form educational concept into an English and a Polish video through generation and dubbing APIs, measured with the full YouTube Analytics history of both channels: 148 videos, 73 matched pairs."
+category: experiments
+role: "Built and ran the automated production, dubbing and analytics pipeline for both channels"
+years: "2026"
+status: "Both channels published in March 2026; analytics exported and analysed on 19 September 2026"
+evidence: ["Audience reach", "Creative experiment"]
+seoDescription: "One automated pipeline, an English and a Polish short-form channel, and what 727,000 views of YouTube Analytics say about whether a format transfers."
+technologies: ["Google Veo (Vertex AI)", "ElevenLabs API", "YouTube Analytics API v2", "YouTube Data API v3", "OAuth 2.0", "Python"]
+result: "727,455 views across 148 short-form videos in English and Polish (YouTube Analytics, 11 March to 19 September 2026). Views, not unique viewers. Across 73 matched pairs, English and Polish results correlated only loosely (rank correlation 0.46)."
+links:
+  - label: "CleverFacts on YouTube"
+    href: "https://www.youtube.com/@minimotionvid"
+    external: true
+  - label: "Ogarnik on YouTube"
+    href: "https://www.youtube.com/@Ogarnik1"
+    external: true
+cover: ../../assets/work/multilingual-shorts/pair-vegetables.jpg
+coverPosition: "centre"
+coverAlt: "Two vertical video thumbnails side by side: an animated celery plant with a face standing in a bowl of water, captioned in English on the left and in Polish on the right."
+coverCaption: "One concept, two localised videos: the vegetables-from-scraps short had 2,097 views in English and 8,474 in Polish by 19 September 2026."
+coverLabel: "Thumbnails"
+order: 8
+featured: false
+schemaType: CreativeWork
+metrics:
+  - value: "727,455 views"
+    context: "CleverFacts 486,941 and Ogarnik 240,514, across 74 videos each, from YouTube Analytics; views, not unique viewers; audience reach"
+    asOf: "19 September 2026"
+  - value: "73 matched pairs"
+    context: "The same concept published in English and in Polish; rank correlation of views 0.46"
+    asOf: "19 September 2026"
+---
+import ExternalLink from '../../components/ExternalLink.astro';
+import EvidenceBand from '../../components/EvidenceBand.astro';
+import ShortsPair from '../../components/ShortsPair.astro';
+import ShortsStills from '../../components/ShortsStills.astro';
+import ShortsPipeline from '../../components/ShortsPipeline.astro';
+import ShortsCumulative from '../../components/ShortsCumulative.astro';
+import ShortsLaunch from '../../components/ShortsLaunch.astro';
+import ShortsPairsScatter from '../../components/ShortsPairsScatter.astro';
+import ShortsSkew from '../../components/ShortsSkew.astro';
+import ShortsTraffic from '../../components/ShortsTraffic.astro';
+import ShortsDevices from '../../components/ShortsDevices.astro';
+import ShortsWatch from '../../components/ShortsWatch.astro';
+import { analytics as a, num, pct, longDate } from '../../components/shorts-scale';
+import catEn from '../../assets/work/multilingual-shorts/cat-safety-en.jpg';
+import catPl from '../../assets/work/multilingual-shorts/cat-safety-pl.jpg';
+import leftEn from '../../assets/work/multilingual-shorts/leftovers-en.jpg';
+import leftPl from '../../assets/work/multilingual-shorts/leftovers-pl.jpg';
+
+export const pair = (concept) => a.pairs.points.find((p) => p.concept === concept);
+export const cat = pair('House things that can hurt a cat');
+export const left = pair('Leftovers that can make you sick');
+export const country = (k, code) => a[k].countries.find((c) => c.code === code);
+
+## The hypothesis
+
+Does a short-form educational format transfer between languages, or does each audience need its own? I built a pipeline to find out: one concept goes in, and two localised videos come out, an English one for CleverFacts and a Polish one for Ogarnik. The channels share localised versions of the same underlying concepts; that is the design of the experiment.
+
+Over ten days in March 2026 the pipeline published {a.en.experiment_videos} videos on each channel. Six months later I exported the full analytics history of both and analysed it. This page reports what the data supports, and says where it stops.
+
+## What I built
+
+- An automated production pipeline. The videos were generated through APIs, not edited by hand: one concept becomes a vertical video with a voice.
+- A localisation stage. Each concept is translated and adapted for the Polish audience, then dubbed expressively, so the delivery survives the change of language.
+- Two channels run as a matched set: the same format, the same concepts, published in nearly the same order within the same ten days, so that a concept can be read across markets.
+- Editorial choices: topic selection, hooks, pacing and publishing cadence.
+- A measurement stage: an export of each channel's full history through the YouTube APIs, an analysis script that reduces it to aggregates, and the charts on this page, which are drawn from that file when the site is built.
+
+I did not build or train the generation models. They are reached through their providers' APIs. My work is the pipeline around them, the two channels it produced and the analysis that measures them.
+
+## Technical stack
+
+The pipeline is built on three groups of interfaces: video generation, voice and dubbing, and the YouTube APIs for measurement.
+
+<div class="table-wrap" role="region" aria-label="Technical stack by layer" tabindex="0">
+
+| Layer | Component | What it does |
+| --- | --- | --- |
+| Concept | Topic, hook and script | One educational idea per video, written for a short vertical format |
+| Video | Google Veo (Vertex AI; Flow is the same model family's studio tool) | Generates the vertical footage as a long-running operation: a `predictLongRunning` request on the model, polled with `fetchPredictOperation` until the video is ready |
+| Voice | ElevenLabs API, `POST /v1/text-to-speech/{voice_id}` | Narration for the English version |
+| Localisation | ElevenLabs API, `POST /v1/dubbing` | Translates the video and dubs it into Polish, keeping the expressive delivery |
+| Publication | Two YouTube channels | The English video goes to CleverFacts, the Polish one to Ogarnik |
+| Export | YouTube Data API v3 and YouTube Analytics API v2, OAuth 2.0, Python | The upload index, then daily, per-video, country, traffic-source, device and audience reports, written to CSV per channel |
+| Analysis | Python over the CSV exports | Restricts to the experiment's videos, matches the pairs, computes medians, shares and correlations, and writes one aggregates file |
+| Presentation | Astro, inline SVG | Every chart on this page is drawn from the aggregates file at build time, with no chart library and no request to a third party |
+
+</div>
+
+<ShortsPipeline />
+
+## Decisions that mattered
+
+<dl class="decisions">
+  <div>
+    <dt>Produce through APIs</dt>
+    <dd>Generation, voice and dubbing are all API calls, so the same process turns out concept after concept and the two language versions differ only where they are meant to.</dd>
+  </div>
+  <div>
+    <dt>Adapt, not translate literally</dt>
+    <dd>Each Polish version is an adaptation of the concept for the audience it is going to, with its own title and phrasing.</dd>
+  </div>
+  <div>
+    <dt>Matched pairs</dt>
+    <dd>Each concept yields an English and a Polish video, so the two channels can be compared concept by concept and not only in total.</dd>
+  </div>
+  <div>
+    <dt>Measure per video</dt>
+    <dd>Channel totals say little about any one concept. The export holds a daily series for every video, which is what the launch curve and the pair comparison below are built from.</dd>
+  </div>
+  <div>
+    <dt>Publish aggregates only</dt>
+    <dd>The raw exports stay private. The analysis script writes medians, shares and per-concept view counts to one file, and the page reads nothing else.</dd>
+  </div>
+</dl>
+
+<EvidenceBand
+  title="Evidence, from the analytics export"
+  intro={`YouTube Analytics for both channels, ${longDate(a.en.range.start)} to ${longDate(a.en.range.end)}, exported on ${longDate(a.en.exported_at)}. Views count plays, not people, and these figures measure audience reach.`}
+  items={[
+    { figure: num(a.combined.experiment_views), unit: `views across ${a.combined.experiment_videos} videos`, context: `CleverFacts ${num(a.en.views.experiment_total)} and Ogarnik ${num(a.pl.views.experiment_total)}, ${a.en.experiment_videos} videos each; about ${num(a.combined.watch_hours)} hours of watch time.` },
+    { figure: `${num(a.en.views.per_video.median)} and ${num(a.pl.views.per_video.median)}`, unit: 'median views per video, English and Polish', context: `Ranges ${num(a.en.views.per_video.min)} to ${num(a.en.views.per_video.max)} and ${num(a.pl.views.per_video.min)} to ${num(a.pl.views.per_video.max)}. The median describes a typical video better than the total does.` },
+    { figure: String(a.pairs.spearman), unit: `rank correlation across ${a.pairs.n} matched pairs`, context: `English views against Polish views for the same concept. It falls to ${a.pairs.robustness_excluding_first_batch.spearman} when the first day's batch is left out.` },
+    { figure: `${a.en.subscribers.gained_per_1000_views.toFixed(1)} and ${a.pl.subscribers.gained_per_1000_views.toFixed(1)}`, unit: 'subscribers gained per 1,000 views', context: `${num(a.en.subscribers.gained)} gained on CleverFacts and ${num(a.pl.subscribers.gained)} on Ogarnik; net of losses, ${num(a.en.subscribers.net)} and ${num(a.pl.subscribers.net)}.` },
+  ]}
+>
+
+The totals here come from YouTube Analytics and run to {longDate(a.en.range.end)}. The public counters on the channel pages count differently and showed a slightly lower combined figure a few days earlier; this page uses the export throughout so that every number can be recomputed.
+
+</EvidenceBand>
+
+## What the analytics show
+
+The analysis covers the {a.combined.experiment_videos} short-form videos published between {longDate(a.en.publish_window.first)} and {longDate(a.pl.publish_window.last)}. The CleverFacts channel itself dates from 2017 and carries {a.en.excluded_videos} unrelated uploads; they are excluded, and they account for {a.en.excluded_views} of the channel's {num(a.en.views.experiment_total + a.en.excluded_views)} views. One Ogarnik upload with no recorded views is also left out.
+
+<ShortsCumulative />
+
+Both channels peaked within a day of each other, CleverFacts on {longDate(a.en.timeline.peak_day)} with {num(a.en.timeline.peak_day_views)} views and Ogarnik on {longDate(a.pl.timeline.peak_day)} with {num(a.pl.timeline.peak_day_views)}. Publishing stopped on 20 March and the feed moved on within days. What is left is a long, thin tail: about a dozen views a day on each channel by September.
+
+<ShortsLaunch />
+
+The same shape holds video by video. For most videos on both channels the busiest day was the first or the second. A short that has not found an audience within a week is very unlikely to find one later, which makes the first days the only useful window for judging a concept.
+
+<ShortsTraffic />
+
+Subscribers, search and the channel page together supplied under a quarter of English views and about a tenth of Polish ones. With so little of the audience arriving by choice, a video's view count here is mostly a record of how far the feed chose to carry it.
+
+<ShortsPairsScatter />
+
+This is the question the experiment was built for. English won {a.pairs.en_wins} of the {a.pairs.n} pairs, and the median pair had {a.pairs.median_ratio_en_over_pl} times more views in English (middle half {a.pairs.ratio_q1} to {a.pairs.ratio_q3} times), which mostly reflects the size of the two audiences. The more useful reading is relative: of the concepts that beat their own channel's median, {a.pairs.above_median_both} did so in both languages, {a.pairs.above_median_en_only} only in English and {a.pairs.above_median_pl_only} only in Polish. {a.pairs.gap_10x_or_more} pairs differ by ten times or more. Only two concepts made the top ten on both channels: dog-walking conditions and cleaning tricks.
+
+The first day's batch needs a caveat. The nine Polish videos published on {longDate(a.pl.first_batch.day)} had a median of {num(a.pl.first_batch.median_views)} views, against {num(a.en.first_batch.median_views)} for the English videos of the same day, and they sit together in the lower left of the chart. They lift the correlation: without them it is {a.pairs.robustness_excluding_first_batch.spearman} across {a.pairs.robustness_excluding_first_batch.n} pairs.
+
+<div class="pairs">
+<ShortsPair
+  en={{ id: 'xI79QPSMG8Y', title: 'These Things In Your House Can Hurt Your Cat', views: num(cat.en), thumb: catEn }}
+  pl={{ id: 'HOlVHw7zaFk', title: 'Te rzeczy w domu mogą zaszkodzić Twojemu kotu', views: num(cat.pl), thumb: catPl }}
+  caption="The cat-safety concept is the most viewed Polish video and an ordinary English one. The player loads from youtube-nocookie.com only when clicked."
+/>
+<ShortsStills
+  en={{ id: '9GeegzREvX4', title: 'Leftovers That Can Make You Sick', views: num(left.en), thumb: leftEn, alt: 'Animated creamy pasta with an angry face in a plastic tub inside a fridge, with English captions.' }}
+  pl={{ id: '4qCEGZmO8QI', title: 'Resztki, po których możesz się rozchorować', views: num(left.pl), thumb: leftPl, alt: 'The same animated pasta character in a plastic tub, with Polish captions.' }}
+  caption="The leftovers concept went the other way: among the strongest in English, barely noticed in Polish. Stills only; the links open YouTube."
+/>
+</div>
+
+<ShortsSkew />
+
+The Polish channel's three pet-safety videos, all published on 18 March, account for {pct(a.pl.skew.ranked_views.slice(0, 3).reduce((s, v) => s + v, 0) / a.pl.views.experiment_total)} of its views and {pct(a.pl.subscribers.top3_videos_share_of_attributed)} of the subscribers that YouTube attributes to a video. That is also why Ogarnik converts views to subscribers at about twice the English rate: most of its subscribers arrived through three videos. On CleverFacts the top three videos by subscribers account for {pct(a.en.subscribers.top3_videos_share_of_attributed)}.
+
+<ShortsWatch />
+
+Average percentage viewed is the only retention measure in this export. It was higher in English on the median video, and the gap narrows when weighted by views ({a.en.watch.views_weighted_avg_view_pct}% against {a.pl.watch.views_weighted_avg_view_pct}%), because the Polish hits held attention well. Within a channel the link between this figure and views is weak: a rank correlation of {a.en.watch.spearman_views_vs_avg_view_pct} in English and {a.pl.watch.spearman_views_vs_avg_view_pct} in Polish. Videos that are watched for longer tend to travel a little further, and that is as much as these numbers say.
+
+<ShortsDevices />
+
+### Who watched, and where
+
+<div class="table-wrap table-wrap--nums" role="region" aria-label="Audience by channel" tabindex="0">
+
+| Audience | CleverFacts | Ogarnik |
+| --- | --- | --- |
+| Largest country | United States, {pct(country('en', 'US').share)} | Poland, {pct(country('pl', 'PL').share)} |
+| Second and third | United Kingdom {pct(country('en', 'GB').share)}, Philippines {pct(country('en', 'PH').share)} | Germany {pct(country('pl', 'DE').share, 1)}, United Kingdom {pct(country('pl', 'GB').share, 1)} |
+| Countries with views | {a.en.countries_total} | {a.pl.countries_total} |
+| Views from subscribers | {pct(a.en.subscribed.subscribed_share, 1)} | {pct(a.pl.subscribed.subscribed_share, 1)} |
+| Viewers aged 25 to 44 | {a.en.audience.age_25_44_share}% | {a.pl.audience.age_25_44_share}% |
+| Female viewers | {a.en.audience.female_share}% | {a.pl.audience.female_share}% |
+
+</div>
+
+The English channel found a mostly American audience spread over {a.en.countries_total} countries; the Polish one stayed in Poland, with Germany, the United Kingdom and the Netherlands a distant second, third and fourth. Age and gender are YouTube's estimates for signed-in viewers and cover the whole channel.
+
+## Limitations and status
+
+Both channels are published, and nothing new has gone out since March 2026. The analysis is observational. The two channels have different audiences and sizes of market, the platform's distribution decides most of what any single video receives, and a concept was published once per language, so no pair is a controlled comparison. A correlation of {a.pairs.spearman} across {a.pairs.n} pairs, with an interval of roughly {a.pairs.spearman_ci95[0]} to {a.pairs.spearman_ci95[1]}, is evidence of a loose relationship and nothing finer. Pairs were matched by hand from the titles and the publication order.
+
+Views count plays, not people. Per-video audience retention curves are not part of this export: that report needs one request per video and the run stalled, so the page relies on average percentage viewed and makes no claim about where in a video viewers left. Traffic source, device, country, age and gender are channel-level reports and cannot be split by video. The API has no hour-of-day dimension, so nothing here speaks to publishing time.
+
+The production code is not public, and this page describes that side of the pipeline by layer and interface only. The generation models belong to their providers and I make no claim about them.
+
+## What I learned
+
+<div class="offset">
+
+<p class="pull">A format can transfer between languages while the hits do not.</p>
+
+The same pipeline produced a working channel in both markets, with the same launch curve, the same dependence on the feed and the same television audience. Which concepts took off was a different matter in each language, and the Polish channel's result rested on three videos about pets. If I ran it again I would publish fewer concepts more than once, so that the difference between a concept and a lucky day could be measured, and I would judge each video on its first week, because the data says there is no second one.
+
+On the engineering side: once production was automated, measurement became the part still to build. The charts on this page are the end of that pipeline, and they redraw themselves from a new export.
+
+</div>
+
+## The channels
+
+Both channels are public: <ExternalLink href="https://www.youtube.com/@minimotionvid">CleverFacts on YouTube</ExternalLink> and <ExternalLink href="https://www.youtube.com/@Ogarnik1">Ogarnik on YouTube</ExternalLink>. The measurement interfaces are documented by Google: <ExternalLink href="https://developers.google.com/youtube/analytics">YouTube Analytics API</ExternalLink> and <ExternalLink href="https://developers.google.com/youtube/v3">YouTube Data API</ExternalLink>. Thumbnails here are self-hosted and the player loads only when clicked.

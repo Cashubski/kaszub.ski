@@ -1,0 +1,121 @@
+---
+title: "Cash Nova"
+editorialTitle: "Building an AI-native artist through an API pipeline"
+summary: "A fictional producer whose tracks I generated programmatically through the Eleven Music API. The pipeline covered music, voices, sound matching and sequencing, with six albums and 52 tracks on ElevenMusic in 2026."
+category: experiments
+role: "Built and ran the automated generation pipeline; producer behind the Cash Nova identity"
+years: "2026"
+status: "Six albums released in 2026; figures as of 15 September 2026"
+evidence: ["Creative experiment", "Audience reach"]
+seoDescription: "A fictional producer whose tracks I generated through the Eleven Music API, in a pipeline covering music, voices, sound matching and sequencing."
+technologies: ["Eleven Music API", "ElevenLabs voices"]
+result: "52 tracks generated through the Eleven Music API and released as six albums; 97 followers on ElevenMusic as of 15 September 2026, with platform discovery and playlist placement."
+links:
+  - label: "Listen on ElevenMusic"
+    href: "https://elevenmusic.io/artists/cashubski-aqAqR3"
+    external: true
+cover: ../../assets/work/cash-nova/album-the-last-lie.webp
+coverPosition: "centre"
+coverAlt: "Album artwork for The Last Lie by Cash Nova: a woman in profile in black and white beside the title set in serif capitals."
+coverCaption: "The Last Lie, one of six Cash Nova albums released in 2026. Artwork from the artist profile."
+coverLabel: "Artwork"
+order: 7
+featured: false
+compact: true
+schemaType: CreativeWork
+metrics:
+  - value: "52 tracks, six albums"
+    context: "Generated programmatically through the Eleven Music API and released on ElevenMusic in 2026"
+    asOf: "15 September 2026"
+  - value: "97 followers"
+    context: "ElevenMusic artist profile; audience reach"
+    asOf: "15 September 2026"
+---
+import ExternalLink from '../../components/ExternalLink.astro';
+import Artworks from '../../components/Artworks.astro';
+import EvidenceBand from '../../components/EvidenceBand.astro';
+import CashNovaStack from '../../components/CashNovaStack.astro';
+import CashNovaSchematic from '../../components/CashNovaSchematic.astro';
+import burning from '../../assets/work/cash-nova/album-burning-in-the-light.webp';
+import remixes from '../../assets/work/cash-nova/album-remixes.webp';
+import cartagena from '../../assets/work/cash-nova/album-midnight-in-cartagena.webp';
+import sunComesUp from '../../assets/work/cash-nova/track-sun-comes-up.webp';
+
+## The hypothesis
+
+Can an artist who does not exist, and whose records are made by API calls, earn a real audience? Cash Nova is a fictional producer (“I’m Cash, producer based in London”) that I created to find out. Generating a single track is the easy part. An album is a property of the whole set: a consistent sound, voices, a running order that flows. The hypothesis was that a pipeline could produce those qualities, and that listeners would respond to the result on its own terms.
+
+## What I did
+
+- Built and ran the pipeline that generated the catalogue programmatically through the <ExternalLink href="https://elevenlabs.io/eleven-music-api">Eleven Music API</ExternalLink> from ElevenLabs. No track was made by hand in a web interface.
+- Released the output on ElevenMusic under the Cash Nova identity, with its own bio and artwork. On 15 September 2026 the profile showed 52 tracks and six albums, all released in 2026, among them Gold Coast, Burning In The Light, The Last Lie, Remixes and Midnight in Cartagena.
+- Treated audience response as the outcome: a dated follower count, plus platform discovery and playlist placement, for which I publish no counts.
+
+I did not build or train the generation model. It is ElevenLabs’ model, reached through their API. My work is the pipeline around it and the catalogue it produced.
+
+## Technical stack
+
+The pipeline is built on the ElevenLabs API at <span class="cn-base">{'api.elevenlabs.io'}</span>, authenticated with an xi-api-key header. Read from the top, the layers run from planning a release to publishing it. Every endpoint named is a documented one.
+
+<CashNovaStack />
+
+<CashNovaSchematic />
+
+## Decisions that mattered
+
+<dl class="decisions">
+  <div>
+    <dt>The API, not the web interface</dt>
+    <dd>Every track came from a programmatic call, not from a web interface.</dd>
+  </div>
+  <div>
+    <dt>The album, not the track, as the unit</dt>
+    <dd>Sound matching and sequencing are stages of the pipeline, so coherence across a release is part of the build.</dd>
+  </div>
+  <div>
+    <dt>Voices inside the pipeline</dt>
+    <dd>The voices, spoken parts included, are a stage of the pipeline like the music, so they fall under the same process.</dd>
+  </div>
+  <div>
+    <dt>A named persona</dt>
+    <dd>The catalogue is released under one fictional identity with its own bio and artwork. Listeners meet an artist, and the follower count belongs to that artist.</dd>
+  </div>
+</dl>
+
+<Artworks
+  caption="Three of the six albums and the cover of the strongest-performing track. All artwork from the artist profile, 2026. Credits are given as the platform shows them."
+  items={[
+    { image: burning, alt: 'Album artwork for Burning In The Light by Cash Nova.', caption: 'Burning In The Light' },
+    { image: remixes, alt: 'Album artwork for Remixes by Cash Nova.', caption: 'Remixes' },
+    { image: cartagena, alt: 'Album artwork for Midnight in Cartagena by Cash Nova.', caption: 'Midnight in Cartagena' },
+    { image: sunComesUp, alt: 'Cover artwork for the track Sun Comes Up, credited on the platform as featuring Wyclef Bonansi.', caption: 'Sun Comes Up (feat. Wyclef Bonansi)' },
+  ]}
+/>
+
+<EvidenceBand
+  tone="shade"
+  title="Evidence so far"
+  intro="Read from the public ElevenMusic profile on 15 September 2026. The figures are small, and they measure audience reach."
+  items={[
+    { figure: '52 tracks', unit: 'across six albums', context: 'Generated through the Eleven Music API and released on ElevenMusic in 2026. Output, not audience. Profile on 15 September 2026.' },
+    { figure: '97', unit: 'followers', context: 'ElevenMusic artist profile on 15 September 2026. Audience reach.' },
+  ]}
+>
+
+The tracks also received platform discovery and playlist placement; I publish no counts for either. According to my creator analytics the strongest-performing track is “Sun Comes Up” (feat. Wyclef Bonansi), on Gold Coast.
+
+So far the answer to the question is: yes, a small audience. 97 followers and some playlist placement show that listeners found the music. They do not show more than that.
+
+</EvidenceBand>
+
+## Limitations and status
+
+The figures belong to one platform and are modest. The only audience figure I publish is the follower count, with its date. The model is ElevenLabs’ and I make no claim about it. The pipeline code is not public. The stack above names the endpoints the pipeline is built on and how it approaches coherence across an album. It gives no measurements of how closely the tracks match, because I have none to publish.
+
+## What I learned
+
+Single generations are easy to come by. Consistency of sound, voice and order across a release has to be engineered, and that is where the pipeline earns its place. The audience figures are small, and they are the only measure I have of how the catalogue was received.
+
+## Where to listen
+
+ElevenMusic offers no public embed, so the music lives there: <ExternalLink href="https://elevenmusic.io/artists/cashubski-aqAqR3">listen on ElevenMusic</ExternalLink>. Nothing plays on this page. The API the pipeline runs on is documented by ElevenLabs: <ExternalLink href="https://elevenlabs.io/eleven-music-api">Eleven Music API</ExternalLink>.

@@ -1,0 +1,44 @@
+---
+/** An English short beside its Polish adaptation as plain self-hosted stills with links out: no player, no third-party request. */
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+import ExternalLink from './ExternalLink.astro';
+interface Side { id: string; title: string; views: string; thumb: ImageMetadata; alt: string; }
+interface Props { en: Side; pl: Side; caption: string; }
+const { en, pl, caption } = Astro.props;
+const sides = [{ ...en, lang: undefined, meta: `English, ${en.views} views` }, { ...pl, lang: 'pl', meta: `Polish, ${pl.views} views` }];
+---
+
+<figure class="stills">
+  <div class="stills__grid">
+    {sides.map((s) => {
+      const tw = Math.min(540, s.thumb.width);
+      return (
+        <div class="stills__side">
+          <div class="stills__frame print print--lift">
+            <Image src={s.thumb} alt={s.alt} width={tw} height={Math.round((tw * 16) / 9)} widths={[360, 540].filter((w) => w < tw).concat(tw)} sizes="(min-width: 720px) 18rem, 45vw" loading="lazy" decoding="async" />
+          </div>
+          <span class="stills__title small" lang={s.lang}>{s.title}</span>
+          <span class="muted small">{s.meta}</span>
+          <ExternalLink href={`https://www.youtube.com/shorts/${s.id}`} class="stills__link small">Open on YouTube</ExternalLink>
+        </div>
+      );
+    })}
+  </div>
+  <figcaption class="stills__cap small">
+    <span class="stills__label">Matched pair</span>
+    <span class="muted">{caption}</span>
+  </figcaption>
+</figure>
+
+<style>
+  .stills__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(4, auto); column-gap: var(--space-5); max-width: 36rem; }
+  .stills__side { display: grid; grid-template-rows: subgrid; grid-row: span 4; row-gap: 0.1rem; justify-items: start; }
+  .stills__frame { aspect-ratio: 9 / 16; overflow: hidden; width: 100%; }
+  .stills__frame :global(img) { width: 100%; height: 100%; object-fit: cover; }
+  .stills__title { margin-top: var(--space-3); color: var(--ink); }
+  .stills :global(.stills__link) { display: inline-flex; min-height: 2.25rem; align-items: center; font-weight: 500; }
+  .stills__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); max-width: var(--measure); }
+  .stills__label { color: var(--ink); font-weight: 500; }
+  @media (max-width: 420px) { .stills__grid { column-gap: var(--space-3); } }
+</style>

@@ -1,0 +1,2128 @@
+{
+ "en": {
+  "channel": "CleverFacts",
+  "first_batch": {
+   "day": "2026-03-12",
+   "videos": 7,
+   "median_views": 1465,
+   "max_views": 4268
+  },
+  "exported_at": "2026-09-19T09:15:51",
+  "range": {
+   "start": "2026-03-11",
+   "end": "2026-09-19"
+  },
+  "channel_first_upload": "2017-09-09",
+  "retention_export": "skipped — YouTube Analytics retention is one request per video and stalled; all other reports are complete",
+  "retention_rows": 0,
+  "videos_in_export": 77,
+  "experiment_videos": 74,
+  "excluded_videos": 3,
+  "excluded_views": 71,
+  "non_experiment_view_share": 0.00015,
+  "publish_window": {
+   "first": "2026-03-11",
+   "last": "2026-03-19"
+  },
+  "views": {
+   "experiment_total": 486941,
+   "channel_total_daily_report": 486948,
+   "watch_hours": 2455,
+   "per_video": {
+    "n": 74,
+    "median": 4318.0,
+    "q1": 1637.5,
+    "q3": 9953.8,
+    "min": 207,
+    "max": 24644
+   },
+   "under_1000": 11,
+   "over_10000": 19
+  },
+  "engagement": {
+   "likes": 12982,
+   "shares": 1695,
+   "comments": 177,
+   "likes_per_1000_views": 26.7,
+   "shares_per_1000_views": 3.5
+  },
+  "skew": {
+   "top1_share": 0.0506,
+   "top5_share": 0.2181,
+   "top10_share": 0.3928,
+   "videos_for_half": 14,
+   "bottom_half_share": 0.1419,
+   "gini": 0.504,
+   "ranked_views": [
+    24644,
+    21254,
+    20423,
+    19944,
+    19922,
+    18717,
+    17755,
+    17093,
+    16428,
+    15114,
+    14513,
+    14384,
+    13432,
+    13363,
+    12925,
+    12046,
+    10999,
+    10420,
+    10303,
+    8906,
+    8547,
+    8271,
+    8265,
+    8193,
+    7623,
+    6736,
+    6721,
+    6171,
+    5974,
+    5694,
+    5389,
+    4856,
+    4752,
+    4712,
+    4513,
+    4464,
+    4368,
+    4268,
+    4172,
+    4071,
+    3991,
+    3861,
+    3549,
+    3242,
+    2866,
+    2567,
+    2371,
+    2252,
+    2172,
+    2097,
+    2026,
+    1864,
+    1783,
+    1695,
+    1681,
+    1623,
+    1595,
+    1556,
+    1465,
+    1397,
+    1291,
+    1238,
+    1138,
+    989,
+    868,
+    788,
+    787,
+    751,
+    674,
+    664,
+    597,
+    554,
+    397,
+    207
+   ]
+  },
+  "timeline": {
+   "cumulative": [
+    {
+     "day": "2026-03-11",
+     "views": 18
+    },
+    {
+     "day": "2026-03-12",
+     "views": 7900
+    },
+    {
+     "day": "2026-03-13",
+     "views": 12196
+    },
+    {
+     "day": "2026-03-14",
+     "views": 43441
+    },
+    {
+     "day": "2026-03-15",
+     "views": 94890
+    },
+    {
+     "day": "2026-03-16",
+     "views": 141768
+    },
+    {
+     "day": "2026-03-17",
+     "views": 215831
+    },
+    {
+     "day": "2026-03-18",
+     "views": 269706
+    },
+    {
+     "day": "2026-03-19",
+     "views": 346772
+    },
+    {
+     "day": "2026-03-20",
+     "views": 399906
+    },
+    {
+     "day": "2026-03-21",
+     "views": 430473
+    },
+    {
+     "day": "2026-03-22",
+     "views": 449087
+    },
+    {
+     "day": "2026-03-23",
+     "views": 457660
+    },
+    {
+     "day": "2026-03-24",
+     "views": 463060
+    },
+    {
+     "day": "2026-03-25",
+     "views": 467321
+    },
+    {
+     "day": "2026-03-26",
+     "views": 470858
+    },
+    {
+     "day": "2026-03-27",
+     "views": 472985
+    },
+    {
+     "day": "2026-03-28",
+     "views": 475849
+    },
+    {
+     "day": "2026-03-29",
+     "views": 477521
+    },
+    {
+     "day": "2026-03-30",
+     "views": 478795
+    },
+    {
+     "day": "2026-03-31",
+     "views": 479768
+    },
+    {
+     "day": "2026-04-01",
+     "views": 480662
+    },
+    {
+     "day": "2026-04-02",
+     "views": 481379
+    },
+    {
+     "day": "2026-04-03",
+     "views": 482194
+    },
+    {
+     "day": "2026-04-04",
+     "views": 482932
+    },
+    {
+     "day": "2026-04-05",
+     "views": 483238
+    },
+    {
+     "day": "2026-04-06",
+     "views": 483610
+    },
+    {
+     "day": "2026-04-07",
+     "views": 483891
+    },
+    {
+     "day": "2026-04-08",
+     "views": 484136
+    },
+    {
+     "day": "2026-04-09",
+     "views": 484232
+    },
+    {
+     "day": "2026-04-10",
+     "views": 484320
+    },
+    {
+     "day": "2026-04-11",
+     "views": 484391
+    },
+    {
+     "day": "2026-04-12",
+     "views": 484433
+    },
+    {
+     "day": "2026-04-13",
+     "views": 484482
+    },
+    {
+     "day": "2026-04-14",
+     "views": 484588
+    },
+    {
+     "day": "2026-04-15",
+     "views": 484664
+    },
+    {
+     "day": "2026-04-22",
+     "views": 484919
+    },
+    {
+     "day": "2026-04-29",
+     "views": 485108
+    },
+    {
+     "day": "2026-05-06",
+     "views": 485219
+    },
+    {
+     "day": "2026-05-13",
+     "views": 485321
+    },
+    {
+     "day": "2026-05-20",
+     "views": 485401
+    },
+    {
+     "day": "2026-05-27",
+     "views": 485450
+    },
+    {
+     "day": "2026-06-03",
+     "views": 485551
+    },
+    {
+     "day": "2026-06-10",
+     "views": 485599
+    },
+    {
+     "day": "2026-06-17",
+     "views": 485684
+    },
+    {
+     "day": "2026-06-24",
+     "views": 485756
+    },
+    {
+     "day": "2026-07-01",
+     "views": 485867
+    },
+    {
+     "day": "2026-07-08",
+     "views": 485943
+    },
+    {
+     "day": "2026-07-15",
+     "views": 486210
+    },
+    {
+     "day": "2026-07-22",
+     "views": 486268
+    },
+    {
+     "day": "2026-07-29",
+     "views": 486367
+    },
+    {
+     "day": "2026-08-05",
+     "views": 486422
+    },
+    {
+     "day": "2026-08-12",
+     "views": 486500
+    },
+    {
+     "day": "2026-08-19",
+     "views": 486552
+    },
+    {
+     "day": "2026-08-26",
+     "views": 486683
+    },
+    {
+     "day": "2026-09-02",
+     "views": 486763
+    },
+    {
+     "day": "2026-09-09",
+     "views": 486835
+    },
+    {
+     "day": "2026-09-16",
+     "views": 486948
+    },
+    {
+     "day": "2026-09-19",
+     "views": 486948
+    }
+   ],
+   "peak_day": "2026-03-19",
+   "peak_day_views": 77066,
+   "days_to_50pct": 7,
+   "days_to_90pct": 11,
+   "day_50pct": "2026-03-18",
+   "day_90pct": "2026-03-22",
+   "views_by_end_march": 479768,
+   "share_by_end_march": 0.9853,
+   "views_last_28_full_days": 310,
+   "per_day_last_28": 11.1
+  },
+  "launch": {
+   "videos": 74,
+   "min_lifetime_views": 100,
+   "curve": [
+    {
+     "day": 0,
+     "median": 0.3637,
+     "q1": 0.2299,
+     "q3": 0.5276
+    },
+    {
+     "day": 1,
+     "median": 0.6544,
+     "q1": 0.4562,
+     "q3": 0.7414
+    },
+    {
+     "day": 2,
+     "median": 0.7662,
+     "q1": 0.6258,
+     "q3": 0.8674
+    },
+    {
+     "day": 3,
+     "median": 0.851,
+     "q1": 0.7414,
+     "q3": 0.9148
+    },
+    {
+     "day": 4,
+     "median": 0.8947,
+     "q1": 0.8072,
+     "q3": 0.9412
+    },
+    {
+     "day": 5,
+     "median": 0.9161,
+     "q1": 0.8477,
+     "q3": 0.9546
+    },
+    {
+     "day": 6,
+     "median": 0.9412,
+     "q1": 0.8987,
+     "q3": 0.9638
+    },
+    {
+     "day": 7,
+     "median": 0.9505,
+     "q1": 0.9189,
+     "q3": 0.9724
+    },
+    {
+     "day": 8,
+     "median": 0.9587,
+     "q1": 0.9311,
+     "q3": 0.9759
+    },
+    {
+     "day": 9,
+     "median": 0.9656,
+     "q1": 0.9455,
+     "q3": 0.9797
+    },
+    {
+     "day": 10,
+     "median": 0.9712,
+     "q1": 0.9517,
+     "q3": 0.9852
+    },
+    {
+     "day": 11,
+     "median": 0.9765,
+     "q1": 0.9563,
+     "q3": 0.9888
+    },
+    {
+     "day": 12,
+     "median": 0.9802,
+     "q1": 0.9599,
+     "q3": 0.9902
+    },
+    {
+     "day": 13,
+     "median": 0.9831,
+     "q1": 0.9641,
+     "q3": 0.9916
+    },
+    {
+     "day": 14,
+     "median": 0.9847,
+     "q1": 0.9666,
+     "q3": 0.9931
+    },
+    {
+     "day": 15,
+     "median": 0.9858,
+     "q1": 0.9704,
+     "q3": 0.9937
+    },
+    {
+     "day": 16,
+     "median": 0.9875,
+     "q1": 0.9746,
+     "q3": 0.9941
+    },
+    {
+     "day": 17,
+     "median": 0.9892,
+     "q1": 0.9775,
+     "q3": 0.9949
+    },
+    {
+     "day": 18,
+     "median": 0.9898,
+     "q1": 0.9775,
+     "q3": 0.9954
+    },
+    {
+     "day": 19,
+     "median": 0.991,
+     "q1": 0.9811,
+     "q3": 0.9955
+    },
+    {
+     "day": 20,
+     "median": 0.9921,
+     "q1": 0.9831,
+     "q3": 0.9963
+    },
+    {
+     "day": 21,
+     "median": 0.9929,
+     "q1": 0.9843,
+     "q3": 0.9965
+    },
+    {
+     "day": 22,
+     "median": 0.9934,
+     "q1": 0.9854,
+     "q3": 0.9966
+    },
+    {
+     "day": 23,
+     "median": 0.9944,
+     "q1": 0.9862,
+     "q3": 0.9971
+    },
+    {
+     "day": 24,
+     "median": 0.9946,
+     "q1": 0.9873,
+     "q3": 0.9974
+    },
+    {
+     "day": 25,
+     "median": 0.9948,
+     "q1": 0.9874,
+     "q3": 0.9975
+    },
+    {
+     "day": 26,
+     "median": 0.9949,
+     "q1": 0.988,
+     "q3": 0.9979
+    },
+    {
+     "day": 27,
+     "median": 0.9952,
+     "q1": 0.9886,
+     "q3": 0.9979
+    },
+    {
+     "day": 28,
+     "median": 0.9952,
+     "q1": 0.9893,
+     "q3": 0.998
+    },
+    {
+     "day": 42,
+     "median": 0.9969,
+     "q1": 0.9908,
+     "q3": 0.9989
+    },
+    {
+     "day": 56,
+     "median": 0.9975,
+     "q1": 0.9923,
+     "q3": 0.9992
+    },
+    {
+     "day": 70,
+     "median": 0.9979,
+     "q1": 0.9928,
+     "q3": 0.9993
+    },
+    {
+     "day": 90,
+     "median": 0.9984,
+     "q1": 0.9941,
+     "q3": 0.9994
+    },
+    {
+     "day": 120,
+     "median": 0.9991,
+     "q1": 0.9967,
+     "q3": 0.9998
+    }
+   ],
+   "peak_day_index": {
+    "n": 74,
+    "median": 0.0,
+    "q1": 0.0,
+    "q3": 1.0,
+    "min": 0,
+    "max": 3
+   }
+  },
+  "traffic": [
+   {
+    "source": "Shorts feed",
+    "views": 375994,
+    "share": 0.772
+   },
+   {
+    "source": "Subscriptions and notifications",
+    "views": 56652,
+    "share": 0.1163
+   },
+   {
+    "source": "Channel page",
+    "views": 32421,
+    "share": 0.0666
+   },
+   {
+    "source": "YouTube search",
+    "views": 15759,
+    "share": 0.0324
+   },
+   {
+    "source": "Everything else",
+    "views": 6190,
+    "share": 0.0127
+   }
+  ],
+  "devices": [
+   {
+    "device": "Mobile",
+    "views": 290947,
+    "share": 0.6056
+   },
+   {
+    "device": "TV",
+    "views": 81672,
+    "share": 0.17
+   },
+   {
+    "device": "Tablet",
+    "views": 80528,
+    "share": 0.1676
+   },
+   {
+    "device": "Desktop",
+    "views": 27295,
+    "share": 0.0568
+   }
+  ],
+  "mobile_os": {
+   "android": 203007,
+   "ios": 87922,
+   "android_share_of_mobile": 0.6978
+  },
+  "countries": [
+   {
+    "code": "US",
+    "views": 249372,
+    "share": 0.5267,
+    "avg_view_pct": 86.8
+   },
+   {
+    "code": "GB",
+    "views": 52855,
+    "share": 0.1116,
+    "avg_view_pct": 74.0
+   },
+   {
+    "code": "PH",
+    "views": 24512,
+    "share": 0.0518,
+    "avg_view_pct": 79.8
+   },
+   {
+    "code": "CA",
+    "views": 20001,
+    "share": 0.0422,
+    "avg_view_pct": 76.7
+   },
+   {
+    "code": "IN",
+    "views": 19529,
+    "share": 0.0412,
+    "avg_view_pct": 68.5
+   },
+   {
+    "code": "ZA",
+    "views": 13043,
+    "share": 0.0275,
+    "avg_view_pct": 88.6
+   }
+  ],
+  "countries_total": 129,
+  "subscribed": {
+   "subscribed_share": 0.0294,
+   "avg_view_pct_subscribed": 84.4,
+   "avg_view_pct_unsubscribed": 81.9
+  },
+  "audience": {
+   "female_share": 64.5,
+   "age_25_44_share": 52.6,
+   "ages": {
+    "13-17": 8.7,
+    "18-24": 6.4,
+    "25-34": 23.5,
+    "35-44": 29.1,
+    "45-54": 15.6,
+    "55-64": 9.7,
+    "65-": 6.9
+   }
+  },
+  "subscribers": {
+   "gained": 1186,
+   "lost": 207,
+   "net": 979,
+   "gained_per_1000_views": 2.44,
+   "net_per_1000_views": 2.01,
+   "attributed_to_videos": 1081,
+   "top3_videos_share_of_attributed": 0.2988
+  },
+  "watch": {
+   "avg_view_pct": {
+    "n": 74,
+    "median": 79.9,
+    "q1": 74.9,
+    "q3": 85.6,
+    "min": 52.8,
+    "max": 183.1
+   },
+   "avg_view_pct_sorted": [
+    52.8,
+    56.2,
+    57.7,
+    64.5,
+    66.2,
+    68.5,
+    69.0,
+    69.9,
+    70.2,
+    70.5,
+    70.6,
+    71.4,
+    72.1,
+    72.5,
+    73.5,
+    74.0,
+    74.1,
+    74.5,
+    74.8,
+    75.2,
+    75.4,
+    75.4,
+    75.6,
+    76.3,
+    76.7,
+    76.9,
+    77.0,
+    77.0,
+    77.2,
+    77.6,
+    77.8,
+    77.8,
+    78.9,
+    79.0,
+    79.1,
+    79.3,
+    79.8,
+    80.0,
+    81.0,
+    81.0,
+    81.3,
+    81.3,
+    81.7,
+    81.8,
+    82.0,
+    82.9,
+    83.1,
+    83.1,
+    83.4,
+    83.9,
+    84.4,
+    84.6,
+    85.2,
+    85.4,
+    85.5,
+    85.6,
+    86.3,
+    87.5,
+    87.6,
+    88.6,
+    89.0,
+    89.1,
+    89.1,
+    89.9,
+    90.0,
+    90.5,
+    91.1,
+    91.8,
+    95.2,
+    95.4,
+    99.0,
+    102.9,
+    119.6,
+    183.1
+   ],
+   "over_100pct": 3,
+   "avg_view_seconds": {
+    "n": 74,
+    "median": 31.5,
+    "q1": 30.0,
+    "q3": 34.0,
+    "min": 21.0,
+    "max": 74.0
+   },
+   "views_weighted_avg_view_pct": 81.9,
+   "spearman_views_vs_avg_view_pct": 0.14
+  }
+ },
+ "pl": {
+  "channel": "Ogarnik",
+  "first_batch": {
+   "day": "2026-03-12",
+   "videos": 9,
+   "median_views": 69,
+   "max_views": 127
+  },
+  "exported_at": "2026-09-19T09:21:18",
+  "range": {
+   "start": "2026-03-11",
+   "end": "2026-09-19"
+  },
+  "channel_first_upload": "2026-03-12",
+  "retention_export": "not exported",
+  "retention_rows": 0,
+  "videos_in_export": 75,
+  "experiment_videos": 74,
+  "excluded_videos": 1,
+  "excluded_views": 0,
+  "non_experiment_view_share": 0.0,
+  "publish_window": {
+   "first": "2026-03-12",
+   "last": "2026-03-20"
+  },
+  "views": {
+   "experiment_total": 240514,
+   "channel_total_daily_report": 240517,
+   "watch_hours": 1153,
+   "per_video": {
+    "n": 74,
+    "median": 1302.0,
+    "q1": 287.2,
+    "q3": 1963.2,
+    "min": 37,
+    "max": 49750
+   },
+   "under_1000": 30,
+   "over_10000": 3
+  },
+  "engagement": {
+   "likes": 7730,
+   "shares": 462,
+   "comments": 46,
+   "likes_per_1000_views": 32.1,
+   "shares_per_1000_views": 1.9
+  },
+  "skew": {
+   "top1_share": 0.2068,
+   "top5_share": 0.5601,
+   "top10_share": 0.6964,
+   "videos_for_half": 4,
+   "bottom_half_share": 0.0683,
+   "gini": 0.731,
+   "ranked_views": [
+    49750,
+    35211,
+    31992,
+    9065,
+    8687,
+    8474,
+    8026,
+    5673,
+    5646,
+    4981,
+    4661,
+    4018,
+    3656,
+    3178,
+    3166,
+    3128,
+    2258,
+    1990,
+    1973,
+    1934,
+    1920,
+    1812,
+    1782,
+    1754,
+    1750,
+    1643,
+    1635,
+    1526,
+    1525,
+    1505,
+    1454,
+    1424,
+    1422,
+    1418,
+    1404,
+    1328,
+    1326,
+    1278,
+    1252,
+    1241,
+    1237,
+    1232,
+    1169,
+    1116,
+    986,
+    884,
+    648,
+    500,
+    449,
+    446,
+    363,
+    362,
+    332,
+    321,
+    306,
+    281,
+    268,
+    190,
+    163,
+    147,
+    135,
+    129,
+    127,
+    119,
+    116,
+    112,
+    96,
+    95,
+    77,
+    69,
+    52,
+    47,
+    37,
+    37
+   ]
+  },
+  "timeline": {
+   "cumulative": [
+    {
+     "day": "2026-03-11",
+     "views": 0
+    },
+    {
+     "day": "2026-03-12",
+     "views": 580
+    },
+    {
+     "day": "2026-03-13",
+     "views": 958
+    },
+    {
+     "day": "2026-03-14",
+     "views": 5088
+    },
+    {
+     "day": "2026-03-15",
+     "views": 21038
+    },
+    {
+     "day": "2026-03-16",
+     "views": 40712
+    },
+    {
+     "day": "2026-03-17",
+     "views": 55942
+    },
+    {
+     "day": "2026-03-18",
+     "views": 66807
+    },
+    {
+     "day": "2026-03-19",
+     "views": 106688
+    },
+    {
+     "day": "2026-03-20",
+     "views": 173119
+    },
+    {
+     "day": "2026-03-21",
+     "views": 201916
+    },
+    {
+     "day": "2026-03-22",
+     "views": 212607
+    },
+    {
+     "day": "2026-03-23",
+     "views": 217509
+    },
+    {
+     "day": "2026-03-24",
+     "views": 221683
+    },
+    {
+     "day": "2026-03-25",
+     "views": 226149
+    },
+    {
+     "day": "2026-03-26",
+     "views": 228220
+    },
+    {
+     "day": "2026-03-27",
+     "views": 229941
+    },
+    {
+     "day": "2026-03-28",
+     "views": 231560
+    },
+    {
+     "day": "2026-03-29",
+     "views": 232787
+    },
+    {
+     "day": "2026-03-30",
+     "views": 233593
+    },
+    {
+     "day": "2026-03-31",
+     "views": 234167
+    },
+    {
+     "day": "2026-04-01",
+     "views": 234732
+    },
+    {
+     "day": "2026-04-02",
+     "views": 235248
+    },
+    {
+     "day": "2026-04-03",
+     "views": 235722
+    },
+    {
+     "day": "2026-04-04",
+     "views": 236165
+    },
+    {
+     "day": "2026-04-05",
+     "views": 236389
+    },
+    {
+     "day": "2026-04-06",
+     "views": 236535
+    },
+    {
+     "day": "2026-04-07",
+     "views": 236674
+    },
+    {
+     "day": "2026-04-08",
+     "views": 236778
+    },
+    {
+     "day": "2026-04-09",
+     "views": 236842
+    },
+    {
+     "day": "2026-04-10",
+     "views": 236924
+    },
+    {
+     "day": "2026-04-11",
+     "views": 237000
+    },
+    {
+     "day": "2026-04-12",
+     "views": 237061
+    },
+    {
+     "day": "2026-04-13",
+     "views": 237119
+    },
+    {
+     "day": "2026-04-14",
+     "views": 237158
+    },
+    {
+     "day": "2026-04-15",
+     "views": 237222
+    },
+    {
+     "day": "2026-04-22",
+     "views": 237457
+    },
+    {
+     "day": "2026-04-29",
+     "views": 237667
+    },
+    {
+     "day": "2026-05-06",
+     "views": 237878
+    },
+    {
+     "day": "2026-05-13",
+     "views": 238111
+    },
+    {
+     "day": "2026-05-20",
+     "views": 238293
+    },
+    {
+     "day": "2026-05-27",
+     "views": 238463
+    },
+    {
+     "day": "2026-06-03",
+     "views": 238613
+    },
+    {
+     "day": "2026-06-10",
+     "views": 238739
+    },
+    {
+     "day": "2026-06-17",
+     "views": 238876
+    },
+    {
+     "day": "2026-06-24",
+     "views": 239107
+    },
+    {
+     "day": "2026-07-01",
+     "views": 239274
+    },
+    {
+     "day": "2026-07-08",
+     "views": 239431
+    },
+    {
+     "day": "2026-07-15",
+     "views": 239562
+    },
+    {
+     "day": "2026-07-22",
+     "views": 239732
+    },
+    {
+     "day": "2026-07-29",
+     "views": 239877
+    },
+    {
+     "day": "2026-08-05",
+     "views": 239987
+    },
+    {
+     "day": "2026-08-12",
+     "views": 240073
+    },
+    {
+     "day": "2026-08-19",
+     "views": 240152
+    },
+    {
+     "day": "2026-08-26",
+     "views": 240225
+    },
+    {
+     "day": "2026-09-02",
+     "views": 240313
+    },
+    {
+     "day": "2026-09-09",
+     "views": 240407
+    },
+    {
+     "day": "2026-09-16",
+     "views": 240517
+    },
+    {
+     "day": "2026-09-19",
+     "views": 240517
+    }
+   ],
+   "peak_day": "2026-03-20",
+   "peak_day_views": 66431,
+   "days_to_50pct": 9,
+   "days_to_90pct": 12,
+   "day_50pct": "2026-03-20",
+   "day_90pct": "2026-03-23",
+   "views_by_end_march": 234167,
+   "share_by_end_march": 0.9736,
+   "views_last_28_full_days": 356,
+   "per_day_last_28": 12.7
+  },
+  "launch": {
+   "videos": 66,
+   "min_lifetime_views": 100,
+   "curve": [
+    {
+     "day": 0,
+     "median": 0.2868,
+     "q1": 0.0846,
+     "q3": 0.4886
+    },
+    {
+     "day": 1,
+     "median": 0.5477,
+     "q1": 0.3657,
+     "q3": 0.7585
+    },
+    {
+     "day": 2,
+     "median": 0.725,
+     "q1": 0.5371,
+     "q3": 0.8279
+    },
+    {
+     "day": 3,
+     "median": 0.7949,
+     "q1": 0.6531,
+     "q3": 0.8818
+    },
+    {
+     "day": 4,
+     "median": 0.8394,
+     "q1": 0.7187,
+     "q3": 0.9125
+    },
+    {
+     "day": 5,
+     "median": 0.8602,
+     "q1": 0.7599,
+     "q3": 0.929
+    },
+    {
+     "day": 6,
+     "median": 0.8917,
+     "q1": 0.7975,
+     "q3": 0.9492
+    },
+    {
+     "day": 7,
+     "median": 0.8994,
+     "q1": 0.851,
+     "q3": 0.961
+    },
+    {
+     "day": 8,
+     "median": 0.9158,
+     "q1": 0.8668,
+     "q3": 0.9679
+    },
+    {
+     "day": 9,
+     "median": 0.9272,
+     "q1": 0.8819,
+     "q3": 0.9749
+    },
+    {
+     "day": 10,
+     "median": 0.9383,
+     "q1": 0.889,
+     "q3": 0.9788
+    },
+    {
+     "day": 11,
+     "median": 0.9463,
+     "q1": 0.895,
+     "q3": 0.9794
+    },
+    {
+     "day": 12,
+     "median": 0.9516,
+     "q1": 0.9017,
+     "q3": 0.9813
+    },
+    {
+     "day": 13,
+     "median": 0.9519,
+     "q1": 0.9061,
+     "q3": 0.9826
+    },
+    {
+     "day": 14,
+     "median": 0.956,
+     "q1": 0.9081,
+     "q3": 0.9834
+    },
+    {
+     "day": 15,
+     "median": 0.959,
+     "q1": 0.9105,
+     "q3": 0.9847
+    },
+    {
+     "day": 16,
+     "median": 0.9622,
+     "q1": 0.9114,
+     "q3": 0.9859
+    },
+    {
+     "day": 17,
+     "median": 0.9628,
+     "q1": 0.9114,
+     "q3": 0.9867
+    },
+    {
+     "day": 18,
+     "median": 0.965,
+     "q1": 0.9223,
+     "q3": 0.987
+    },
+    {
+     "day": 19,
+     "median": 0.9653,
+     "q1": 0.9293,
+     "q3": 0.987
+    },
+    {
+     "day": 20,
+     "median": 0.9704,
+     "q1": 0.9297,
+     "q3": 0.9882
+    },
+    {
+     "day": 21,
+     "median": 0.9727,
+     "q1": 0.93,
+     "q3": 0.9889
+    },
+    {
+     "day": 22,
+     "median": 0.9747,
+     "q1": 0.9308,
+     "q3": 0.9891
+    },
+    {
+     "day": 23,
+     "median": 0.9748,
+     "q1": 0.9333,
+     "q3": 0.9892
+    },
+    {
+     "day": 24,
+     "median": 0.9748,
+     "q1": 0.9358,
+     "q3": 0.9895
+    },
+    {
+     "day": 25,
+     "median": 0.9748,
+     "q1": 0.9365,
+     "q3": 0.9899
+    },
+    {
+     "day": 26,
+     "median": 0.9748,
+     "q1": 0.9365,
+     "q3": 0.99
+    },
+    {
+     "day": 27,
+     "median": 0.9748,
+     "q1": 0.9365,
+     "q3": 0.99
+    },
+    {
+     "day": 28,
+     "median": 0.9748,
+     "q1": 0.9375,
+     "q3": 0.99
+    },
+    {
+     "day": 42,
+     "median": 0.9791,
+     "q1": 0.9452,
+     "q3": 0.9924
+    },
+    {
+     "day": 56,
+     "median": 0.9835,
+     "q1": 0.958,
+     "q3": 0.9946
+    },
+    {
+     "day": 70,
+     "median": 0.9912,
+     "q1": 0.9713,
+     "q3": 0.9974
+    },
+    {
+     "day": 90,
+     "median": 0.9922,
+     "q1": 0.9773,
+     "q3": 0.9981
+    },
+    {
+     "day": 120,
+     "median": 0.9976,
+     "q1": 0.9855,
+     "q3": 0.9993
+    }
+   ],
+   "peak_day_index": {
+    "n": 66,
+    "median": 0.5,
+    "q1": 0.0,
+    "q3": 1.0,
+    "min": 0,
+    "max": 8
+   }
+  },
+  "traffic": [
+   {
+    "source": "Shorts feed",
+    "views": 210914,
+    "share": 0.8769
+   },
+   {
+    "source": "Subscriptions and notifications",
+    "views": 9613,
+    "share": 0.04
+   },
+   {
+    "source": "Channel page",
+    "views": 8313,
+    "share": 0.0346
+   },
+   {
+    "source": "YouTube search",
+    "views": 9096,
+    "share": 0.0378
+   },
+   {
+    "source": "Everything else",
+    "views": 2580,
+    "share": 0.0107
+   }
+  ],
+  "devices": [
+   {
+    "device": "Mobile",
+    "views": 170680,
+    "share": 0.7142
+   },
+   {
+    "device": "TV",
+    "views": 38132,
+    "share": 0.1596
+   },
+   {
+    "device": "Tablet",
+    "views": 18997,
+    "share": 0.0795
+   },
+   {
+    "device": "Desktop",
+    "views": 11157,
+    "share": 0.0467
+   }
+  ],
+  "mobile_os": {
+   "android": 157601,
+   "ios": 13079,
+   "android_share_of_mobile": 0.9234
+  },
+  "countries": [
+   {
+    "code": "PL",
+    "views": 225786,
+    "share": 0.952,
+    "avg_view_pct": 77.2
+   },
+   {
+    "code": "DE",
+    "views": 5282,
+    "share": 0.0223,
+    "avg_view_pct": 78.4
+   },
+   {
+    "code": "GB",
+    "views": 2494,
+    "share": 0.0105,
+    "avg_view_pct": 65.9
+   },
+   {
+    "code": "NL",
+    "views": 1249,
+    "share": 0.0053,
+    "avg_view_pct": 73.6
+   },
+   {
+    "code": "NO",
+    "views": 342,
+    "share": 0.0014,
+    "avg_view_pct": 65.8
+   },
+   {
+    "code": "SE",
+    "views": 281,
+    "share": 0.0012,
+    "avg_view_pct": 67.1
+   }
+  ],
+  "countries_total": 21,
+  "subscribed": {
+   "subscribed_share": 0.0238,
+   "avg_view_pct_subscribed": 75.0,
+   "avg_view_pct_unsubscribed": 77.0
+  },
+  "audience": {
+   "female_share": 59.1,
+   "age_25_44_share": 61.7,
+   "ages": {
+    "13-17": 6.5,
+    "18-24": 5.1,
+    "25-34": 27.9,
+    "35-44": 33.8,
+    "45-54": 14.7,
+    "55-64": 7.3,
+    "65-": 4.7
+   }
+  },
+  "subscribers": {
+   "gained": 1288,
+   "lost": 272,
+   "net": 1016,
+   "gained_per_1000_views": 5.36,
+   "net_per_1000_views": 4.22,
+   "attributed_to_videos": 1257,
+   "top3_videos_share_of_attributed": 0.7263
+  },
+  "watch": {
+   "avg_view_pct": {
+    "n": 74,
+    "median": 67.1,
+    "q1": 62.2,
+    "q3": 77.1,
+    "min": 48.2,
+    "max": 154.3
+   },
+   "avg_view_pct_sorted": [
+    48.2,
+    51.0,
+    52.5,
+    52.6,
+    53.3,
+    53.8,
+    55.2,
+    55.5,
+    55.6,
+    56.3,
+    57.6,
+    58.3,
+    59.2,
+    59.3,
+    59.7,
+    60.5,
+    60.7,
+    62.1,
+    62.2,
+    62.3,
+    62.5,
+    62.7,
+    63.2,
+    63.3,
+    63.3,
+    63.5,
+    63.8,
+    63.9,
+    64.2,
+    64.2,
+    64.2,
+    65.1,
+    65.6,
+    66.2,
+    66.5,
+    66.5,
+    67.0,
+    67.2,
+    67.6,
+    68.1,
+    68.8,
+    68.9,
+    69.9,
+    70.5,
+    71.0,
+    73.0,
+    73.5,
+    74.7,
+    74.8,
+    75.2,
+    75.3,
+    75.3,
+    75.8,
+    76.1,
+    76.3,
+    77.3,
+    77.5,
+    77.7,
+    77.8,
+    77.8,
+    78.8,
+    80.1,
+    80.3,
+    80.6,
+    80.7,
+    80.8,
+    81.1,
+    81.2,
+    81.3,
+    84.6,
+    85.0,
+    93.1,
+    93.5,
+    154.3
+   ],
+   "over_100pct": 1,
+   "avg_view_seconds": {
+    "n": 74,
+    "median": 26.5,
+    "q1": 24.0,
+    "q3": 30.0,
+    "min": 19.0,
+    "max": 62.0
+   },
+   "views_weighted_avg_view_pct": 76.9,
+   "spearman_views_vs_avg_view_pct": 0.36
+  }
+ },
+ "pairs": {
+  "n": 73,
+  "robustness_excluding_first_batch": {
+   "n": 65,
+   "spearman": 0.34
+  },
+  "unmatched": {
+   "en": 1,
+   "pl": 1
+  },
+  "matching": "by hand, from title meaning and publication order",
+  "spearman": 0.46,
+  "spearman_ci95": [
+   0.25,
+   0.63
+  ],
+  "pearson_log": 0.47,
+  "en_wins": 59,
+  "pl_wins": 14,
+  "median_ratio_en_over_pl": 4.3,
+  "ratio_q1": 1.4,
+  "ratio_q3": 11.0,
+  "within_3x": 23,
+  "gap_10x_or_more": 21,
+  "median_en": 4368,
+  "median_pl": 1326,
+  "above_median_both": 23,
+  "above_median_en_only": 13,
+  "above_median_pl_only": 13,
+  "above_median_neither": 24,
+  "top10_overlap": [
+   "Bad conditions for walking a dog",
+   "Cleaning tricks that work"
+  ],
+  "top_quartile_both": [
+   "Kitchen things to replace more often",
+   "Foods good for your gut",
+   "Cleaning tricks that work",
+   "Foods dangerous for dogs",
+   "How not to kill houseplants",
+   "Bad conditions for walking a dog"
+  ],
+  "points": [
+   {
+    "concept": "Woodland creatures",
+    "en": 1864,
+    "pl": 37,
+    "log10_ratio_pl_over_en": -1.702
+   },
+   {
+    "concept": "Fruit mistakes",
+    "en": 4268,
+    "pl": 127,
+    "log10_ratio_pl_over_en": -1.526
+   },
+   {
+    "concept": "Skincare mistakes",
+    "en": 1681,
+    "pl": 112,
+    "log10_ratio_pl_over_en": -1.176
+   },
+   {
+    "concept": "Jungle cats",
+    "en": 1695,
+    "pl": 37,
+    "log10_ratio_pl_over_en": -1.661
+   },
+   {
+    "concept": "Cat mistakes",
+    "en": 1465,
+    "pl": 69,
+    "log10_ratio_pl_over_en": -1.327
+   },
+   {
+    "concept": "Sea animals",
+    "en": 207,
+    "pl": 47,
+    "log10_ratio_pl_over_en": -0.644
+   },
+   {
+    "concept": "Vehicles and pollution",
+    "en": 1397,
+    "pl": 77,
+    "log10_ratio_pl_over_en": -1.259
+   },
+   {
+    "concept": "Houseplant mistakes",
+    "en": 1238,
+    "pl": 119,
+    "log10_ratio_pl_over_en": -1.017
+   },
+   {
+    "concept": "Fruit mistakes, part 2",
+    "en": 1623,
+    "pl": 1241,
+    "log10_ratio_pl_over_en": -0.117
+   },
+   {
+    "concept": "Never put these in the fridge",
+    "en": 15114,
+    "pl": 1424,
+    "log10_ratio_pl_over_en": -1.026
+   },
+   {
+    "concept": "Never pick these mushrooms",
+    "en": 2866,
+    "pl": 5673,
+    "log10_ratio_pl_over_en": 0.297
+   },
+   {
+    "concept": "Never leave these foods out",
+    "en": 1783,
+    "pl": 4661,
+    "log10_ratio_pl_over_en": 0.417
+   },
+   {
+    "concept": "Never store these foods together",
+    "en": 2172,
+    "pl": 4018,
+    "log10_ratio_pl_over_en": 0.267
+   },
+   {
+    "concept": "Plants that belong together",
+    "en": 21254,
+    "pl": 1169,
+    "log10_ratio_pl_over_en": -1.26
+   },
+   {
+    "concept": "Never flush these",
+    "en": 5974,
+    "pl": 9065,
+    "log10_ratio_pl_over_en": 0.181
+   },
+   {
+    "concept": "Animals more dangerous than they look",
+    "en": 397,
+    "pl": 986,
+    "log10_ratio_pl_over_en": 0.395
+   },
+   {
+    "concept": "Plants never to grow together",
+    "en": 8193,
+    "pl": 1237,
+    "log10_ratio_pl_over_en": -0.821
+   },
+   {
+    "concept": "Things that expire fast",
+    "en": 8547,
+    "pl": 1422,
+    "log10_ratio_pl_over_en": -0.779
+   },
+   {
+    "concept": "Things that attract bugs",
+    "en": 2567,
+    "pl": 1782,
+    "log10_ratio_pl_over_en": -0.159
+   },
+   {
+    "concept": "Never put these in the microwave",
+    "en": 10303,
+    "pl": 1454,
+    "log10_ratio_pl_over_en": -0.85
+   },
+   {
+    "concept": "Never pour these down the sink",
+    "en": 19944,
+    "pl": 1812,
+    "log10_ratio_pl_over_en": -1.042
+   },
+   {
+    "concept": "Never mix these together",
+    "en": 3242,
+    "pl": 1328,
+    "log10_ratio_pl_over_en": -0.388
+   },
+   {
+    "concept": "Plants that belong together, part 2",
+    "en": 2252,
+    "pl": 147,
+    "log10_ratio_pl_over_en": -1.185
+   },
+   {
+    "concept": "Removing stains",
+    "en": 1595,
+    "pl": 1526,
+    "log10_ratio_pl_over_en": -0.019
+   },
+   {
+    "concept": "Things that start mould",
+    "en": 4752,
+    "pl": 1326,
+    "log10_ratio_pl_over_en": -0.554
+   },
+   {
+    "concept": "Mould you may not notice",
+    "en": 2026,
+    "pl": 95,
+    "log10_ratio_pl_over_en": -1.329
+   },
+   {
+    "concept": "Plants for bees",
+    "en": 1556,
+    "pl": 884,
+    "log10_ratio_pl_over_en": -0.246
+   },
+   {
+    "concept": "Kitchen things to replace more often",
+    "en": 12046,
+    "pl": 1973,
+    "log10_ratio_pl_over_en": -0.786
+   },
+   {
+    "concept": "House smells that mean trouble",
+    "en": 4368,
+    "pl": 4981,
+    "log10_ratio_pl_over_en": 0.057
+   },
+   {
+    "concept": "Never put these in the dishwasher",
+    "en": 674,
+    "pl": 96,
+    "log10_ratio_pl_over_en": -0.846
+   },
+   {
+    "concept": "Never clean these with bleach",
+    "en": 664,
+    "pl": 116,
+    "log10_ratio_pl_over_en": -0.758
+   },
+   {
+    "concept": "Plants for butterflies",
+    "en": 554,
+    "pl": 129,
+    "log10_ratio_pl_over_en": -0.633
+   },
+   {
+    "concept": "Things that ruin air quality",
+    "en": 1291,
+    "pl": 135,
+    "log10_ratio_pl_over_en": -0.981
+   },
+   {
+    "concept": "Plants that repel pests",
+    "en": 787,
+    "pl": 190,
+    "log10_ratio_pl_over_en": -0.617
+   },
+   {
+    "concept": "Kitchen items that hold bacteria",
+    "en": 3991,
+    "pl": 1278,
+    "log10_ratio_pl_over_en": -0.495
+   },
+   {
+    "concept": "Foods you wash wrong",
+    "en": 14384,
+    "pl": 1643,
+    "log10_ratio_pl_over_en": -0.942
+   },
+   {
+    "concept": "Never store these in the bathroom",
+    "en": 4513,
+    "pl": 1404,
+    "log10_ratio_pl_over_en": -0.507
+   },
+   {
+    "concept": "Garden mistakes that attract slugs",
+    "en": 8906,
+    "pl": 1252,
+    "log10_ratio_pl_over_en": -0.852
+   },
+   {
+    "concept": "Foods good for your gut",
+    "en": 12925,
+    "pl": 3128,
+    "log10_ratio_pl_over_en": -0.616
+   },
+   {
+    "concept": "Foods that feed gut bacteria",
+    "en": 3549,
+    "pl": 1525,
+    "log10_ratio_pl_over_en": -0.367
+   },
+   {
+    "concept": "Foods with more fibre than you think",
+    "en": 4464,
+    "pl": 1418,
+    "log10_ratio_pl_over_en": -0.498
+   },
+   {
+    "concept": "Homemade drinks",
+    "en": 4172,
+    "pl": 1505,
+    "log10_ratio_pl_over_en": -0.443
+   },
+   {
+    "concept": "Types of tea",
+    "en": 3861,
+    "pl": 1232,
+    "log10_ratio_pl_over_en": -0.496
+   },
+   {
+    "concept": "Your cleaning tools are filthy",
+    "en": 17755,
+    "pl": 449,
+    "log10_ratio_pl_over_en": -1.597
+   },
+   {
+    "concept": "Never put these in the air fryer",
+    "en": 7623,
+    "pl": 500,
+    "log10_ratio_pl_over_en": -1.183
+   },
+   {
+    "concept": "Never store these under the sink",
+    "en": 5389,
+    "pl": 8026,
+    "log10_ratio_pl_over_en": 0.173
+   },
+   {
+    "concept": "Cleaning tricks that work",
+    "en": 18717,
+    "pl": 5646,
+    "log10_ratio_pl_over_en": -0.52
+   },
+   {
+    "concept": "Foods never to reheat twice",
+    "en": 597,
+    "pl": 163,
+    "log10_ratio_pl_over_en": -0.564
+   },
+   {
+    "concept": "Never refreeze these foods",
+    "en": 868,
+    "pl": 1116,
+    "log10_ratio_pl_over_en": 0.109
+   },
+   {
+    "concept": "Never dry these on a radiator",
+    "en": 989,
+    "pl": 1635,
+    "log10_ratio_pl_over_en": 0.218
+   },
+   {
+    "concept": "Plants dangerous for pets",
+    "en": 13363,
+    "pl": 281,
+    "log10_ratio_pl_over_en": -1.677
+   },
+   {
+    "concept": "Foods dangerous for cats",
+    "en": 2371,
+    "pl": 2258,
+    "log10_ratio_pl_over_en": -0.021
+   },
+   {
+    "concept": "Foods dangerous for dogs",
+    "en": 24644,
+    "pl": 3166,
+    "log10_ratio_pl_over_en": -0.891
+   },
+   {
+    "concept": "How not to kill houseplants",
+    "en": 14513,
+    "pl": 8687,
+    "log10_ratio_pl_over_en": -0.223
+   },
+   {
+    "concept": "Cleaning products that need gloves",
+    "en": 16428,
+    "pl": 1750,
+    "log10_ratio_pl_over_en": -0.973
+   },
+   {
+    "concept": "Vase flowers",
+    "en": 10420,
+    "pl": 1934,
+    "log10_ratio_pl_over_en": -0.731
+   },
+   {
+    "concept": "Bad conditions for walking a dog",
+    "en": 20423,
+    "pl": 31992,
+    "log10_ratio_pl_over_en": 0.195
+   },
+   {
+    "concept": "House things dangerous for dogs",
+    "en": 6171,
+    "pl": 35211,
+    "log10_ratio_pl_over_en": 0.756
+   },
+   {
+    "concept": "Signs never to ignore in a dog",
+    "en": 751,
+    "pl": 3178,
+    "log10_ratio_pl_over_en": 0.627
+   },
+   {
+    "concept": "Garden products dangerous for pets",
+    "en": 5694,
+    "pl": 332,
+    "log10_ratio_pl_over_en": -1.234
+   },
+   {
+    "concept": "House things that can hurt a cat",
+    "en": 8265,
+    "pl": 49750,
+    "log10_ratio_pl_over_en": 0.78
+   },
+   {
+    "concept": "Plants that can kill a dog",
+    "en": 6736,
+    "pl": 362,
+    "log10_ratio_pl_over_en": -1.27
+   },
+   {
+    "concept": "Your dog wants this",
+    "en": 8271,
+    "pl": 363,
+    "log10_ratio_pl_over_en": -1.358
+   },
+   {
+    "concept": "Your bed is dirtier than you think",
+    "en": 10999,
+    "pl": 306,
+    "log10_ratio_pl_over_en": -1.556
+   },
+   {
+    "concept": "Things that attract mice",
+    "en": 13432,
+    "pl": 1920,
+    "log10_ratio_pl_over_en": -0.845
+   },
+   {
+    "concept": "Laundry",
+    "en": 788,
+    "pl": 268,
+    "log10_ratio_pl_over_en": -0.468
+   },
+   {
+    "concept": "Vegetables that grow back from scraps",
+    "en": 2097,
+    "pl": 8474,
+    "log10_ratio_pl_over_en": 0.606
+   },
+   {
+    "concept": "Fruits with the most pesticides",
+    "en": 4712,
+    "pl": 1990,
+    "log10_ratio_pl_over_en": -0.374
+   },
+   {
+    "concept": "Tap water",
+    "en": 1138,
+    "pl": 446,
+    "log10_ratio_pl_over_en": -0.407
+   },
+   {
+    "concept": "Dangers in a baby's room",
+    "en": 6721,
+    "pl": 321,
+    "log10_ratio_pl_over_en": -1.321
+   },
+   {
+    "concept": "Herbs that belong in the same pot",
+    "en": 17093,
+    "pl": 1754,
+    "log10_ratio_pl_over_en": -0.989
+   },
+   {
+    "concept": "Your car is dirtier than a toilet seat",
+    "en": 4856,
+    "pl": 3656,
+    "log10_ratio_pl_over_en": -0.123
+   },
+   {
+    "concept": "Leftovers that can make you sick",
+    "en": 19922,
+    "pl": 648,
+    "log10_ratio_pl_over_en": -1.488
+   }
+  ]
+ },
+ "combined": {
+  "experiment_views": 727455,
+  "experiment_videos": 148,
+  "watch_hours": 3608
+ },
+ "meta": {
+  "script": "tools/yt_analysis.py",
+  "note": "Aggregates only. Views count plays, not people. Per-video figures cover videos published 11 to 20 March 2026 with recorded views."
+ }
+}

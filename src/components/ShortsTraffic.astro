@@ -1,0 +1,17 @@
+---
+import ShortsBars from './ShortsBars.astro';
+import { analytics as a, pct } from './shorts-scale';
+const groups = a.en.traffic.map((t, i) => ({ label: t.source, en: t, pl: a.pl.traffic[i] }));
+const s = (k: 'en' | 'pl') => a[k].traffic[0].share;
+---
+<ShortsBars
+  id="traffic"
+  title="Share of views by traffic source, per channel"
+  desc={`The Shorts feed supplied ${pct(s('en'))} of CleverFacts views and ${pct(s('pl'))} of Ogarnik views. Subscriptions and notifications supplied ${pct(a.en.traffic[1].share, 1)} and ${pct(a.pl.traffic[1].share, 1)}; search ${pct(a.en.traffic[3].share, 1)} and ${pct(a.pl.traffic[3].share, 1)}.`}
+  finding={`The Shorts feed delivered ${pct(s('en'))} of English views and ${pct(s('pl'))} of Polish ones; subscribers and search barely registered.`}
+  caption="Share of each channel's views by traffic source. Subscriptions and notifications are grouped; everything else covers hashtag pages, external links, playlists, sound pages and related videos."
+  tableLabel="Traffic sources as a table"
+  note={`This report covers the whole channel; ${a.en.excluded_views} CleverFacts views (${pct(a.en.non_experiment_view_share, 2)}) belong to uploads outside the experiment.`}
+  groups={groups}
+  max={1}
+/>

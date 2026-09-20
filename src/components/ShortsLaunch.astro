@@ -1,0 +1,70 @@
+---
+/** Launch curve: the median video's cumulative share of its lifetime views, by day since its first day with views. */
+import ShortsChart from './ShortsChart.astro';
+import { analytics as a, linear, path, pct, type Variant } from './shorts-scale';
+
+const variants: Variant[] = [{ key: 'wide', W: 640, H: 330 }, { key: 'narrow', W: 340, H: 300 }];
+const LAST = 14;
+const curve = (k: 'en' | 'pl') => a[k].launch.curve.filter((p) => p.day <= LAST);
+const at = (k: 'en' | 'pl', day: number) => a[k].launch.curve.find((p) => p.day === day)!;
+
+const draw = (v: Variant) => {
+  const m = { t: 16, r: 16, b: 46, l: v.key === 'wide' ? 52 : 42 };
+  const x = linear(0, LAST, m.l, v.W - m.r), y = linear(0, 1, v.H - m.b, m.t);
+  const line = (k: 'en' | 'pl') => path(curve(k).map((p) => [x(p.day), y(p.median)] as [number, number]));
+  const band = (k: 'en' | 'pl') => {
+    const c = curve(k);
+    return `${path(c.map((p) => [x(p.day), y(p.q3)] as [number, number]))} ${path([...c].reverse().map((p) => [x(p.day), y(p.q1)] as [number, number])).replace('M', 'L')} Z`;
+  };
+  return { m, x, y, line, band };
+};
+const desc = `For the median CleverFacts video, ${pct(at('en', 0).median)} of lifetime views came on the first day, ${pct(at('en', 1).median)} by the second and ${pct(at('en', 7).median)} within a week. For the median Ogarnik video the figures are ${pct(at('pl', 0).median)}, ${pct(at('pl', 1).median)} and ${pct(at('pl', 7).median)}.`;
+const tableDays = [0, 1, 2, 3, 5, 7, 10, 14, 21, 28, 56, 120];
+---
+
+<ShortsChart
+  finding={`A short is over within a week: the median video had ${pct(at('en', 7).median)} of its lifetime views by day seven in English and ${pct(at('pl', 7).median)} in Polish.`}
+  caption={`Median cumulative share of each video's views to date, by day since its first day with views; the shaded band is the middle half of videos. ${a.en.launch.videos} CleverFacts and ${a.pl.launch.videos} Ogarnik videos with at least ${a.en.launch.min_lifetime_views} views.`}
+  tableLabel="Launch curve as a table"
+>
+  {variants.map((v) => {
+    const g = draw(v);
+    const wide = v.key === 'wide';
+    return (
+      <svg class={`sc-${v.key}`} viewBox={`0 0 ${v.W} ${v.H}`} role="img" aria-labelledby={`sc-lau-t-${v.key} sc-lau-d-${v.key}`}>
+        <title id={`sc-lau-t-${v.key}`}>Share of a video's lifetime views by day since launch</title>
+        <desc id={`sc-lau-d-${v.key}`}>{desc}</desc>
+        {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+          <g>
+            <line class={t === 0 ? 'sc-axis' : 'sc-grid'} x1={g.m.l} x2={v.W - g.m.r} y1={g.y(t)} y2={g.y(t)} />
+            <text x={g.m.l - 8} y={g.y(t) + 4.5} text-anchor="end">{pct(t)}</text>
+          </g>
+        ))}
+        {[0, 1, 3, 7, 10, 14].map((d) => <text x={g.x(d)} y={v.H - 24} text-anchor="middle">{d}</text>)}
+        <text x={g.m.l} y={v.H - 4} text-anchor="start">Days since the video's first day with views</text>
+        <path class="sc-band-pl" d={g.band('pl')} />
+        <path class="sc-band-en" d={g.band('en')} />
+        <path class="sc-line sc-pl" d={g.line('pl')} />
+        <path class="sc-line sc-en" d={g.line('en')} />
+        {[1, 7].map((d) => (
+          <g>
+            <circle class="sc-fill-en sc-ring" cx={g.x(d)} cy={g.y(at('en', d).median)} r="4.5" />
+            <circle class="sc-fill-pl sc-ring" cx={g.x(d)} cy={g.y(at('pl', d).median)} r="4.5" />
+            <text class="sc-strong" x={g.x(d) - 8} y={g.y(at('en', d).median) - 9} text-anchor="end">{pct(at('en', d).median)}</text>
+            <text class="sc-strong" x={g.x(d) + 9} y={g.y(at('pl', d).median) + 19} text-anchor="start">{pct(at('pl', d).median)}</text>
+          </g>
+        ))}
+        {wide && <text class="sc-ink" x={g.x(10.2)} y={g.y(0.62)} text-anchor="start">Upper value CleverFacts,</text>}
+        {wide && <text class="sc-ink" x={g.x(10.2)} y={g.y(0.62) + 18} text-anchor="start">lower value Ogarnik</text>}
+      </svg>
+    );
+  })}
+  <table slot="table">
+    <thead><tr><th>Day</th><th>CleverFacts median</th><th>Middle half</th><th>Ogarnik median</th><th>Middle half</th></tr></thead>
+    <tbody>
+      {tableDays.map((d) => (
+        <tr><td>{d}</td><td>{pct(at('en', d).median, 1)}</td><td>{pct(at('en', d).q1)} to {pct(at('en', d).q3)}</td><td>{pct(at('pl', d).median, 1)}</td><td>{pct(at('pl', d).q1)} to {pct(at('pl', d).q3)}</td></tr>
+      ))}
+    </tbody>
+  </table>
+</ShortsChart>

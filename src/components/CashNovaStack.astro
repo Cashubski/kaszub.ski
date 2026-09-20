@@ -1,0 +1,87 @@
+---
+/**
+ * Cash Nova technical stack (BRIEF.md §11.1): layer, component, what it does.
+ * Endpoint paths are set in Instrument Sans with tabular figures; there is no monospace on this site.
+ * Only documented ElevenLabs endpoints are named. No counts, costs, model versions or infrastructure.
+ */
+interface Row { layer: string; parts: { ep?: string; name?: string }[]; does: string; }
+const rows: Row[] = [
+  {
+    layer: 'Release planning',
+    parts: [{ ep: 'POST /v1/music/plan' }],
+    does: 'Turns a written brief for a track into a composition plan: global styles, then sections, each with its own styles, length and lines. The plan is data, so it can be read and edited before any audio exists.',
+  },
+  {
+    layer: 'Generation',
+    parts: [{ ep: 'POST /v1/music' }, { ep: 'POST /v1/music/detailed' }],
+    does: 'Composes the audio from a plan. The detailed call returns the track’s metadata together with the audio.',
+  },
+  {
+    layer: 'Spoken parts and voices',
+    parts: [{ ep: 'POST /v1/text-to-dialogue' }, { ep: 'POST /v1/text-to-speech/{voice_id}' }],
+    does: 'Dialogue renders an exchange between several speakers from a script in which each line names its voice. Text to speech renders a single voice. The voice_id fixes the speaker, so a voice stays the same wherever it appears.',
+  },
+  {
+    layer: 'Sound matching',
+    parts: [{ name: 'Shared style descriptors in the composition plan' }],
+    does: 'The design problem of the project: each generation is independent, so nothing makes two tracks sound like one record. The pipeline approaches it through the plan. A release shares one set of style descriptors, and every track’s plan carries the same limits on tempo, key and instrumentation.',
+  },
+  {
+    layer: 'Sequencing',
+    parts: [{ name: 'Running order across an album' }],
+    does: 'The album is the unit of work. The running order is set across the release, so that tracks made separately flow from one to the next.',
+  },
+  {
+    layer: 'Artwork and identity',
+    parts: [{ name: 'The Cash Nova persona, a cover for each release' }],
+    does: 'One fictional producer with a bio, credits and cover artwork, so listeners meet an artist and not a folder of files.',
+  },
+  {
+    layer: 'Publishing',
+    parts: [{ name: 'ElevenMusic artist profile' }],
+    does: 'Albums and tracks are released to the public profile. The follower count, discovery and playlist placement are read from there.',
+  },
+];
+/* A break opportunity after each slash, so a long path wraps at a segment and never mid-word. */
+const segs = (ep: string) => ep.split(/(?<=\/)/);
+---
+
+<div class="table-wrap wide cn-stack">
+  <table>
+    <thead>
+      <tr><th scope="col">Layer</th><th scope="col">Component</th><th scope="col">What it does</th></tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <td>{r.layer}</td>
+          <td>
+            {r.parts.map((p) => p.ep
+              ? <span class="cn-ep">{segs(p.ep).map((s, i) => <>{i > 0 && <wbr />}{s}</>)}</span>
+              : <span class="cn-part">{p.name}</span>)}
+          </td>
+          <td>{r.does}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style is:global>
+  .prose .cn-stack table { table-layout: fixed; font-size: var(--step--1); }
+  .prose .cn-stack th:nth-child(1) { width: 21%; }
+  .prose .cn-stack th:nth-child(2) { width: 33%; }
+  .prose .cn-stack :is(th, td) { padding-block: 0.8em; padding-right: 1.6em; }
+  .prose .cn-stack td:first-child { font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.2; letter-spacing: var(--tracking-title); color: var(--ink); }
+  .prose .cn-stack td:nth-child(3) { padding-right: 0; line-height: 1.5; }
+  .cn-stack .cn-ep, .cn-stack .cn-part { display: block; color: var(--ink); font-weight: 500; }
+  .cn-stack .cn-ep { font-variant-numeric: tabular-nums lining-nums; font-feature-settings: 'liga' 0, 'calt' 0; }
+  .prose .cn-base { font-variant-numeric: tabular-nums lining-nums; font-weight: 500; color: var(--ink); overflow-wrap: anywhere; }
+  .cn-stack .cn-ep + .cn-ep { margin-top: 0.3em; }
+  /* Restacked on a phone by the global table rules; here the layer name leads and the other two cells run full width. */
+  @media (max-width: 560px) {
+    .prose .table-wrap.cn-stack:not(.table-wrap--nums) tbody tr { grid-template-columns: 1fr; row-gap: 0.4em; padding-block: 1em; }
+    .prose .table-wrap.cn-stack:not(.table-wrap--nums) td:first-child { color: var(--ink); }
+    .prose .table-wrap.cn-stack:not(.table-wrap--nums) td { grid-column: 1 / -1; }
+  }
+</style>

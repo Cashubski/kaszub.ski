@@ -1,0 +1,73 @@
+---
+/** Per-video average percentage viewed, as a dot histogram per channel: one dot is one video. */
+import ShortsChart from './ShortsChart.astro';
+import { analytics as a, linear } from './shorts-scale';
+
+const LO = 45, HI = 125;
+const w = { en: a.en.watch, pl: a.pl.watch };
+const spec = { wide: { W: 640, bin: 2.5, r: 4.2, step: 9.4 }, narrow: { W: 340, bin: 4, r: 3.6, step: 8 } };
+
+const stack = (k: 'en' | 'pl', bin: number) => {
+  const counts = new Map<number, number>();
+  return w[k].avg_view_pct_sorted.map((raw) => {
+    const clipped = Math.min(raw, HI - bin / 2);
+    const b = Math.floor((clipped - LO) / bin);
+    const n = counts.get(b) ?? 0;
+    counts.set(b, n + 1);
+    return { centre: LO + (b + 0.5) * bin, level: n, raw, over: raw > HI };
+  });
+};
+const desc = `The median CleverFacts video was watched for ${w.en.avg_view_pct.median}% of its length on average (middle half ${w.en.avg_view_pct.q1}% to ${w.en.avg_view_pct.q3}%). The median Ogarnik video reached ${w.pl.avg_view_pct.median}% (middle half ${w.pl.avg_view_pct.q1}% to ${w.pl.avg_view_pct.q3}%). Values above 100% mean the looping video was replayed.`;
+---
+
+<ShortsChart
+  twoSeries={false}
+  finding={`English videos were watched further through: the median video was watched for ${Math.round(w.en.avg_view_pct.median)}% of its length, against ${Math.round(w.pl.avg_view_pct.median)}% in Polish.`}
+  caption={`Average percentage viewed for each of the ${w.en.avg_view_pct.n} videos per channel; one dot is one video and the tick marks the median. A short loops, so replays push the figure past 100%: ${w.en.over_100pct} CleverFacts videos and ${w.pl.over_100pct} Ogarnik video did. The two highest (${w.en.avg_view_pct.max}% and ${w.pl.avg_view_pct.max}%) are drawn at the right edge. Median view duration was ${w.en.avg_view_seconds.median} and ${w.pl.avg_view_seconds.median} seconds.`}
+  tableLabel="Average percentage viewed as a table"
+>
+  {(['wide', 'narrow'] as const).map((key) => {
+    const s = spec[key];
+    const dots = { en: stack('en', s.bin), pl: stack('pl', s.bin) };
+    const tall = (k: 'en' | 'pl') => Math.max(...dots[k].map((d) => d.level)) + 1;
+    const rowH = (k: 'en' | 'pl') => tall(k) * s.step + 34;
+    const m = { l: 6, r: 10 };
+    const x = linear(LO, HI, m.l, s.W - m.r);
+    const baseEn = rowH('en'), basePl = baseEn + rowH('pl') + 10;
+    const H = basePl + 44;
+    const row = (k: 'en' | 'pl', base: number, name: string) => (
+      <g>
+        <text class="sc-strong" x={m.l} y={base - rowH(k) + 14}>{name}</text>
+        <line class="sc-axis" x1={m.l} x2={s.W - m.r} y1={base} y2={base} />
+        <line class="sc-ref" x1={x(w[k].avg_view_pct.median)} x2={x(w[k].avg_view_pct.median)} y1={base} y2={base - rowH(k) + 24} />
+        <text class="sc-ink" x={x(w[k].avg_view_pct.median) + 7} y={base - rowH(k) + 32}>median {w[k].avg_view_pct.median}%</text>
+        {dots[k].map((d) => (
+          <circle class={`sc-fill-${k}`} cx={x(d.centre)} cy={base - s.r - 2 - d.level * s.step} r={s.r} opacity={d.over ? 0.45 : 1}><title>{d.raw}%</title></circle>
+        ))}
+      </g>
+    );
+    return (
+      <svg class={`sc-${key}`} viewBox={`0 0 ${s.W} ${H}`} role="img" aria-labelledby={`sc-watch-t-${key} sc-watch-d-${key}`}>
+        <title id={`sc-watch-t-${key}`}>Average percentage viewed per video, by channel</title>
+        <desc id={`sc-watch-d-${key}`}>{desc}</desc>
+        {[50, 75, 100, 125].map((t) => <line class="sc-grid" x1={x(t)} x2={x(t)} y1="20" y2={basePl} />)}
+        {row('en', baseEn, 'CleverFacts, English')}
+        {row('pl', basePl, 'Ogarnik, Polish')}
+        {[50, 75, 100].map((t) => <text x={x(t)} y={basePl + 19} text-anchor="middle">{t}%</text>)}
+        <text x={x(125)} y={basePl + 19} text-anchor="end">{key === 'wide' ? '125% and over' : '125%+'}</text>
+        <text x={m.l} y={basePl + 40}>Average percentage of the video viewed</text>
+      </svg>
+    );
+  })}
+  <table slot="table">
+    <thead><tr><th>Average percentage viewed</th><th>CleverFacts</th><th>Ogarnik</th></tr></thead>
+    <tbody>
+      <tr><td>Median video</td><td>{w.en.avg_view_pct.median}%</td><td>{w.pl.avg_view_pct.median}%</td></tr>
+      <tr><td>Lower quartile</td><td>{w.en.avg_view_pct.q1}%</td><td>{w.pl.avg_view_pct.q1}%</td></tr>
+      <tr><td>Upper quartile</td><td>{w.en.avg_view_pct.q3}%</td><td>{w.pl.avg_view_pct.q3}%</td></tr>
+      <tr><td>Lowest and highest</td><td>{w.en.avg_view_pct.min}% to {w.en.avg_view_pct.max}%</td><td>{w.pl.avg_view_pct.min}% to {w.pl.avg_view_pct.max}%</td></tr>
+      <tr><td>Weighted by views</td><td>{w.en.views_weighted_avg_view_pct}%</td><td>{w.pl.views_weighted_avg_view_pct}%</td></tr>
+      <tr><td>Median view duration</td><td>{w.en.avg_view_seconds.median} s</td><td>{w.pl.avg_view_seconds.median} s</td></tr>
+    </tbody>
+  </table>
+</ShortsChart>

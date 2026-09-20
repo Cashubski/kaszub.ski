@@ -1,0 +1,72 @@
+---
+/** Matched English and Polish versions of the same concept, views on log axes. */
+import ShortsChart from './ShortsChart.astro';
+import { analytics as a, log10, num, type Variant } from './shorts-scale';
+
+const variants: Variant[] = [{ key: 'wide', W: 640, H: 560 }, { key: 'narrow', W: 340, H: 372 }];
+const LO = 25, HI = 80000;
+const ticks = [100, 1000, 10000];
+const P = a.pairs;
+
+/** Selective direct labels: the pairs the text discusses. dx, dy and anchor are set by eye per variant. */
+const labels: Record<string, { text: string; wide: [number, number, string]; narrow?: [number, number, string] }> = {
+  'House things that can hurt a cat': { text: 'Cat hazards at home', wide: [-10, 4, 'end'], narrow: [-9, 4, 'end'] },
+  'House things dangerous for dogs': { text: 'Dog hazards at home', wide: [-10, 5, 'end'] },
+  'Bad conditions for walking a dog': { text: 'Dog walking', wide: [-4, 22, 'end'] },
+  'Cleaning tricks that work': { text: 'Cleaning tricks', wide: [10, 5, 'start'] },
+  'Leftovers that can make you sick': { text: 'Leftovers', wide: [10, 5, 'start'] },
+  'Plants dangerous for pets': { text: 'Plants and pets', wide: [10, 5, 'start'] },
+  'Woodland creatures': { text: 'Woodland creatures', wide: [-20, 5, 'end'] },
+};
+const desc = `Each dot is one concept published on both channels, ${P.n} in all. The rank correlation between English and Polish views is ${P.spearman}. ${P.en_wins} concepts had more views in English and ${P.pl_wins} more in Polish; ${P.gap_10x_or_more} pairs differ by ten times or more.`;
+const sorted = [...P.points].sort((p, q) => q.log10_ratio_pl_over_en - p.log10_ratio_pl_over_en);
+---
+
+<ShortsChart
+  twoSeries={false}
+  finding={`What worked in English was only a loose guide to what worked in Polish: a rank correlation of ${P.spearman} across ${P.n} matched pairs.`}
+  caption={`Views to date for each concept's English video against its Polish video, both axes logarithmic. Pairs matched by hand from title meaning and publication order; one video on each channel has no counterpart. The interval on the correlation is roughly ${P.spearman_ci95[0]} to ${P.spearman_ci95[1]}, and leaving out the first day's batch lowers it to ${P.robustness_excluding_first_batch.spearman}.`}
+  tableLabel={`All ${P.n} pairs as a table`}
+>
+  {variants.map((v) => {
+    const wide = v.key === 'wide';
+    const m = { t: 34, r: 14, b: 48, l: wide ? 64 : 50 };
+    const x = log10(LO, HI, m.l, v.W - m.r), y = log10(LO, HI, v.H - m.b, m.t);
+    return (
+      <svg class={`sc-${v.key}`} viewBox={`0 0 ${v.W} ${v.H}`} role="img" aria-labelledby={`sc-pairs-t-${v.key} sc-pairs-d-${v.key}`}>
+        <title id={`sc-pairs-t-${v.key}`}>English views against Polish views for {P.n} matched concepts</title>
+        <desc id={`sc-pairs-d-${v.key}`}>{desc}</desc>
+        {ticks.map((t) => (
+          <g>
+            <line class="sc-grid" x1={m.l} x2={v.W - m.r} y1={y(t)} y2={y(t)} />
+            <line class="sc-grid" x1={x(t)} x2={x(t)} y1={m.t} y2={v.H - m.b} />
+            <text x={m.l - 8} y={y(t) + 4.5} text-anchor="end">{num(t)}</text>
+            <text x={x(t)} y={v.H - m.b + 19} text-anchor="middle">{num(t)}</text>
+          </g>
+        ))}
+        <line class="sc-axis" x1={m.l} x2={v.W - m.r} y1={v.H - m.b} y2={v.H - m.b} />
+        <line class="sc-axis" x1={m.l} x2={m.l} y1={m.t} y2={v.H - m.b} />
+        <line class="sc-ref" x1={x(LO)} y1={y(LO)} x2={x(HI)} y2={y(HI)} />
+        <text class="sc-ink" x={m.l + 10} y={m.t + 16}>{wide ? 'More views in Polish' : 'More in Polish'}</text>
+        <text class="sc-ink" x={v.W - m.r - 6} y={v.H - m.b - 12} text-anchor="end">{wide ? 'More views in English' : 'More in English'}</text>
+        <text x={v.W - m.r} y={v.H - 4} text-anchor="end">English video, views</text>
+        <text x="0" y="14" text-anchor="start">Polish video, views</text>
+        {P.points.map((p) => (
+          <circle class="sc-fill-en sc-ring" cx={x(p.en)} cy={y(p.pl)} r={wide ? 5 : 4.5} opacity={labels[p.concept] ? 1 : 0.62}>
+            <title>{p.concept}: {num(p.en)} English, {num(p.pl)} Polish</title>
+          </circle>
+        ))}
+        {P.points.filter((p) => labels[p.concept] && labels[p.concept][v.key]).map((p) => {
+          const [dx, dy, anchor] = labels[p.concept][v.key]!;
+          return <text class="sc-strong" x={x(p.en) + dx} y={y(p.pl) + dy} text-anchor={anchor}>{labels[p.concept].text}</text>;
+        })}
+      </svg>
+    );
+  })}
+  <table slot="table">
+    <thead><tr><th>Concept</th><th>English views</th><th>Polish views</th></tr></thead>
+    <tbody>
+      {sorted.map((p) => <tr><td>{p.concept}</td><td>{num(p.en)}</td><td>{num(p.pl)}</td></tr>)}
+    </tbody>
+  </table>
+</ShortsChart>

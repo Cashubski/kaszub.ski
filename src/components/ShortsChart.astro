@@ -1,0 +1,75 @@
+---
+/**
+ * The frame every analytics chart on /work/multilingual-shorts sits in: the finding as a heading,
+ * the chart on a print, a key for two-series charts, a caption with the date range and export date,
+ * and the same figures as a table for anyone who cannot or would rather not read the drawing.
+ */
+import { sourceLine } from './shorts-scale';
+interface Props { finding: string; caption: string; twoSeries?: boolean; tableLabel: string; note?: string; }
+const { finding, caption, twoSeries = true, tableLabel, note } = Astro.props;
+---
+
+<figure class="sc">
+  <h3 class="sc__finding">{finding}</h3>
+  <div class="sc__plate print panel">
+    {twoSeries && (
+      <p class="sc__key small" aria-hidden="true">
+        <span class="sc__keyitem"><span class="sc__swatch sc__swatch--en"></span>CleverFacts, English</span>
+        <span class="sc__keyitem"><span class="sc__swatch sc__swatch--pl"></span>Ogarnik, Polish</span>
+      </p>
+    )}
+    <slot />
+  </div>
+  <figcaption class="sc__cap small">
+    <span class="sc__tag">Chart</span>
+    <span class="muted">{caption}{" "}{sourceLine}{note ? ` ${note}` : ''}</span>
+  </figcaption>
+  <details class="sc__data small">
+    <summary>{tableLabel}</summary>
+    <div class="sc__table" role="region" aria-label={tableLabel} tabindex="0"><slot name="table" /></div>
+  </details>
+</figure>
+
+<style is:global>
+  .prose .sc { margin-block: var(--space-7) var(--space-8); }
+  .prose .sc .sc__finding {
+    font-family: var(--font-serif); font-weight: 420; font-size: var(--step-2); line-height: 1.18;
+    letter-spacing: var(--tracking-title); color: var(--ink); margin: 0 0 var(--space-5); max-width: 28ch; text-wrap: balance;
+  }
+  .sc__plate { background: var(--paper-deep); padding: clamp(1rem, 2.4vw, 1.75rem); }
+  .prose .sc .sc__key { display: flex; flex-wrap: wrap; gap: 0.2rem var(--space-5); margin: 0 0 var(--space-3); color: var(--ink-2); }
+  .sc__keyitem { display: inline-flex; align-items: center; gap: 0.5rem; }
+  .sc__swatch { display: inline-block; width: 1.25rem; height: 0; border-top: 3px solid var(--ink); border-radius: 2px; }
+  .sc__swatch--en { border-top-color: var(--cobalt); }
+  .sc svg { display: block; width: 100%; height: auto; overflow: visible; font-family: var(--font-sans); font-variant-numeric: tabular-nums lining-nums; }
+  .sc .sc-narrow { display: none; max-width: 27.5rem; margin-inline: auto; }
+  @media (max-width: 680px) {
+    .sc .sc-wide { display: none; }
+    .sc .sc-narrow { display: block; }
+  }
+  .sc text { font-size: 14px; fill: var(--muted); }
+  .sc .sc-narrow text { font-size: 13px; }
+  .sc text.sc-strong { fill: var(--ink); font-weight: 500; }
+  .sc text.sc-ink { fill: var(--ink-2); }
+  .sc text.sc-onmark { fill: var(--paper); font-weight: 500; }
+  .sc .sc-grid { stroke: var(--rule-strong); stroke-width: 1; opacity: 0.55; shape-rendering: crispEdges; }
+  .sc .sc-axis { stroke: var(--ink); stroke-width: 1; shape-rendering: crispEdges; }
+  .sc .sc-ref { stroke: var(--muted); stroke-width: 1; }
+  .sc .sc-line { fill: none; stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .sc .sc-en { stroke: var(--cobalt); }
+  .sc .sc-pl { stroke: var(--ink); }
+  .sc .sc-fill-en { fill: var(--cobalt); }
+  .sc .sc-fill-pl { fill: var(--ink); }
+  .sc .sc-band-en { fill: var(--cobalt); opacity: 0.1; }
+  .sc .sc-band-pl { fill: var(--ink); opacity: 0.09; }
+  .sc .sc-ring { stroke: var(--paper-deep); stroke-width: 2; }
+  .sc .sc-hit { fill: transparent; }
+  .sc__cap { display: grid; justify-items: start; gap: 0.15rem; padding-top: var(--space-3); margin-top: var(--space-4); max-width: var(--measure); }
+  .sc__tag { color: var(--ink); font-weight: 500; }
+  .sc__data { margin-top: var(--space-3); }
+  .sc__data summary { cursor: pointer; color: var(--cobalt); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; width: fit-content; list-style-position: inside; }
+  .sc__data summary:hover { color: var(--cobalt-ink); }
+  .sc__table { overflow-x: auto; margin-top: var(--space-3); max-height: 24rem; overflow-y: auto; }
+  .prose .sc__table table { font-size: var(--step--1); }
+  .prose .sc__table :is(th, td):nth-child(n + 2) { text-align: right; padding-right: 0; padding-left: 0.9em; white-space: nowrap; }
+</style>

@@ -1,0 +1,58 @@
+---
+/** Concentration: cumulative share of a channel's views held by its top-ranked videos. */
+import ShortsChart from './ShortsChart.astro';
+import { analytics as a, linear, path, pct, num, type Variant } from './shorts-scale';
+
+const variants: Variant[] = [{ key: 'wide', W: 640, H: 340 }, { key: 'narrow', W: 340, H: 300 }];
+const cum = (k: 'en' | 'pl') => {
+  const total = a[k].skew.ranked_views.reduce((s, v) => s + v, 0);
+  let run = 0;
+  return [0, ...a[k].skew.ranked_views.map((v) => (run += v) / total)];
+};
+const C = { en: cum('en'), pl: cum('pl') };
+const N = a.en.skew.ranked_views.length;
+const half = { en: a.en.skew.videos_for_half, pl: a.pl.skew.videos_for_half };
+const desc = `On Ogarnik the top ${half.pl} of ${N} videos account for half of all views and the top ten for ${pct(a.pl.skew.top10_share)}. On CleverFacts it takes the top ${half.en} videos to reach half, and the top ten hold ${pct(a.en.skew.top10_share)}.`;
+const rows = [1, 3, 5, 10, 20, 37, 74];
+---
+
+<ShortsChart
+  finding={`The Polish channel lived on a few hits: ${half.pl} videos made half its views, where the English channel needed ${half.en}.`}
+  caption={`Cumulative share of each channel's views, videos ranked from most to least viewed; ${N} videos per channel, published ${'11 to 20 March 2026'}. Median views per video: ${num(a.en.views.per_video.median)} on CleverFacts (range ${num(a.en.views.per_video.min)} to ${num(a.en.views.per_video.max)}) and ${num(a.pl.views.per_video.median)} on Ogarnik (range ${num(a.pl.views.per_video.min)} to ${num(a.pl.views.per_video.max)}).`}
+  tableLabel="Concentration of views as a table"
+>
+  {variants.map((v) => {
+    const wide = v.key === 'wide';
+    const m = { t: 16, r: 16, b: 46, l: wide ? 52 : 42 };
+    const x = linear(0, N, m.l, v.W - m.r), y = linear(0, 1, v.H - m.b, m.t);
+    const line = (k: 'en' | 'pl') => path(C[k].map((s, i) => [x(i), y(s)] as [number, number]));
+    return (
+      <svg class={`sc-${v.key}`} viewBox={`0 0 ${v.W} ${v.H}`} role="img" aria-labelledby={`sc-skew-t-${v.key} sc-skew-d-${v.key}`}>
+        <title id={`sc-skew-t-${v.key}`}>Share of views held by the most viewed videos</title>
+        <desc id={`sc-skew-d-${v.key}`}>{desc}</desc>
+        {[0, 0.25, 0.5, 0.75, 1].map((t) => (
+          <g>
+            <line class={t === 0 ? 'sc-axis' : 'sc-grid'} x1={m.l} x2={v.W - m.r} y1={y(t)} y2={y(t)} />
+            <text x={m.l - 8} y={y(t) + 4.5} text-anchor="end">{pct(t)}</text>
+          </g>
+        ))}
+        {[1, 10, 20, 30, 40, 50, 60, 74].filter((t) => wide || ![30, 50].includes(t)).map((t) => <text x={x(t)} y={v.H - 24} text-anchor="middle">{t}</text>)}
+        <text x={m.l} y={v.H - 4} text-anchor="start">Videos, ranked by views</text>
+        <path class="sc-line sc-pl" d={line('pl')} />
+        <path class="sc-line sc-en" d={line('en')} />
+        <line class="sc-ref" x1={x(half.pl)} x2={x(half.pl)} y1={y(C.pl[half.pl])} y2={y(0)} />
+        <line class="sc-ref" x1={x(half.en)} x2={x(half.en)} y1={y(C.en[half.en])} y2={y(0)} />
+        <circle class="sc-fill-pl sc-ring" cx={x(half.pl)} cy={y(C.pl[half.pl])} r="4.5" />
+        <circle class="sc-fill-en sc-ring" cx={x(half.en)} cy={y(C.en[half.en])} r="4.5" />
+        <text class="sc-strong" x={x(half.pl) + 10} y={y(0.9)} text-anchor="start">Ogarnik: half from {half.pl} videos</text>
+        <text class="sc-strong" x={x(half.en) + 12} y={y(0.36)} text-anchor="start">CleverFacts: half from {half.en}</text>
+      </svg>
+    );
+  })}
+  <table slot="table">
+    <thead><tr><th>Top videos</th><th>CleverFacts share</th><th>Ogarnik share</th></tr></thead>
+    <tbody>
+      {rows.map((r) => <tr><td>{r}</td><td>{pct(C.en[r], 1)}</td><td>{pct(C.pl[r], 1)}</td></tr>)}
+    </tbody>
+  </table>
+</ShortsChart>

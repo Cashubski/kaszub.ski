@@ -1,0 +1,59 @@
+---
+/** Grouped horizontal bars, one group per category, English above Polish, value at the tip. Shares of views. */
+import ShortsChart from './ShortsChart.astro';
+import { linear, num, type Variant } from './shorts-scale';
+interface Group { label: string; en: { share: number; views: number }; pl: { share: number; views: number }; }
+interface Props { id: string; title: string; desc: string; finding: string; caption: string; tableLabel: string; groups: Group[]; max: number; note?: string; }
+const { id, title, desc, finding, caption, tableLabel, groups, max, note } = Astro.props;
+
+const BAR = 12, GAP = 3;
+const fmt = (s: number) => `${(s * 100).toFixed(s < 0.1 ? 1 : 0)}%`;
+const layout = (v: Variant['key']) => {
+  const wide = v === 'wide';
+  const W = wide ? 640 : 340;
+  const labelW = wide ? 224 : 0;
+  const head = wide ? 0 : 20;
+  const groupH = head + 2 * BAR + GAP + (wide ? 22 : 18);
+  const H = groups.length * groupH - (wide ? 16 : 12);
+  const x = linear(0, max, labelW, W - 52);
+  return { wide, W, H, labelW, head, groupH, x };
+};
+const roundedBar = (x0: number, y: number, w: number, h: number) => {
+  const r = Math.min(4, w);
+  return `M${x0} ${y} H${x0 + w - r} Q${x0 + w} ${y} ${x0 + w} ${y + r} V${y + h - r} Q${x0 + w} ${y + h} ${x0 + w - r} ${y + h} H${x0} Z`;
+};
+---
+
+<ShortsChart finding={finding} caption={caption} tableLabel={tableLabel} note={note}>
+  {(['wide', 'narrow'] as const).map((key) => {
+    const g = layout(key);
+    return (
+      <svg class={`sc-${key}`} viewBox={`0 0 ${g.W} ${g.H}`} role="img" aria-labelledby={`sc-${id}-t-${key} sc-${id}-d-${key}`}>
+        <title id={`sc-${id}-t-${key}`}>{title}</title>
+        <desc id={`sc-${id}-d-${key}`}>{desc}</desc>
+        {groups.map((grp, i) => {
+          const top = i * g.groupH + 2;
+          const y0 = top + g.head;
+          return (
+            <g>
+              {g.wide
+                ? <text class="sc-ink" x="0" y={y0 + BAR + GAP / 2 + 5}>{grp.label}</text>
+                : <text class="sc-ink" x="0" y={top + 12}>{grp.label}</text>}
+              <path class="sc-fill-en" d={roundedBar(g.labelW, y0, Math.max(2, g.x(grp.en.share) - g.labelW), BAR)}><title>{grp.label}, CleverFacts: {fmt(grp.en.share)} ({num(grp.en.views)} views)</title></path>
+              <path class="sc-fill-pl" d={roundedBar(g.labelW, y0 + BAR + GAP, Math.max(2, g.x(grp.pl.share) - g.labelW), BAR)}><title>{grp.label}, Ogarnik: {fmt(grp.pl.share)} ({num(grp.pl.views)} views)</title></path>
+              <text class="sc-strong" x={g.x(grp.en.share) + 7} y={y0 + BAR - 1}>{fmt(grp.en.share)}</text>
+              <text class="sc-strong" x={g.x(grp.pl.share) + 7} y={y0 + 2 * BAR + GAP - 1}>{fmt(grp.pl.share)}</text>
+            </g>
+          );
+        })}
+        <line class="sc-axis" x1={g.labelW} x2={g.labelW} y1="0" y2={g.H - 2} />
+      </svg>
+    );
+  })}
+  <table slot="table">
+    <thead><tr><th>Category</th><th>CleverFacts views</th><th>Share</th><th>Ogarnik views</th><th>Share</th></tr></thead>
+    <tbody>
+      {groups.map((grp) => <tr><td>{grp.label}</td><td>{num(grp.en.views)}</td><td>{fmt(grp.en.share)}</td><td>{num(grp.pl.views)}</td><td>{fmt(grp.pl.share)}</td></tr>)}
+    </tbody>
+  </table>
+</ShortsChart>

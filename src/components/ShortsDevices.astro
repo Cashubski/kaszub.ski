@@ -1,0 +1,18 @@
+---
+import ShortsBars from './ShortsBars.astro';
+import { analytics as a, pct } from './shorts-scale';
+const order = ['Mobile', 'TV', 'Tablet', 'Desktop'];
+const labels: Record<string, string> = { Mobile: 'Phone', TV: 'Television', Tablet: 'Tablet', Desktop: 'Computer' };
+const pick = (k: 'en' | 'pl', d: string) => a[k].devices.find((x) => x.device === d)!;
+const groups = order.map((d) => ({ label: labels[d], en: pick('en', d), pl: pick('pl', d) }));
+---
+<ShortsBars
+  id="devices"
+  title="Share of views by device type, per channel"
+  desc={groups.map((g) => `${g.label}: ${pct(g.en.share)} of CleverFacts views and ${pct(g.pl.share)} of Ogarnik views.`).join(' ')}
+  finding={`Vertical video is not only a phone format: about one view in six was on a television, in both languages.`}
+  caption={`Share of each channel's views by device type. Among phone views, Android accounts for ${pct(a.en.mobile_os.android_share_of_mobile)} on CleverFacts and ${pct(a.pl.mobile_os.android_share_of_mobile)} on Ogarnik.`}
+  tableLabel="Devices as a table"
+  groups={groups}
+  max={1}
+/>
