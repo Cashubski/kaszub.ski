@@ -1,0 +1,136 @@
+---
+import { getCollection } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import Ledger from '../components/Ledger.astro';
+import ProjectCard from '../components/ProjectCard.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { person, personId, site, now, homeOrder } from '../data/site';
+
+const works = await getCollection('work');
+const byId = new Map(works.map((w) => [w.id, w]));
+const ordered = homeOrder.map((id) => byId.get(id)).filter((w): w is NonNullable<typeof w> => Boolean(w));
+const [first, second, third, fourth, fifth, sixth, seventh, eighth] = ordered;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  givenName: person.givenName,
+  familyName: person.familyName,
+  '@id': personId,
+  url: `${site.url}/`,
+  // A stable URL (public/media/portrait.jpg), not a hashed build artefact.
+  image: new URL('/media/portrait.jpg', site.url).toString(),
+  jobTitle: person.role,
+  description: person.lede,
+  homeLocation: { '@type': 'Place', name: person.location },
+  sameAs: [person.github, person.linkedin],
+  worksFor: { '@type': 'Organization', name: person.company.name, url: person.company.url },
+  alumniOf: person.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution })),
+  knowsAbout: ['machine learning', 'medical imaging', 'production AI systems', 'product engineering', 'API automation', 'generative media pipelines'],
+};
+const description = `${person.name}, ${person.role} in London: ML research, production AI systems, products and automated API pipelines, with dated evidence.`;
+---
+
+<Base title={`${person.name}, ${person.role}`} bareTitle description={description} jsonLd={jsonLd} ogImageAlt={`${person.name}, ${person.role}`}>
+  <section class="hero wash" aria-label="Introduction">
+    <div class="container">
+    <h1 class="hero__name display" data-reveal="mask">Michal Kaszubski</h1>
+    <div class="hero__row grid">
+      <p class="hero__role" data-reveal>{person.role}</p>
+      <div class="hero__col" data-reveal-group>
+        <p class="hero__lede lede">{person.lede}</p>
+        <ul class="hero__links link-row" role="list" aria-label="Profiles and CV">
+          <li><ExternalLink href={person.github}>GitHub</ExternalLink></li>
+          <li><ExternalLink href={person.linkedin}>LinkedIn</ExternalLink></li>
+          <li><a href="/cv">Curriculum vitae</a></li>
+          <li><a href="/work">Index of works</a></li>
+        </ul>
+        <p class="hero__contact small muted">To get in touch,{' '}<ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</p>
+      </div>
+    </div>
+    </div>
+  </section>
+
+  <Ledger />
+
+  <section class="works container" aria-labelledby="works-title">
+    <div class="section-head section-head--top" data-rule="ink" data-reveal-group>
+      <h2 id="works-title" class="display">Selected works</h2>
+      <div class="aside">
+        <p>Each card says what the work is, what I did and what happened as a result. The two experiments are automated API pipelines, with audience response as the measured outcome.</p>
+        <a href="/work" class="row-link">See the full index of works</a>
+      </div>
+    </div>
+
+    <div class="flagships">
+      {first && <ProjectCard entry={first} variant="plate" side="right" headingLevel="h3" eager />}
+      {second && <ProjectCard entry={second} variant="plate" side="left" headingLevel="h3" />}
+    </div>
+
+    <div class="rest grid">
+      {third && <div class="cell cell--a" data-reveal="block"><ProjectCard entry={third} headingLevel="h3" brief size="large" /></div>}
+      {fourth && <div class="cell cell--b" data-reveal="block"><ProjectCard entry={fourth} headingLevel="h3" brief /></div>}
+      {fifth && <div class="cell cell--c" data-reveal="block"><ProjectCard entry={fifth} headingLevel="h3" brief /></div>}
+      {sixth && <div class="cell cell--d" data-reveal="block"><ProjectCard entry={sixth} headingLevel="h3" brief /></div>}
+      {seventh && <div class="cell cell--e" data-reveal="block"><ProjectCard entry={seventh} headingLevel="h3" brief /></div>}
+      {eighth && <div class="cell cell--f" data-reveal="block"><ProjectCard entry={eighth} headingLevel="h3" brief size="large" /></div>}
+      <section data-reveal data-rule="ink" class="cell cell--now now" aria-labelledby="now-title">
+        <h3 id="now-title" class="serif now__title">{now.label}</h3>
+        <p class="now__text">{now.text}</p>
+        <ul class="now__links link-row" role="list">
+          {now.links.map((l) => (
+            <li><a href={l.href} class="row-link">{l.label}</a></li>
+          ))}
+        </ul>
+      </section>
+    </div>
+  </section>
+</Base>
+
+<style>
+  /* --- hero: type and whitespace only ---------------------------------------- */
+  .hero { padding-top: clamp(3rem, 8vw, 7rem); padding-bottom: clamp(3rem, 7vw, 6rem); }
+  .hero__name { font-size: var(--step-5); margin-left: -0.04em; margin-bottom: clamp(1.25rem, 3vw, 2.25rem); max-width: 9ch; }
+  .hero__row { row-gap: var(--space-5); align-items: start; }
+  .hero__role { grid-column: 1 / span 5; font-size: var(--step-1); line-height: 1.35; color: var(--ink); padding-top: 0.2em; }
+  .hero__col { grid-column: 7 / span 5; display: grid; gap: var(--space-4); }
+  .hero__lede { max-width: 36ch; color: var(--ink-2); }
+  .hero__links { margin-top: var(--space-2); }
+  .hero__links a { font-weight: 500; }
+  @media (max-width: 1023.98px) {
+    .hero__role { grid-column: 1 / span 6; }
+    .hero__col { grid-column: 7 / -1; }
+  }
+  @media (max-width: 720px) {
+    .hero__role, .hero__col { grid-column: 1 / -1; }
+  }
+
+  /* --- works ------------------------------------------------------------------ */
+  .works { padding-top: var(--space-9); }
+  .flagships { display: grid; row-gap: var(--space-9); margin-bottom: var(--space-9); }
+  .rest { row-gap: var(--space-9); }
+  .cell { grid-column: span 12; min-width: 0; }
+  @media (min-width: 640px) { .cell { grid-column: span 6; } }
+  @media (min-width: 1024px) {
+    .cell--a { grid-column: 1 / span 7; }
+    .cell--b { grid-column: 9 / span 4; align-self: end; }
+    .cell--c { grid-column: 1 / span 5; }
+    .cell--d { grid-column: 7 / span 4; margin-top: var(--space-8); }
+    /* Third row: an uneven pair again, mirrored. Fourth: the compact card and the "now" note stack in the
+       left column beside the last, wide card. */
+    .cell--e { grid-column: 1 / span 4; grid-row: 3; }
+    .cell--f { grid-column: 6 / span 7; grid-row: 3 / span 2; }
+    .cell--now { grid-column: 1 / span 4; grid-row: 4; align-self: end; }
+  }
+
+  /* --- now: a short ruled note beside the last card ---------------------------- */
+  .now { display: grid; gap: var(--space-3); align-content: start; justify-items: start; border-top: 1px solid var(--ink); padding-top: var(--space-4); }
+  .now__title { font-size: var(--step-3); line-height: 1; letter-spacing: var(--tracking-title); }
+  .now__text { color: var(--ink-2); max-width: 34ch; }
+  .now__links { margin-top: var(--space-1); }
+  @media (max-width: 1023.98px) {
+    .cell--now { grid-column: 1 / -1; }
+  }
+  /* Tablet, two columns: six cards fill three rows, and the "now" note runs full width beneath them. */
+</style>

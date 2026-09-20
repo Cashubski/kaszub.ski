@@ -1,0 +1,29 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="Page not found" description="This page does not exist on kaszub.ski. The index of works, about page and CV are one click away." path="/404" noindex>
+  <section class="container nf">
+    <div class="grid nf__grid">
+      <h1 class="display nf__title" data-reveal="mask">Nothing at this address.</h1>
+      <div class="nf__col" data-reveal-group>
+        <p class="lede nf__text">There is no page here. It may have moved, or the link was mistyped. This is a 404 error.</p>
+        <ul class="link-row" role="list">
+          <li><a href="/">Home</a></li>
+          <li><a href="/work">Index of works</a></li>
+          <li><a href="/about">About</a></li>
+          <li><a href="/cv">Curriculum vitae</a></li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .nf { padding-top: var(--space-9); min-height: 50vh; }
+  .nf__grid { row-gap: var(--space-6); align-items: end; }
+  .nf__title { grid-column: 1 / span 8; font-size: var(--step-5); max-width: 10ch; }
+  .nf__col { grid-column: 9 / span 4; display: grid; gap: var(--space-4); }
+  .nf__text { max-width: 30ch; }
+  @media (max-width: 900px) { .nf__title, .nf__col { grid-column: 1 / -1; } }
+</style>

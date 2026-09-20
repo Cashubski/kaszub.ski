@@ -1,0 +1,83 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../layouts/Base.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { person, personId, site } from '../data/site';
+import portrait from '../assets/work/portrait.jpg';
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: person.name,
+  givenName: person.givenName,
+  familyName: person.familyName,
+  '@id': personId,
+  url: `${site.url}/`,
+  jobTitle: person.role,
+  homeLocation: { '@type': 'Place', name: person.location },
+  sameAs: [person.github, person.linkedin],
+  worksFor: { '@type': 'Organization', name: person.company.name, url: person.company.url },
+  alumniOf: person.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution })),
+  // A stable URL (public/media/portrait.jpg), not a hashed build artefact.
+  image: new URL('/media/portrait.jpg', site.url).toString(),
+};
+const description = `About ${person.name}: UCL MSc in AI and Medical Imaging, BSc Computer Science at City, founder and AI engineer at NeuralTake, London.`;
+---
+
+<Base title="About" description={description} jsonLd={jsonLd} ogImageAlt={`About ${person.name}`}>
+  <section class="container about">
+    <div class="grid about__grid">
+      <h1 class="display about__title" data-reveal="mask">I like models that know their limits and products that people keep using.</h1>
+      <figure class="about__portrait" data-reveal="block">
+        <div class="print print--lift">
+          <Image src={portrait} alt="Portrait photograph of Michal Kaszubski." width={460} height={460} widths={[300, 460]} sizes="(min-width: 900px) 18rem, 60vw" loading="eager" decoding="async" />
+        </div>
+        <figcaption class="small muted">Michal Kaszubski, London.</figcaption>
+      </figure>
+      <div class="about__text">
+        <div class="about__body" data-reveal-group>
+          <p>I am an AI/ML engineer and founder in London. My MSc in AI and Medical Imaging at UCL (2025 to 2026) asked whether a model for flagging distorted prostate MRI could also tell when its own judgement was unreliable. Before that I read Computer Science at City, University of London.</p>
+          <p>I founded NeuralTake, my AI consultancy, in 2024. Through it I scope, build and support production AI software for clients, among them AI Zuzi, a social-media platform I engineer for a client company. I also build products of my own: NeuralKite for acquisition research and ChefBot, a cooking assistant on GPT. And I run two automated API pipelines: a fictional artist generated through the Eleven Music API, and a video pipeline that turns one concept into an English and a Polish short.</p>
+          <p>To get in touch,{' '}<ExternalLink href={person.linkedin}>message me on LinkedIn</ExternalLink>.</p>
+        </div>
+        <dl class="about__facts facts print panel" data-reveal="block">
+          <div><dt>Education</dt><dd>MSc in AI and Medical Imaging, UCL, 2025 to 2026</dd><dd>BSc Computer Science, City, University of London</dd></div>
+          <div><dt>Currently</dt><dd>Founder and AI engineer, <ExternalLink href={person.company.url}>NeuralTake</ExternalLink></dd></div>
+          <div><dt>Interests</dt><dd>Reliable ML, production AI, product building, creative experimentation</dd></div>
+          <div><dt>Location</dt><dd>{person.location}</dd></div>
+          <div><dt>GitHub</dt><dd><ExternalLink href={person.github}>github.com/Cashubski</ExternalLink></dd></div>
+          <div><dt>LinkedIn</dt><dd><ExternalLink href={person.linkedin}>linkedin.com/in/m1k</ExternalLink></dd></div>
+          <div><dt>Email</dt><dd>{person.email ? <a href={`mailto:${person.email}`}>{person.email}</a> : 'On request via LinkedIn'}</dd></div>
+          <div><dt>CV</dt><dd><a href="/cv">Read the curriculum vitae</a></dd></div>
+        </dl>
+      </div>
+    </div>
+  </section>
+</Base>
+
+<style>
+  .about { padding-top: var(--space-8); }
+  .about__grid { row-gap: var(--space-7); }
+  .about__title { grid-column: 1 / span 10; font-size: var(--step-4); max-width: 20ch; }
+  .about__portrait { grid-column: 1 / span 4; margin: 0; display: grid; gap: var(--space-4); align-content: start; justify-items: start; }
+  .about__portrait .print { width: 100%; max-width: 18rem; }
+  .about__portrait :global(img) { width: 100%; height: auto; }
+  .about__text { grid-column: 6 / span 7; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--space-7); min-width: 0; }
+  .about__text > * { min-width: 0; }
+  .about__facts dd { overflow-wrap: anywhere; min-width: 0; }
+  .about__facts dd + dd { grid-column: 2; }
+  .about__body { display: grid; gap: 1em; color: var(--ink-2); max-width: var(--measure-narrow); font-size: var(--step-1); line-height: 1.5; }
+  .about__facts { max-width: 40rem; background: var(--paper-deep); }
+  .about__facts > div { grid-template-columns: 6.5rem minmax(0, 1fr); }
+  @media (max-width: 360px) { .about__facts > div { grid-template-columns: 5rem minmax(0, 1fr); } }
+  .about__facts > div:first-child { border-top: 0; }
+  @media (max-width: 900px) {
+    .about__title { grid-column: 1 / -1; }
+    .about__portrait { grid-column: 1 / span 5; }
+    .about__text { grid-column: 1 / -1; }
+  }
+  @media (max-width: 560px) {
+    .about__portrait { grid-column: 1 / -1; }
+    .about__portrait .print { max-width: 12rem; }
+  }
+</style>

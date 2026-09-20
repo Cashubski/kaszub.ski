@@ -1,0 +1,234 @@
+---
+import Base from '../layouts/Base.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { person, site } from '../data/site';
+const description = `Curriculum vitae of ${person.name}, AI/ML engineer and founder in London: UCL MSc research, NeuralTake, AI Zuzi, NeuralKite and automated API pipelines.`;
+---
+
+<Base title="CV" description={description} bodyClass="cv-page">
+  <article class="container cv">
+    <header class="cv__head">
+      <div class="cv__head-row">
+        <div>
+          <h1 class="display cv__name" data-reveal="mask">Michal Kaszubski</h1>
+          <p class="cv__role">{person.role}</p>
+        </div>
+        <div class="cv__contact small" data-reveal>
+          <p>{person.location}</p>
+          <p><ExternalLink href={person.github} >github.com/Cashubski</ExternalLink></p>
+          <p><ExternalLink href={person.linkedin} >linkedin.com/in/m1k</ExternalLink></p>
+          <p><a href="/" >kaszub.ski</a></p>
+          <p class="muted">Contact via LinkedIn; email on request</p>
+        </div>
+      </div>
+      <div class="cv__actions no-print" data-reveal>
+        <button type="button" class="cv__print" data-print hidden>Print or save as PDF</button>
+        <p class="small muted cv__pdf-note">Print this page or save it as a PDF.</p>
+      </div>
+    </header>
+
+    <section class="cv__section">
+      <h2 class="cv__h2 serif" data-reveal>Profile</h2>
+      <p class="cv__lead">{person.lede} My research is on model reliability in medical imaging (UCL MSc), with an ongoing entry to a public RSNA benchmark. Alongside it I run NeuralTake, my AI consultancy, through which I engineer AI Zuzi, a production platform for a client company. I have built NeuralKite for acquisition research, and I run automated content pipelines on generation and analytics APIs.</p>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Experience</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">2024 to present</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">Founder and AI engineer, NeuralTake (Neuraltake Limited), London</h3>
+          <ul>
+            <li>Founded an AI consultancy that automates manual workflows for professional services firms: a two-week embedded workflow audit with a ranked punch list, then fixed-fee builds live in two to six weeks, with thirty days of post-launch defect cover.</li>
+            <li>Signed B2B contracts and delivered them end to end, owning stakeholder discovery, scoping, requirements, architecture, delivery, onboarding, support and roadmap.</li>
+            <li>Build in the client’s repository and infrastructure. Operate my own: an Ubuntu VPS fleet, nginx, pm2, Let’s Encrypt, PostgreSQL, a self-hosted Postal mail server, Docker and Google Cloud Run.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">2026 to present</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">AI Zuzi (client platform), lead engineer through NeuralTake</h3>
+          <ul>
+            <li>Took an AI social-media management and content platform for a client company from prototype to production: Django 5 and Django REST Framework (75 API view classes), React 18, PostgreSQL 16, Stripe, Cloudflare R2. Used by about 50 business users (stated September 2026).</li>
+            <li>Built the publishing pipeline for six Meta post types with direct Instagram Business Login, transient-error retries and real permalinks; task services for YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile; WordPress blog publishing.</li>
+            <li>Moved the database from SQLite to PostgreSQL 16 (563 rows, natural-key dump and load, 64-bit id widening, sequence reset, rollback file kept) and wrote the ETL and runbook for the production cutover.</li>
+            <li>Security and quality: MFA by email code and TOTP, field-level encryption at rest, rate limiting, SSRF guards, GDPR-aligned deletion, 76 automated tests gating deployment in GitHub Actions, Sentry.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Products</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num" aria-hidden="true"></div>
+        <div class="cv__what">
+          <h3 class="cv__h3">NeuralKite, acquisition-target intelligence for fragmented UK private markets</h3>
+          <ul>
+            <li>Built a live product that maps private companies, scores targets against an acquisition thesis and produces decision-ready dossiers: ownership discovery, screening, thesis-fit scoring, shortlisting and export.</li>
+            <li>Stack: Next.js App Router and TypeScript, Prisma and PostgreSQL, NextAuth, Stripe billing, LLM agents on the Anthropic SDK, Playwright and Cheerio scrapers, SSE streaming, and a self-hosted PostgreSQL warehouse including a 2.8-million-company Crunchbase dataset.</li>
+            <li>Live product; customer and usage figures not published.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num" aria-hidden="true"></div>
+        <div class="cv__what">
+          <h3 class="cv__h3">ChefBot, a cooking assistant built on GPT</h3>
+          <ul>
+            <li>Designed the retrieval, prompt logic and multi-step tool flows for a GPT-based assistant that helps people cook from sparse fridge or pantry inputs; iterated using usage patterns and user feedback.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Research</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">2025 to 2026</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">MSc thesis, UCL: automated detection of geometric distortion in prostate diffusion-weighted MRI</h3>
+          <ul>
+            <li>Retrospective dataset of 1,027 acquisitions from 627 patients (single centre, anonymised); strict patient-level five-fold cross-validation.</li>
+            <li>Three-seed DenseNet-121 ensemble: mean AUROC 0.819 (SD 0.049 across the five folds). Heterogeneous nine-model ensemble: uncertainty-error AUROC 0.685. Retrospective triage simulation: 83.6% retained-case accuracy at 70% coverage. Distilled single model: one forward pass instead of nine.</li>
+            <li>PyTorch experiments, classical baselines, bootstrap confidence intervals, paired Wilcoxon tests, Grad-CAM, calibration analysis, synthetic-distortion validation. Public MIT-licensed code with a CPU-only test suite on synthetic data.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">2026, ongoing</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">RSNA Knee Abnormality Detection, Kaggle research code competition</h3>
+          <ul>
+            <li>Weakly supervised multimodal knee-MRI classification: report to labels to image model to image-only inference.</li>
+            <li>timm slice encoder, BiGRU, attention pooling and series aggregation. DistributedDataParallel on two Quadro GV100 GPUs, patient-level GroupKFold, about 500 GB of DICOM preprocessed in shards.</li>
+            <li>Competition ongoing (verified {site.factsDate}); no result yet.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Automation</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num" aria-hidden="true"></div>
+        <div class="cv__what">
+          <h3 class="cv__h3">CleverFacts and Ogarnik, an automated short-form video pipeline in English and Polish</h3>
+          <ul>
+            <li>Built and ran an automated pipeline that turns one concept into two localised videos through generation APIs, including Flow for video, with translation and expressive dubbing for the Polish versions.</li>
+            <li>Built the analytics layer in Python on the YouTube Analytics API v2 and YouTube Data API v3 (OAuth 2.0, a cached token per channel), then analysed 74 matched videos per channel: launch curves, traffic sources and how concepts transferred between languages.</li>
+            <li>It retries 429, 500 and 503 with exponential backoff and exports per-video daily series and audience-retention curves to CSV.</li>
+            <li>Audience response: nearly 720,000 combined views with approximately 1,000 subscribers on each channel (figures from {site.factsDate}; views, not unique viewers).</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">2026</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">Cash Nova, a fictional artist generated through the Eleven Music API</h3>
+          <ul>
+            <li>Generated the tracks programmatically through the ElevenLabs Eleven Music API. The pipeline covered the music, the voices including spoken parts, sound matching across tracks, and the flow and sequencing of each release.</li>
+            <li>Six albums and 52 tracks released on ElevenMusic in 2026; tracks received platform discovery and playlist placement. 97 followers as of {site.factsDate}.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Education</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">2025 to 2026</div>
+        <div class="cv__what"><h3 class="cv__h3">MSc in AI and Medical Imaging, UCL</h3></div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num" aria-hidden="true"></div>
+        <div class="cv__what"><h3 class="cv__h3">BSc Computer Science, City, University of London</h3></div>
+      </div>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Technical</h2>
+      <dl class="cv__skills" data-reveal>
+        <div><dt>ML</dt><dd>PyTorch, timm, DenseNet and ResNet families, EfficientNet, BiGRU and attention pooling, ensembles, MC dropout, selective prediction, calibration (ECE), Grad-CAM, SimCLR and BYOL pretraining, DistributedDataParallel, AMP, GroupKFold</dd></div>
+        <div><dt>Production</dt><dd>Django, Django REST Framework, React, Next.js App Router, TypeScript, Prisma, PostgreSQL, NextAuth, Stripe, Anthropic SDK, OpenAI API, Meta Graph API, Cloudflare R2, Playwright, Cheerio, SSE streaming, encryption at rest, MFA, GDPR-aligned deletion</dd></div>
+        <div><dt>Infrastructure</dt><dd>Ubuntu VPS, nginx, pm2, Let’s Encrypt, Docker, Google Cloud Run, self-hosted PostgreSQL and Postal, GitHub Actions, pytest, Sentry</dd></div>
+        <div><dt>Data</dt><dd>DICOM preprocessing, synthetic NIfTI test data, sharded pipelines on Kaggle, GPU cluster sync, a 2.8-million-company Crunchbase warehouse in self-hosted PostgreSQL</dd></div>
+        <div><dt>Automation</dt><dd>Eleven Music API, ElevenLabs voices, Flow, YouTube Analytics API v2, YouTube Data API v3, OAuth 2.0, Python, rate-limit backoff, CSV exports</dd></div>
+        <div><dt>Product</dt><dd>Stakeholder discovery, scoping, onboarding and support, prompt and tool-flow design, format adaptation across languages, audience-driven iteration</dd></div>
+      </dl>
+    </section>
+  </article>
+
+  <script>
+    const btn = document.querySelector<HTMLButtonElement>('[data-print]');
+    if (btn) {
+      btn.hidden = false;
+      btn.addEventListener('click', () => window.print());
+    }
+  </script>
+</Base>
+
+<style>
+  .cv { padding-top: var(--space-8); max-width: 62rem; margin-inline: auto; }
+  .cv__head { border-bottom: 1px solid var(--ink); padding-bottom: var(--space-5); margin-bottom: var(--space-6); }
+  .cv__head-row { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-5) var(--space-7); }
+  .cv__name { font-size: var(--step-4); margin-top: var(--space-2); }
+  .cv__role { font-size: var(--step-1); color: var(--ink); margin-top: var(--space-3); }
+  .cv__contact { display: grid; gap: 0.1rem; align-content: end; }
+  .cv__contact :global(a) { display: inline-flex; min-height: 2.25rem; align-items: center; }
+  .cv__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-5); }
+  .cv__print { border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: 0.6rem 1rem; border-radius: var(--radius); cursor: pointer; font-weight: 500; min-height: 2.75rem; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+  .cv__print:hover { background: var(--ink); color: var(--paper); }
+  .cv__section { display: grid; grid-template-columns: 11rem 1fr; column-gap: var(--space-6); row-gap: var(--space-4); padding-block: var(--space-6); border-top: var(--hairline); }
+  /* The header block already closes with an ink rule; the first section does not add a second one. */
+  .cv__head + .cv__section { border-top: 0; padding-top: 0; }
+  .cv__h2 { font-size: var(--step-2); letter-spacing: var(--tracking-title); line-height: 1.1; grid-column: 1; }
+  .cv__section > :not(.cv__h2) { grid-column: 2; }
+  .cv__lead { color: var(--ink-2); max-width: var(--measure); }
+  .cv__entry { display: grid; grid-template-columns: 8.5rem 1fr; gap: var(--space-4); }
+  .cv__entry + .cv__entry { margin-top: var(--space-5); }
+  .cv__when { color: var(--muted); padding-top: 0.2rem; }
+  .cv__h3 { font-family: var(--font-sans); font-weight: 600; font-size: var(--step-0); line-height: 1.35; }
+  .cv__what ul { padding-left: 1.1rem; margin-top: var(--space-2); color: var(--ink-2); font-size: var(--step--1); line-height: 1.5; }
+  .cv__what li + li { margin-top: 0.35em; }
+  .cv__skills { display: grid; gap: var(--space-3); }
+  .cv__skills div { display: grid; grid-template-columns: 8.5rem 1fr; gap: var(--space-4); }
+  .cv__skills dt { color: var(--muted); padding-top: 0.15rem; font-size: var(--step--1); }
+  .cv__skills dd { color: var(--ink-2); font-size: var(--step--1); line-height: 1.5; }
+  @media (max-width: 720px) {
+    .cv__section { grid-template-columns: 1fr; }
+    .cv__section > :not(.cv__h2) { grid-column: 1; }
+    .cv__entry, .cv__skills div { grid-template-columns: 1fr; gap: var(--space-1); }
+  }
+
+  /* --- Print: A4, one to two pages ---------------------------------------------- */
+  @media print {
+    @page { size: A4; margin: 13mm 14mm 14mm; }
+    :global(body.cv-page) { font-size: 9.5pt; line-height: 1.35; }
+    :global(body.cv-page .site-head), :global(body.cv-page .site-foot), :global(body.cv-page .skip-link) { display: none !important; }
+    .cv { padding-top: 0; max-width: none; }
+    .cv__head-row { gap: 4mm 10mm; }
+    .cv__name { font-size: 22pt; margin-top: 2pt; }
+    .cv__role { font-size: 11pt; margin-top: 1pt; }
+    .cv__contact { font-size: 8.5pt; gap: 0; }
+    .cv__contact :global(a) { padding: 0; min-height: 0; }
+    .cv__head { padding-bottom: 6pt; margin-bottom: 4pt; border-bottom: 1pt solid #000; }
+    .cv__section { padding-block: 6pt; grid-template-columns: 26mm 1fr; column-gap: 5mm; row-gap: 3pt; border-top: 0.5pt solid #999; break-inside: auto; }
+    .cv__head + .cv__section { border-top: 0; }
+    .cv__h2 { color: #000; font-size: 11pt; }
+    .cv__lead { font-size: 9.5pt; max-width: none; }
+    .cv__entry { grid-template-columns: 1fr; gap: 1pt; break-inside: avoid; }
+    .cv__entry + .cv__entry { margin-top: 5pt; }
+    .cv__when { font-size: 8pt; padding-top: 0; }
+    .cv__h3 { font-size: 10pt; line-height: 1.25; }
+    .cv__what ul { margin-top: 2pt; padding-left: 4mm; }
+    .cv__what li + li { margin-top: 1.5pt; }
+    .cv__what ul, .cv__skills dd { font-size: 8.75pt; line-height: 1.32; }
+    .cv__skills { gap: 2pt; }
+    .cv__skills div { grid-template-columns: 20mm 1fr; gap: 3mm; }
+    .cv__skills dt { font-size: 8pt; padding-top: 1pt; }
+    .cv__contact :global(a), .cv__contact :global(a::after) { color: #000; }
+    .ext::after { display: none; }
+  }
+</style>
