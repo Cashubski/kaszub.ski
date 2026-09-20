@@ -1,0 +1,34 @@
+{
+  "name": "kaszubski",
+  "private": true,
+  "type": "module",
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build && node scripts/postbuild.mjs && node scripts/og.mjs",
+    "build:fast": "astro build && node scripts/postbuild.mjs",
+    "preview": "astro preview",
+    "check": "astro check",
+    "og": "node scripts/og.mjs",
+    "fonts": "node scripts/fonts.mjs",
+    "images": "node scripts/images.mjs",
+    "favicons": "node scripts/favicons.mjs"
+  },
+  "dependencies": {
+    "@astrojs/check": "^0.9.4",
+    "@astrojs/mdx": "^8.0.1",
+    "@astrojs/sitemap": "^3.7.4",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "astro": "^7.3.2",
+    "sharp": "^0.35.4",
+    "typescript": "^5.9.0"
+  },
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "overrides": {
+    "@astrojs/compiler-rs": "0.4.0",
+    "@astrojs/compiler-binding": "0.4.0"
+  }
+}
