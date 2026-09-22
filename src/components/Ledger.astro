@@ -1,6 +1,6 @@
 ---
 /**
- * The evidence ledger: four verified figures, each with a context line and a date where the
+ * The evidence ledger: three verified figures, each with a context line and a date where the
  * number changes over time. Set as an ink-dark full-bleed section: serif figures, sans context,
  * rows separated by hairlines. Not a dashboard: no cards, no icons, no equal columns.
  */
@@ -11,7 +11,7 @@ import { ledger } from '../data/site';
   <div class="container">
     <div class="ledger__head grid" data-reveal-group>
       <h2 id="ledger-title" class="serif ledger__title">The evidence, in context</h2>
-      <p class="ledger__intro">Four figures from the work below. Each is labelled by the kind of evidence it is, and dated where it changes over time.</p>
+      <p class="ledger__intro">Three figures from the work below. Each is labelled by the kind of evidence it is, and dated where it changes over time.</p>
     </div>
     <ol class="ledger__list" role="list">
       {ledger.map((row) => (

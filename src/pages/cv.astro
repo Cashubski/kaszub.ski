@@ -1,8 +1,15 @@
 ---
+/**
+ * The CV page, rebuilt from Michal's real CV (BRIEF.md §14.5) in its order: education, experience,
+ * projects, skills, languages and certifications, with the PDF offered unaltered. Public-safe: no
+ * address or phone on the page; the email is assembled in the browser by the Email component.
+ */
 import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import { person, site } from '../data/site';
-const description = `Curriculum vitae of ${person.name}, AI/ML engineer and founder in London: UCL MSc research, NeuralTake, AI Zuzi, NeuralKite and automated API pipelines.`;
+import Email from '../components/Email.astro';
+import { person } from '../data/site';
+const [msc, bsc] = person.education;
+const description = `Curriculum vitae of ${person.name}, AI/ML engineer and founder in London: UCL MSc in AI and Medical Imaging, NeuralTake, WorldQuant Brain, MIQA, ChefBot, AI Zuzi and NeuralKite.`;
 ---
 
 <Base title="CV" description={description} bodyClass="cv-page">
@@ -15,149 +22,129 @@ const description = `Curriculum vitae of ${person.name}, AI/ML engineer and foun
         </div>
         <div class="cv__contact small" data-reveal>
           <p>{person.location}</p>
-          <p><ExternalLink href={person.github} >github.com/Cashubski</ExternalLink></p>
-          <p><ExternalLink href={person.linkedin} >linkedin.com/in/m1k</ExternalLink></p>
-          <p><a href="/" >kaszub.ski</a></p>
-          <p class="muted">Contact via LinkedIn; email on request</p>
+          <p><Email /></p>
+          <p><ExternalLink href={person.github}>github.com/Cashubski</ExternalLink></p>
+          <p><ExternalLink href={person.linkedin}>linkedin.com/in/m1k</ExternalLink></p>
+          <p><a href="/">kaszub.ski</a></p>
         </div>
       </div>
       <div class="cv__actions no-print" data-reveal>
-        <button type="button" class="cv__print" data-print hidden>Print or save as PDF</button>
-        <p class="small muted cv__pdf-note">Print this page or save it as a PDF.</p>
+        <a class="cv__pdf" href="/Michal-Kaszubski-CV.pdf" download>Download the PDF</a>
+        <button type="button" class="cv__print" data-print hidden>Print this page</button>
+        <p class="small muted cv__pdf-note">The PDF is the CV as supplied in September 2026. This page carries its facts without the phone number.</p>
       </div>
     </header>
 
     <section class="cv__section">
       <h2 class="cv__h2 serif" data-reveal>Profile</h2>
-      <p class="cv__lead">{person.lede} My research is on model reliability in medical imaging (UCL MSc), with an ongoing entry to a public RSNA benchmark. Alongside it I run NeuralTake, my AI consultancy, through which I engineer AI Zuzi, a production platform for a client company. I have built NeuralKite for acquisition research, and I run automated content pipelines on generation and analytics APIs.</p>
+      <p class="cv__lead">{person.lede} My research is on model reliability in medical imaging (UCL MSc). I run NeuralTake, my AI consultancy, through which I engineer AI Zuzi, a production platform for a client company; before that I researched systematic trading signals as a consultant to WorldQuant Brain. I have built NeuralKite for acquisition research and ChefBot, a cooking assistant on GPT.</p>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Education</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">{msc.years}</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">{msc.degree}, {msc.institution}, {msc.classification}</h3>
+          <p class="cv__sub small muted">{msc.department}, London</p>
+          <ul>
+            <li>Focus: high-dimensional medical image analysis (MRI and CT), deep learning and foundation models, image reconstruction and inverse problems, robustness and evaluation of AI in safety-critical settings.</li>
+            <li>Trained and fine-tuned convolutional and transformer models on UCL’s GPU clusters, optimising memory use and run time for medical imaging data.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num" aria-hidden="true"></div>
+        <div class="cv__what">
+          <h3 class="cv__h3">{bsc.degree}, {bsc.institution}, {bsc.classification}</h3>
+          <ul>
+            <li>President, City Wealth Management Society: led a society of 115+ members, secured external sponsorship and a Bright Network partnership, and organised competitions and speaker events including Paul Donovan of UBS.</li>
+            <li>President, Polish Society: grew membership from 0 to 100+ in one year, winning City SU’s 2023 Most Improved Society Award.</li>
+          </ul>
+        </div>
+      </div>
     </section>
 
     <section class="cv__section" data-rule>
       <h2 class="cv__h2 serif" data-reveal>Experience</h2>
       <div class="cv__entry" data-reveal>
-        <div class="cv__when small num">2024 to present</div>
+        <div class="cv__when small num">{person.company.since} to present</div>
         <div class="cv__what">
-          <h3 class="cv__h3">Founder and AI engineer, NeuralTake (Neuraltake Limited), London</h3>
+          <h3 class="cv__h3">{person.company.role}, {person.company.legalName} ({person.company.name}), London</h3>
           <ul>
             <li>Founded an AI consultancy that automates manual workflows for professional services firms: a two-week embedded workflow audit with a ranked punch list, then fixed-fee builds live in two to six weeks, with thirty days of post-launch defect cover.</li>
-            <li>Signed B2B contracts and delivered them end to end, owning stakeholder discovery, scoping, requirements, architecture, delivery, onboarding, support and roadmap.</li>
-            <li>Build in the client’s repository and infrastructure. Operate my own: an Ubuntu VPS fleet, nginx, pm2, Let’s Encrypt, PostgreSQL, a self-hosted Postal mail server, Docker and Google Cloud Run.</li>
+            <li>Secured and delivered signed B2B AI software and consultancy contracts end to end, owning stakeholder discovery, scoping, requirements, architecture, delivery, onboarding, support and roadmap.</li>
+            <li>Designed, built and deployed a production AI SaaS in Django, React and PostgreSQL, supporting AI-assisted content generation, multilingual workflows, payments and seven third-party integrations, for approximately 50 business users.</li>
+            <li>Took a client platform from prototype to production through a security audit, encryption at rest, MFA, GDPR-aligned deletion and a zero-data-loss live migration from SQLite to PostgreSQL.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">{person.pastEmployer.years}</div>
+        <div class="cv__what">
+          <h3 class="cv__h3">{person.pastEmployer.role}, {person.pastEmployer.name}, London</h3>
+          <ul>
+            <li>Researched and backtested systematic trading signals in Python, evaluating risk-adjusted performance, turnover, decay and robustness.</li>
+            <li>Iterated signal formulations and neutralisation choices.</li>
+            <li>Documented findings within a global quantitative-research community.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section class="cv__section" data-rule>
+      <h2 class="cv__h2 serif" data-reveal>Projects</h2>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">October 2025 to August 2026</div>
+        <div class="cv__what">
+          <h3 class="cv__h3"><a href="/work/miqa">MIQA</a>, MSc thesis: AI for medical image quality assessment, UCL</h3>
+          <ul>
+            <li>Benchmarked ResNet-18/50, DenseNet-121 and EfficientNet-B0 on 1,027 UCLH prostate DWI acquisitions from 627 patients under strict patient-level cross-validation. A three-seed DenseNet-121 ensemble reached mean AUROC 0.819 (SD 0.049 across five folds), up to 0.17 AUROC over classical radiomic baselines.</li>
+            <li>Built a heterogeneous multi-architecture ensemble reaching 83.6% retained-case accuracy at 70% coverage in a retrospective triage simulation, deferring uncertain scans for review; distilled it into a single model at about one-ninth of the ensemble’s inference cost.</li>
+            <li>Open-sourced a reproducible PyTorch pipeline (MIT) with 700+ training runs, CI tests, paired Wilcoxon tests with bootstrap confidence intervals, Grad-CAM interpretability and synthetic-distortion physics validation.</li>
+          </ul>
+        </div>
+      </div>
+      <div class="cv__entry" data-reveal>
+        <div class="cv__when small num">February 2024 to present</div>
+        <div class="cv__what">
+          <h3 class="cv__h3"><a href="/work/chefbot">ChefBot</a>, a cooking assistant built on GPT (personal project)</h3>
+          <ul>
+            <li>Built and deployed a GPT-based cooking assistant on ChatGPT: 25,000+ conversations and a 4.7 rating from 100+ ratings on the GPT store (listing, September 2026). Conversations, not people.</li>
+            <li>Designed the multi-step tool-calling and retrieval flows that turn sparse fridge or pantry inputs into a recipe, and iterated the prompts and logic on usage data.</li>
           </ul>
         </div>
       </div>
       <div class="cv__entry" data-reveal>
         <div class="cv__when small num">2026 to present</div>
         <div class="cv__what">
-          <h3 class="cv__h3">AI Zuzi (client platform), lead engineer through NeuralTake</h3>
+          <h3 class="cv__h3"><a href="/work/aizuzi">AI Zuzi</a>, a client platform engineered through NeuralTake</h3>
           <ul>
-            <li>Took an AI social-media management and content platform for a client company from prototype to production: Django 5 and Django REST Framework (75 API view classes), React 18, PostgreSQL 16, Stripe, Cloudflare R2. Used by about 50 business users (stated September 2026).</li>
-            <li>Built the publishing pipeline for six Meta post types with direct Instagram Business Login, transient-error retries and real permalinks; task services for YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile; WordPress blog publishing.</li>
-            <li>Moved the database from SQLite to PostgreSQL 16 (563 rows, natural-key dump and load, 64-bit id widening, sequence reset, rollback file kept) and wrote the ETL and runbook for the production cutover.</li>
-            <li>Security and quality: MFA by email code and TOTP, field-level encryption at rest, rate limiting, SSRF guards, GDPR-aligned deletion, 76 automated tests gating deployment in GitHub Actions, Sentry.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="cv__section" data-rule>
-      <h2 class="cv__h2 serif" data-reveal>Products</h2>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num" aria-hidden="true"></div>
-        <div class="cv__what">
-          <h3 class="cv__h3">NeuralKite, acquisition-target intelligence for fragmented UK private markets</h3>
-          <ul>
-            <li>Built a live product that maps private companies, scores targets against an acquisition thesis and produces decision-ready dossiers: ownership discovery, screening, thesis-fit scoring, shortlisting and export.</li>
-            <li>Stack: Next.js App Router and TypeScript, Prisma and PostgreSQL, NextAuth, Stripe billing, LLM agents on the Anthropic SDK, Playwright and Cheerio scrapers, SSE streaming, and a self-hosted PostgreSQL warehouse including a 2.8-million-company Crunchbase dataset.</li>
-            <li>Live product; customer and usage figures not published.</li>
+            <li>An AI social-media management and content platform for a client company, taken from prototype to production: Django, React and PostgreSQL; publishing to Meta, YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, with WordPress blog publishing; generation, Stripe payments and multi-factor sign-in. About 50 business users (stated September 2026).</li>
           </ul>
         </div>
       </div>
       <div class="cv__entry" data-reveal>
         <div class="cv__when small num" aria-hidden="true"></div>
         <div class="cv__what">
-          <h3 class="cv__h3">ChefBot, a cooking assistant built on GPT</h3>
+          <h3 class="cv__h3"><a href="/work/neuralkite">NeuralKite</a>, acquisition-target intelligence for fragmented UK private markets</h3>
           <ul>
-            <li>Designed the retrieval, prompt logic and multi-step tool flows for a GPT-based assistant that helps people cook from sparse fridge or pantry inputs; iterated using usage patterns and user feedback.</li>
+            <li>Built a live product that maps private companies, scores targets against an acquisition thesis and produces decision-ready dossiers, around an email discovery and verification engine written at socket level. Next.js and TypeScript, Prisma and PostgreSQL, Claude agents on the Anthropic SDK, a self-hosted warehouse with a 2.8-million-company Crunchbase dataset. Customer and usage figures not published.</li>
           </ul>
         </div>
       </div>
     </section>
 
     <section class="cv__section" data-rule>
-      <h2 class="cv__h2 serif" data-reveal>Research</h2>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num">2025 to 2026</div>
-        <div class="cv__what">
-          <h3 class="cv__h3">MSc thesis, UCL: automated detection of geometric distortion in prostate diffusion-weighted MRI</h3>
-          <ul>
-            <li>Retrospective dataset of 1,027 acquisitions from 627 patients (single centre, anonymised); strict patient-level five-fold cross-validation.</li>
-            <li>Three-seed DenseNet-121 ensemble: mean AUROC 0.819 (SD 0.049 across the five folds). Heterogeneous nine-model ensemble: uncertainty-error AUROC 0.685. Retrospective triage simulation: 83.6% retained-case accuracy at 70% coverage. Distilled single model: one forward pass instead of nine.</li>
-            <li>PyTorch experiments, classical baselines, bootstrap confidence intervals, paired Wilcoxon tests, Grad-CAM, calibration analysis, synthetic-distortion validation. Public MIT-licensed code with a CPU-only test suite on synthetic data.</li>
-          </ul>
-        </div>
-      </div>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num">2026, ongoing</div>
-        <div class="cv__what">
-          <h3 class="cv__h3">RSNA Knee Abnormality Detection, Kaggle research code competition</h3>
-          <ul>
-            <li>Weakly supervised multimodal knee-MRI classification: report to labels to image model to image-only inference.</li>
-            <li>timm slice encoder, BiGRU, attention pooling and series aggregation. DistributedDataParallel on two Quadro GV100 GPUs, patient-level GroupKFold, about 500 GB of DICOM preprocessed in shards.</li>
-            <li>Competition ongoing (verified {site.factsDate}); no result yet.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="cv__section" data-rule>
-      <h2 class="cv__h2 serif" data-reveal>Automation</h2>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num" aria-hidden="true"></div>
-        <div class="cv__what">
-          <h3 class="cv__h3">CleverFacts and Ogarnik, an automated short-form video pipeline in English and Polish</h3>
-          <ul>
-            <li>Built and ran an automated pipeline that turns one concept into two localised videos through generation APIs, including Flow for video, with translation and expressive dubbing for the Polish versions.</li>
-            <li>Built the analytics layer in Python on the YouTube Analytics API v2 and YouTube Data API v3 (OAuth 2.0, a cached token per channel), then analysed 74 matched videos per channel: launch curves, traffic sources and how concepts transferred between languages.</li>
-            <li>It retries 429, 500 and 503 with exponential backoff and exports per-video daily series and audience-retention curves to CSV.</li>
-            <li>Audience response: nearly 720,000 combined views with approximately 1,000 subscribers on each channel (figures from {site.factsDate}; views, not unique viewers).</li>
-          </ul>
-        </div>
-      </div>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num">2026</div>
-        <div class="cv__what">
-          <h3 class="cv__h3">Cash Nova, a fictional artist generated through the Eleven Music API</h3>
-          <ul>
-            <li>Generated the tracks programmatically through the ElevenLabs Eleven Music API. The pipeline covered the music, the voices including spoken parts, sound matching across tracks, and the flow and sequencing of each release.</li>
-            <li>Six albums and 52 tracks released on ElevenMusic in 2026; tracks received platform discovery and playlist placement. 97 followers as of {site.factsDate}.</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section class="cv__section" data-rule>
-      <h2 class="cv__h2 serif" data-reveal>Education</h2>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num">2025 to 2026</div>
-        <div class="cv__what"><h3 class="cv__h3">MSc in AI and Medical Imaging, UCL</h3></div>
-      </div>
-      <div class="cv__entry" data-reveal>
-        <div class="cv__when small num" aria-hidden="true"></div>
-        <div class="cv__what"><h3 class="cv__h3">BSc Computer Science, City, University of London</h3></div>
-      </div>
-    </section>
-
-    <section class="cv__section" data-rule>
-      <h2 class="cv__h2 serif" data-reveal>Technical</h2>
+      <h2 class="cv__h2 serif" data-reveal>Skills</h2>
       <dl class="cv__skills" data-reveal>
-        <div><dt>ML</dt><dd>PyTorch, timm, DenseNet and ResNet families, EfficientNet, BiGRU and attention pooling, ensembles, MC dropout, selective prediction, calibration (ECE), Grad-CAM, SimCLR and BYOL pretraining, DistributedDataParallel, AMP, GroupKFold</dd></div>
-        <div><dt>Production</dt><dd>Django, Django REST Framework, React, Next.js App Router, TypeScript, Prisma, PostgreSQL, NextAuth, Stripe, Anthropic SDK, OpenAI API, Meta Graph API, Cloudflare R2, Playwright, Cheerio, SSE streaming, encryption at rest, MFA, GDPR-aligned deletion</dd></div>
-        <div><dt>Infrastructure</dt><dd>Ubuntu VPS, nginx, pm2, Let’s Encrypt, Docker, Google Cloud Run, self-hosted PostgreSQL and Postal, GitHub Actions, pytest, Sentry</dd></div>
-        <div><dt>Data</dt><dd>DICOM preprocessing, synthetic NIfTI test data, sharded pipelines on Kaggle, GPU cluster sync, a 2.8-million-company Crunchbase warehouse in self-hosted PostgreSQL</dd></div>
-        <div><dt>Automation</dt><dd>Eleven Music API, ElevenLabs voices, Flow, YouTube Analytics API v2, YouTube Data API v3, OAuth 2.0, Python, rate-limit backoff, CSV exports</dd></div>
-        <div><dt>Product</dt><dd>Stakeholder discovery, scoping, onboarding and support, prompt and tool-flow design, format adaptation across languages, audience-driven iteration</dd></div>
+        <div><dt>Technical</dt><dd>{person.technical}</dd></div>
+        <div><dt>Languages</dt><dd>{person.languages}</dd></div>
+        <div><dt>Certifications</dt><dd>{person.certifications}</dd></div>
       </dl>
     </section>
+
+    <p class="cv__foot small muted no-print" data-reveal>Facts on this page are as stated on the CV supplied in September 2026; the RSNA competition entry and the two automated content pipelines are on the <a href="/work">index of works</a>. <a href="/Michal-Kaszubski-CV.pdf" download>Download the PDF</a>.</p>
   </article>
 
   <script>
@@ -178,8 +165,15 @@ const description = `Curriculum vitae of ${person.name}, AI/ML engineer and foun
   .cv__contact { display: grid; gap: 0.1rem; align-content: end; }
   .cv__contact :global(a) { display: inline-flex; min-height: 2.25rem; align-items: center; }
   .cv__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-5); }
-  .cv__print { border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: 0.6rem 1rem; border-radius: var(--radius); cursor: pointer; font-weight: 500; min-height: 2.75rem; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+  .cv__pdf, .cv__print { display: inline-flex; align-items: center; border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: 0.6rem 1rem; border-radius: var(--radius); cursor: pointer; font-weight: 500; min-height: 2.75rem; text-decoration: none; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
+  .cv__pdf { background: var(--ink); color: var(--paper); }
+  .cv__pdf:hover { background: transparent; border-color: var(--cobalt); color: var(--cobalt); }
   .cv__print:hover { background: var(--ink); color: var(--paper); }
+  .cv__pdf-note { flex-basis: 100%; }
+  .cv__sub { margin-top: 0.2rem; }
+  .cv__foot { grid-column: 1 / -1; margin-top: var(--space-6); max-width: var(--measure); }
+  /* Inline links keep a comfortable tap height on a phone; block padding on an inline element leaves the line unchanged. */
+  .cv__h3 a, .cv__foot a, .cv__contact :global(a.email) { padding-block: 0.5em; }
   .cv__section { display: grid; grid-template-columns: 11rem 1fr; column-gap: var(--space-6); row-gap: var(--space-4); padding-block: var(--space-6); border-top: var(--hairline); }
   /* The header block already closes with an ink rule; the first section does not add a second one. */
   .cv__head + .cv__section { border-top: 0; padding-top: 0; }

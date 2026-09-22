@@ -33,12 +33,12 @@ function frontmatter(file) {
 const categoryLabel = { research: 'Research', products: 'Products', experiments: 'Experiments' };
 const pages = [
   { slug: 'home', kicker: 'AI/ML engineer and founder, London', title: 'Michal Kaszubski', summary: 'I investigate how models fail, build production AI systems and create products that people actually use.', footer: 'portfolio' },
-  { slug: 'work', kicker: 'Index of works', title: 'Eight works, three kinds of evidence', summary: 'Research, products and experiments, each labelled by the evidence behind it and dated where the figures change.', footer: 'index of works' },
+  { slug: 'work', kicker: 'Index of works', title: 'Eight works, three kinds of evidence', summary: 'Four featured works first: MIQA, AI Zuzi, NeuralKite and ChefBot. Then the consultancy, the RSNA entry and two automated pipelines, each labelled by the evidence behind it.', footer: 'index of works' },
   { slug: 'research', kicker: 'Works filtered by category', title: 'Research', summary: 'Rigorous ML research: prostate MRI quality assessment at UCL and a public RSNA knee MRI benchmark.', footer: 'research' },
   { slug: 'products', kicker: 'Works filtered by category', title: 'Products', summary: 'Production AI systems and commercial delivery: the NeuralTake consultancy, the AI Zuzi client platform, NeuralKite and a GPT-based cooking assistant.', footer: 'products' },
   { slug: 'experiments', kicker: 'Works filtered by category', title: 'Experiments', summary: 'Automated content pipelines built on APIs: a fictional artist generated through the Eleven Music API, and one short-form concept turned into an English and a Polish video.', footer: 'experiments' },
-  { slug: 'about', kicker: 'About', title: 'I like models that know their limits and products that people keep using.', summary: 'UCL MSc in AI and Medical Imaging. Founder and AI engineer at NeuralTake. London, UK.', footer: 'about' },
-  { slug: 'cv', kicker: 'Curriculum vitae', title: 'Michal Kaszubski', summary: 'AI/ML engineer and founder in London: research, production systems and products with dated evidence.', footer: 'curriculum vitae' },
+  { slug: 'about', kicker: 'About', title: 'I like models that know their limits and products that people keep using.', summary: 'UCL MSc in AI and Medical Imaging. Managing Director and AI Engineer at NeuralTake; formerly a quantitative research consultant to WorldQuant Brain. London, UK.', footer: 'about' },
+  { slug: 'cv', kicker: 'Curriculum vitae', title: 'Michal Kaszubski', summary: 'UCL MSc, NeuralTake, WorldQuant Brain, MIQA, ChefBot, AI Zuzi and NeuralKite, with the PDF to download.', footer: 'curriculum vitae' },
   { slug: '404', kicker: 'Error 404', title: 'Nothing at this address.', summary: 'There is no page here. It may have moved, or the link was mistyped.', footer: 'not found' },
 ];
 const workDir = join(root, 'src', 'content', 'work');

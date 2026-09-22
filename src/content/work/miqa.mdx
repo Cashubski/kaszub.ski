@@ -5,11 +5,11 @@ summary: "MSc research at UCL on automated detection of geometric distortion in 
 category: research
 role: "MSc researcher, UCL (thesis author)"
 years: "2025 to 2026"
-status: "Retrospectively validated proof of concept; retrospective triage simulation only"
+status: "Retrospectively validated proof of concept; retrospective triage simulation only. Thesis, October 2025 to August 2026"
 evidence: ["Research evidence"]
 seoDescription: "UCL MSc research: detecting geometric distortion in prostate diffusion-weighted MRI, and whether a model can tell when it is wrong."
 technologies: ["PyTorch", "DenseNet-121", "Deep ensembles", "Selective prediction", "Calibration", "Grad-CAM", "pytest"]
-result: "Three-seed DenseNet-121 ensemble: mean AUROC 0.819, SD 0.049 across five patient-level folds. Retrospective triage simulation: 83.6% retained-case accuracy at 70% coverage (thesis, 2026)."
+result: "Three-seed DenseNet-121 ensemble: mean AUROC 0.819, SD 0.049 across five patient-level folds, up to 0.17 AUROC over classical radiomic baselines. Retrospective triage simulation: 83.6% retained-case accuracy at 70% coverage (thesis, 2026)."
 links:
   - label: "Code on GitHub (MIT)"
     href: "https://github.com/Cashubski/miqa-prostate-dwi"
@@ -39,13 +39,16 @@ metrics:
     context: "Retrospective, single-centre, anonymised prostate DWI dataset; strict patient-level five-fold cross-validation"
     asOf: "Thesis, 2026"
   - value: "AUROC 0.819 (SD 0.049)"
-    context: "Three-seed DenseNet-121 ensemble; the SD is across the five folds, not across seeds"
+    context: "Three-seed DenseNet-121 ensemble; the SD is across the five folds, not across seeds; up to 0.17 AUROC over classical radiomic baselines"
     asOf: "Thesis, 2026"
   - value: "Uncertainty-error AUROC 0.685"
-    context: "Heterogeneous nine-model ensemble"
+    context: "Heterogeneous nine-model ensemble, against 0.522 for the three-seed DenseNet-121 ensemble"
     asOf: "Thesis, 2026"
   - value: "83.6% at 70% coverage"
     context: "Retained-case accuracy in a retrospective triage simulation that defers the least-certain cases"
+    asOf: "Thesis, 2026"
+  - value: "About one-ninth"
+    context: "The distilled single model's inference cost, relative to the nine-model ensemble"
     asOf: "Thesis, 2026"
 ---
 import EvidenceBand from '../../components/EvidenceBand.astro';
@@ -57,120 +60,91 @@ import fig4 from '../../assets/work/miqa/fig-04-heterogeneous-ensemble.png';
 import fig5 from '../../assets/work/miqa/fig-05-selective-prediction.png';
 import fig6 from '../../assets/work/miqa/fig-06-synthetic-distortion.png';
 
-Figure 2, above, is the result this page is about: the architecture that classified best was the worst at knowing when it was wrong. The underlying scans are patient data and cannot be shown, so this page shows aggregate results and model outputs only.
+Figure 2, above, is the result this page is about: the architecture that classified best was the worst at knowing when it was wrong. The scans are patient data and cannot be shown, so this page shows aggregate results and model outputs only.
 
 ## The problem
 
-Diffusion-weighted MRI of the prostate is sensitive to geometric distortion, and an acquisition that looks plausible can still be unreliable for reading. My MSc thesis at UCL asked two questions in sequence. Can a model detect distorted acquisitions automatically? And, more usefully for any real workflow, can that model tell when its own judgement should not be trusted, so that the uncertain cases go to a person instead?
-
-The second question turned out to be the interesting one. The most accurate architecture I trained performed poorly at identifying its own mistakes.
+Diffusion-weighted MRI of the prostate is sensitive to geometric distortion, and an acquisition that looks plausible can still be unreliable for reading. My MSc thesis at UCL, October 2025 to August 2026, asked two questions. Can a model detect distorted acquisitions? And can it tell when its own judgement should not be trusted, so that the uncertain cases go to a person instead? The second question turned out to be the interesting one.
 
 ## What I did
 
-- Assembled the experimental pipeline in PyTorch on a retrospective dataset of 1,027 acquisitions from 627 patients (single centre, University College London Hospital, anonymised; the data cannot be shared).
-- Enforced strict patient-level five-fold cross-validation, so no patient appears in both the training and the validation side of any fold.
-- Benchmarked four backbones (ResNet-18, ResNet-50, DenseNet-121, EfficientNet-B0) against classical baselines, then trained a three-seed DenseNet-121 ensemble.
-- Investigated why the most accurate architecture performed poorly at identifying its own mistakes, looking at ensemble homogeneity and correlated errors between members.
-- Built a heterogeneous nine-model ensemble to get a more informative uncertainty signal, then a retrospective triage simulation that defers the least-certain cases.
-- Distilled the nine-model ensemble into a single student model, reducing inference from nine forward passes to one.
-- Reported with bootstrap confidence intervals and paired Wilcoxon tests, and inspected behaviour with Grad-CAM, calibration analysis and synthetic-distortion validation.
+- Built the experimental pipeline in PyTorch on 1,027 acquisitions from 627 patients (single centre, University College London Hospital, anonymised), under strict patient-level five-fold cross-validation.
+- Benchmarked four backbones against classical radiomic baselines, over 700+ training runs, then trained a three-seed DenseNet-121 ensemble and measured how far its members agree.
+- Built a heterogeneous nine-model ensemble, a retrospective triage simulation that defers the least-certain cases, and a distilled single model at about one-ninth of the ensemble’s inference cost.
+- Reported with bootstrap confidence intervals and paired Wilcoxon tests; checked behaviour with Grad-CAM, calibration analysis and synthetic-distortion validation.
 
 <MiqaFigure
   n={1}
   src={fig1}
   span="wide"
-  alt="Architecture schematic from the thesis. An input of 3 by 224 by 224 feeds four interchangeable CNN backbones, ResNet-18 with 11 million parameters, ResNet-50 with 25 million, DenseNet-121 with 8 million and EfficientNet-B0 with 5 million. Each feeds the same global average pooling and fully connected head with one logit, which gives the probability that the acquisition is distorted."
-  caption="The system. Four CNN backbones share one input format and one classification head, so the backbone is the only thing that changes between experiments. Every one of them runs through the same patient-level five-fold cross-validation."
+  alt="Architecture schematic from the thesis. One input feeds four interchangeable CNN backbones, ResNet-18, ResNet-50, DenseNet-121 and EfficientNet-B0, each ending in the same pooling and classification head with one logit: the probability that the acquisition is distorted."
+  caption="The system. Four backbones share one input format and one classification head, so the backbone is the only thing that changes between experiments."
 />
 
-## The finding, and the mechanism behind it
+## The finding, and a plausible explanation
 
-The three-seed DenseNet-121 ensemble was the most accurate model, with a mean AUROC of 0.819. Its uncertainty was close to useless. Uncertainty-error AUROC asks whether the cases a model is unsure about are the cases it gets wrong; 0.50 is chance. The DenseNet-121 ensemble scored 0.52. ResNet-18, a much shallower and slightly less accurate network, scored 0.64 (Figure 2).
+The three-seed DenseNet-121 ensemble was the most accurate model: mean AUROC 0.819, up to 0.17 above the classical radiomic baselines. Its uncertainty was close to useless. Uncertainty-error AUROC asks whether the cases a model is unsure about are the cases it gets wrong; 0.50 is chance. DenseNet-121 scored 0.52. ResNet-18, shallower and slightly less accurate, scored 0.64 (Figure 2).
 
-A deep ensemble turns disagreement between its members into uncertainty, so I measured how much the members disagree. DenseNet-121 models trained from different seeds make strongly correlated predictions, with a mean pairwise correlation of 0.74 against 0.68 for ResNet-18 and 0.64 for ResNet-50. Members that agree with one another, including when they are wrong, leave the ensemble with little disagreement to report.
+A deep ensemble turns disagreement between its members into uncertainty, so I measured how much the members agree. DenseNet-121 models trained from different seeds make strongly correlated predictions: a mean pairwise correlation of 0.74, against 0.68 for ResNet-18 and 0.64 for ResNet-50. That ordering matches the ordering of the uncertainty results. It is consistent with the explanation that members which agree with one another, including when they are wrong, leave the ensemble little disagreement to report. It is an association across three architectures, not a demonstration of cause, and the thesis presents it as evidence for a plausible explanation and no more.
 
 <MiqaFigure
   n={3}
   src={fig3}
   span="text"
-  alt="Bar chart from the thesis: mean pairwise prediction correlation between seed variants over five folds. DenseNet-121 is highest at r equals 0.74, ResNet-18 is 0.68 and ResNet-50 is 0.64 with the widest error bar. A dotted line marks the thesis's threshold for a homogeneous ensemble at 0.85, above all three bars."
-  caption="The mechanism. DenseNet-121 seed variants agree with one another most strongly (r = 0.74, against 0.68 and 0.64 for the two ResNets), which removes the disagreement an ensemble needs in order to signal doubt. All three sit below the 0.85 line the thesis uses to call an ensemble homogeneous, so this is a difference of degree."
+  alt="Bar chart from the thesis: mean pairwise prediction correlation between seed variants over five folds. DenseNet-121 is highest at r equals 0.74, ResNet-18 is 0.68 and ResNet-50 is 0.64. A dotted line marks the thesis's threshold for a homogeneous ensemble at 0.85, above all three bars."
+  caption="Evidence for a plausible explanation. The architecture whose seed variants agree most (DenseNet-121, r = 0.74, against 0.68 and 0.64 for the two ResNets) is the one whose uncertainty ranks errors worst. The association is consistent with ensemble homogeneity as the reason; it does not prove it."
 />
 
 ## Decisions that mattered
 
-<dl class="decisions">
-  <div>
-    <dt>Split by patient</dt>
-    <dd>Several acquisitions share a patient. Splitting by acquisition would have leaked patient-specific appearance across folds and inflated every number that follows, so the five folds are drawn at patient level.</dd>
-  </div>
-  <div>
-    <dt>Report the spread across folds</dt>
-    <dd>The headline AUROC of 0.819 carries an SD of 0.049. Seed variance is a different quantity; the SD quoted here is across the five folds.</dd>
-  </div>
-  <div>
-    <dt>Make the ensemble heterogeneous</dt>
-    <dd>If same-architecture members agree too much, mix the architectures. A heterogeneous nine-model ensemble, three architectures with three seeds each, reached an uncertainty-error AUROC of 0.685 against 0.522 for the three-seed DenseNet-121 ensemble, which made deferral worth simulating (Figure 4).</dd>
-  </div>
-  <div>
-    <dt>Make the expensive model cheap</dt>
-    <dd>Nine models are a lot to run on every scan. Distilling the ensemble into one student reduces inference from nine forward passes to one.</dd>
-  </div>
-  <div>
-    <dt>Test without patient data</dt>
-    <dd>The public repository ships a CPU-only pytest suite that runs on synthetic NIfTI volumes, so the code can be checked anywhere without access to the dataset.</dd>
-  </div>
-</dl>
+Three choices shaped every number here. The folds are drawn at patient level, because several acquisitions share a patient and splitting by acquisition would have leaked patient-specific appearance across folds. The ensemble was made heterogeneous, three architectures with three seeds each, because same-architecture members agreed too much; that lifted uncertainty-error AUROC from 0.522 to 0.685 and made deferral worth simulating (Figure 4). And the nine models were distilled into one student, because nine forward passes on every scan is not a deployable cost.
 
 <MiqaFigure
   n={4}
   src={fig4}
   span="xwide"
   alt="Two horizontal bar charts from the thesis comparing five ensembles over five folds. Classification AUROC: heterogeneous nine-model 0.802, heterogeneous three-architecture 0.797, homogeneous ResNet-50 0.739, homogeneous ResNet-18 0.801, homogeneous DenseNet 0.819. Uncertainty-error AUROC for the same ensembles: 0.685, 0.652, 0.617, 0.645 and 0.522, with a dashed chance line at 0.50."
-  caption="The fix. Mixing architectures lifts uncertainty-error AUROC from 0.522 for the three-seed DenseNet-121 ensemble to 0.685 for the nine-model ensemble. Classification AUROC moves from 0.819 to 0.802, a gap well inside the spread across folds drawn on the same bars."
+  caption="The fix. Mixing architectures lifts uncertainty-error AUROC from 0.522 to 0.685. Classification AUROC moves from 0.819 to 0.802, a gap well inside the spread across folds."
 />
 
 <EvidenceBand
   title="Evidence that it worked"
-  intro="All figures are from the thesis (2026) and are retrospective."
+  intro="All figures are from the thesis (October 2025 to August 2026) and are retrospective."
   items={[
-    { figure: '0.819', unit: 'mean AUROC, distortion detection', context: 'Three-seed DenseNet-121 ensemble; SD 0.049 across the five patient-level folds.' },
+    { figure: '0.819', unit: 'mean AUROC, distortion detection', context: 'Three-seed DenseNet-121 ensemble; SD 0.049 across the five patient-level folds; up to 0.17 AUROC above classical radiomic baselines.' },
     { figure: '0.685', unit: 'uncertainty-error AUROC', context: 'Heterogeneous nine-model ensemble, against 0.522 for the three-seed DenseNet-121 ensemble.' },
     { figure: '83.6%', unit: 'retained-case accuracy at 70% coverage', context: 'Retrospective triage simulation, deferring the least-certain cases.' },
-    { figure: '9 to 1', unit: 'forward passes at inference', context: 'Distilled single student model.' },
+    { figure: 'One-ninth', unit: 'of the ensemble’s inference cost', context: 'The distilled single student model, approximately: one forward pass in place of nine.' },
+    { figure: '700+', unit: 'training runs', context: 'In the public PyTorch pipeline, across backbones, baselines, seeds and folds.' },
   ]}
->
-
-The public code also contains the surrounding apparatus: MC dropout, deep ensembles, selective prediction, expected calibration error, SimCLR and BYOL pretraining, DWI plus T2 fusion, an auxiliary b-value head, and the synthetic test suite.
-
-</EvidenceBand>
+/>
 
 ## Deferral, and a check against physics
 
-An uncertainty signal earns its keep when it decides which cases a model should not answer. Selective prediction does that: rank the cases by uncertainty, defer the least certain, and measure accuracy on what is left. It is a tunable deferral mechanism, shown retrospectively. The coverage level is a dial for whoever runs it, and nothing here was run on live cases.
+An uncertainty signal earns its keep when it decides which cases a model should not answer. Selective prediction ranks the cases by uncertainty, defers the least certain, and measures accuracy on the rest: a tunable deferral rule, shown retrospectively, never run on live cases.
 
 <MiqaFigure
   n={5}
   src={fig5}
   span="wide"
   sheet="narrow"
-  alt="Line chart from the thesis: accuracy against coverage, the fraction of cases retained, for ResNet-18 with three uncertainty methods. As coverage falls from 1.0 to about 0.1, the deep ensemble rises from about 0.77 to about 0.91, MC dropout from about 0.78 to about 0.90 and test-time augmentation from about 0.71 to about 0.91. The shaded bands across folds are wide and overlap."
-  caption="Selective prediction, shown here for ResNet-18 with three uncertainty methods. Accuracy on the retained cases climbs as the system defers the scans it is least sure of. The bands are the spread across folds, and they are wide: the direction is consistent, the exact height is not settled by a dataset of this size."
+  alt="Line chart from the thesis: accuracy against coverage for ResNet-18 with three uncertainty methods. As coverage falls from 1.0 to about 0.1, accuracy rises from about 0.71 to 0.78 up to about 0.90 to 0.91 for all three. The shaded bands across folds are wide and overlap."
+  caption="Selective prediction, for ResNet-18 with three uncertainty methods. Accuracy on the retained cases climbs as the system defers the scans it is least sure of. The bands, the spread across folds, are wide: the direction is consistent, the exact height is not."
 />
 
-A classifier trained at one centre can learn a shortcut that has nothing to do with the artefact. To test that, I injected synthetic geometric distortion of increasing magnitude into undistorted test acquisitions and watched the output.
+A classifier trained at one centre can learn a shortcut that has nothing to do with the artefact. To test that, I injected synthetic geometric distortion of increasing magnitude into undistorted test acquisitions.
 
 <MiqaFigure
   n={6}
   src={fig6}
   span="text"
-  alt="Line chart from the thesis: mean predicted probability of distortion on undistorted test cases as synthetic vertical distortion of 0 to 14 pixels is injected. DenseNet-121 rises from about 0.35 to about 0.40, ResNet-18 from about 0.27 to about 0.35 and ResNet-50 from about 0.27 to about 0.31. Every curve rises monotonically and every mean stays below the dashed decision threshold at 0.5; error bars are wide."
-  caption="Physics validation. The mean predicted probability of distortion rises monotonically with the magnitude of injected synthetic distortion for all three architectures, which is what a model responding to the artefact should do. The rise is modest and the means stay below the 0.5 decision threshold, so this is a sanity check on direction and no more."
+  alt="Line chart from the thesis: mean predicted probability of distortion on undistorted test cases as synthetic vertical distortion of 0 to 14 pixels is injected. All three architectures rise monotonically, DenseNet-121 from about 0.35 to 0.40 and the two ResNets from about 0.27 to 0.31 and 0.35, and every mean stays below the dashed decision threshold at 0.5."
+  caption="Physics validation. The predicted probability of distortion rises monotonically with the injected magnitude for all three architectures, as a model responding to the artefact should. The rise is modest, so this is a sanity check on direction and no more."
 />
 
 ## Limitations and status
 
-This is a retrospectively validated proof of concept. The dataset comes from a single centre, the triage figures come from a simulation on held-out retrospective data, and nothing here has been deployed or validated in a clinic. The fold-to-fold spread in every figure above is large, as it will be with 627 patients. The results are evidence that the approach is worth carrying forward. They are not a clinical claim.
+This is a retrospectively validated proof of concept: a single centre, a triage simulation on held-out retrospective data, and nothing deployed or validated in a clinic. The fold-to-fold spread is large, as it will be with 627 patients, and the seed-correlation result is an association, not a cause. The results are evidence that the approach is worth carrying forward; they are not a clinical claim.
 
 ## What I learned
 
@@ -178,10 +152,10 @@ This is a retrospectively validated proof of concept. The dataset comes from a s
 
 <p class="pull">Accuracy and self-knowledge are different properties, and optimising the first can quietly damage the second.</p>
 
-An ensemble’s disagreement is only useful as an uncertainty signal if its members disagree in informative ways, which is why I looked at homogeneity and correlated errors. I also learned to write a result down in its plainest form: spread across folds, splits at patient level, a simulation called a simulation.
+An ensemble’s disagreement is only useful as an uncertainty signal if its members disagree in informative ways. I also learned to write a result down in its plainest form: spread across folds, splits at patient level, a simulation called a simulation, an association called an association.
 
 </div>
 
 ## The repository
 
-The repository is public under the MIT licence: <ExternalLink href="https://github.com/Cashubski/miqa-prostate-dwi">miqa-prostate-dwi on GitHub</ExternalLink>. It contains the training and evaluation code, the ensemble and distillation experiments, and the CPU-only test suite on synthetic data. The six figures on this page are aggregate plots from the thesis; the dataset itself cannot be shared.
+The code is public under the MIT licence: <ExternalLink href="https://github.com/Cashubski/miqa-prostate-dwi">miqa-prostate-dwi on GitHub</ExternalLink>, with the training and evaluation pipeline, the ensemble and distillation experiments, and a CPU-only test suite on synthetic data. The figures here are aggregate plots from the thesis; the dataset cannot be shared.

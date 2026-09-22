@@ -1,15 +1,15 @@
 ---
 title: "AI Zuzi"
 editorialTitle: "AI Zuzi: taking a client’s social-media platform from prototype to production"
-summary: "An AI social-media management and content platform that I engineer for a client company through NeuralTake. Django, React and PostgreSQL, publishing to Meta and six further platforms, with generation, payments and multi-factor sign-in. About 50 business users."
+summary: "An AI social-media management and content platform that I engineer for a client company through NeuralTake. Django, React and PostgreSQL, with seven third-party integrations, generation, payments and multi-factor sign-in. About 50 business users."
 category: products
 role: "Lead engineer through NeuralTake: back end, front end, integrations, security, database migration and deployment"
 years: "2026 to present"
 status: "In production at socials.aizuzi.com; user figure stated September 2026; repository private"
 evidence: ["Production deployment", "User adoption", "Commercial validation"]
-seoDescription: "AI Zuzi, a social-media and content platform I engineer for a client through NeuralTake: Django, React, PostgreSQL 16, a multi-platform publishing pipeline."
-technologies: ["Django 5", "Django REST Framework", "React 18", "PostgreSQL 16", "Stripe", "Cloudflare R2", "Meta Graph API", "OpenAI API", "xAI API", "GitHub Actions"]
-result: "Used by about 50 business users, as stated in September 2026; 76 automated tests gate every deploy, and the database was moved from SQLite to PostgreSQL 16 with a rollback file kept."
+seoDescription: "AI Zuzi, a social-media and content platform I engineer for a client through NeuralTake: Django, React, PostgreSQL, seven integrations, about 50 business users."
+technologies: ["Django", "Django REST Framework", "React", "PostgreSQL", "Stripe", "Cloudflare R2", "Meta Graph API", "GitHub Actions"]
+result: "Used by about 50 business users, as stated in September 2026; a zero-data-loss live migration from SQLite to PostgreSQL; a security audit, encryption at rest, MFA and GDPR-aligned deletion before strangers were given accounts."
 links:
   - label: "socials.aizuzi.com"
     href: "https://www.socials.aizuzi.com"
@@ -23,7 +23,7 @@ coverAlt: "The AI Zuzi Socials Manager headline on a dark blue ground, with the 
 coverCaption: "AI Zuzi Socials Manager: the headline panel of the public sign-in page, September 2026, cropped to leave out the testimonial and the sign-in form. The application itself sits behind sign-in and is not shown."
 coverLabel: "Screenshot"
 cardCaption: "Screenshot, socials.aizuzi.com, September 2026"
-order: 3
+order: 2
 featured: true
 flagship: true
 schemaType: SoftwareApplication
@@ -32,34 +32,36 @@ metrics:
   - value: "About 50 business users"
     context: "Of AI Zuzi, a production AI platform engineered for a client through NeuralTake"
     asOf: "Stated September 2026"
+  - value: "Seven third-party integrations"
+    context: "Meta (Facebook and Instagram), YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, plus WordPress blog publishing"
+    asOf: "September 2026"
 ---
 import ExternalLink from '../../components/ExternalLink.astro';
 import EvidenceBand from '../../components/EvidenceBand.astro';
 import AizuziStack from '../../components/AizuziStack.astro';
 import AizuziPipeline from '../../components/AizuziPipeline.astro';
 
-AI Zuzi is a client’s product. I engineer it for a client company through <a href="/work/neuraltake">NeuralTake</a>, my consultancy. The product name and its address are public; the company and its users are not named here, and the repository is private. Everything technical on this page was checked against that repository on 20 September 2026, and the counts were taken from the source, not from its documentation.
+AI Zuzi is a client’s product. I engineer it for a client company through <a href="/work/neuraltake">NeuralTake</a>, my consultancy. The product name and its address are public; the company and its users are not named here, the repository is private, and this page describes the platform at the level of what it does rather than how its internals are arranged.
 
 ## The problem
 
 A small business that markets itself on social media does the same job many times over: write the post, resize the image, publish it to each channel, do it again tomorrow. AI Zuzi puts that in one place. A business composes a post once, optionally with generated text, images or video, schedules it, and the platform publishes it to each connected channel and reports what happened.
 
-The engineering problem is less tidy. Every channel has its own OAuth flow, its own media rules, its own idea of what a post is and its own way of failing. Meta alone has six post types, a container model with asynchronous processing, and errors that mean “not yet” as often as “no”. On top of that sit payments, a token-metered generation studio, five interface languages, and the security a product needs before strangers are given accounts on it.
+The engineering problem is less tidy. Every channel has its own sign-in flow, its own media rules, its own idea of what a post is and its own way of failing. On top of that sit payments, a metered generation studio, five interface languages, and the security a product needs before strangers are given accounts on it.
 
-When I took it on, in March 2026, it was a prototype on SQLite whose asynchronous publishing path was broken. The job was to make it a product.
+When I took it on it was a prototype on SQLite whose publishing path was unreliable. The job was to make it a product.
 
 ## What I did
 
-- Rebuilt publishing for the six Meta post types, first as a synchronous path that replaced a broken asynchronous one, then as a repaired scheduler with retries, real permalinks and error messages a user can act on.
-- Added direct Instagram Business Login, so an Instagram account with no Facebook Page behind it can be connected and published to.
-- Wrote task services for YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, and a full WordPress integration: connection, ten post formats, scheduling, categories, authors, media and AI-drafted articles.
-- Built Creative Studio, image, composition, edit and video generation, on a token economy with Stripe Checkout, signed webhooks and automatic invoices.
-- Added multi-factor authentication by emailed code or authenticator app, then closed the route around it.
-- Moved media to Cloudflare R2 and the database from SQLite to PostgreSQL 16, and wrote the tooling and runbook for the production cutover.
-- Did the security work a production system needs: field-level encryption of stored tokens, brute-force throttling, SSRF guards, a content security policy header, log redaction, and account deletion with a thirty-day purge.
+- Rebuilt publishing to Meta, so that a business can post to Facebook and Instagram in every format the platforms take: image, carousel, reel and stories. Added direct Instagram Business Login, so an Instagram account with no Facebook Page behind it can be connected as well.
+- Added publishing to YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, and blog publishing to WordPress with scheduling, categories, authors, media and AI-drafted articles.
+- Built Creative Studio, image and video generation priced in tokens that are bought through Stripe Checkout, with webhooks and invoices.
+- Added multi-factor authentication by emailed code or authenticator app, and made sure it cannot be walked around.
+- Moved media to Cloudflare R2 and the database from SQLite to PostgreSQL, as a live migration with zero data loss.
+- Did the security work a production system needs: a security audit, encryption at rest for stored credentials, rate limiting, guards against server-side request forgery, log redaction, and GDPR-aligned account deletion.
 - Wrote the privacy policy and data-deletion pages that Meta’s App Review asks for, and took the app through Meta’s configuration for Facebook Login and the Instagram API.
-- Set up the test suite, continuous integration and deployment, error monitoring and structured audit logging.
-- Rebuilt the interface: composer with a live phone preview, schedule calendar, media library, statistics with a print-ready PDF report, an assistant with a prompt library and thread management, a command palette, a system-status page and a five-language translations editor.
+- Set up the automated tests, continuous integration and deployment, error monitoring and an audit log.
+- Rebuilt the interface: a composer with a live phone preview, a schedule calendar, a media library, statistics with a printable PDF report, an assistant with a prompt library, a command palette, a system-status page and a five-language translations editor.
 
 ## How it is layered
 
@@ -71,82 +73,34 @@ Publishing is the part of the product that has to work every time, and the part 
 
 <AizuziPipeline />
 
-### Six post types, two Instagram routes
-
-Meta’s six cases are an image post, a carousel, a reel, an image story, a video story and the publish call that turns a processed container into a live post. Each exists twice in the task services, once for Facebook and once for Instagram, because the two APIs differ in how media is registered and when it is ready.
-
-Instagram itself has two routes. An account linked to a Facebook Page is reached through the Page’s token on the Facebook Graph host. An account connected by Instagram Business Login has no Page, so its stored entry carries a flag, and every Instagram service checks that flag and sends the request to Instagram’s own Graph host with the account’s own token. The flag is threaded through from the scheduler’s post data, so nothing downstream has to guess.
-
-### The system-status page
-
-Support questions about a publishing product start with “is it you or is it Meta?”. The status endpoint answers that. It probes six dependencies, the API itself, the database, Meta’s Graph API, OpenAI, the profile’s WordPress site and free disk space, each with a three-second timeout and a measured latency, and rolls them up into operational, degraded or outage. A probe that fails does not fail the page. The top bar shows the result on every screen.
-
-## The database cutover, step by step
-
-SQLite allows one writer. With a scheduler ticking every five seconds beside the web workers, scheduled posts were blocking on database locks. In April 2026 I moved the deployment to PostgreSQL 16. The changelog records the steps, and they are worth giving exactly, because each one exists to prevent a specific loss.
-
-1. Widen the schema first. Instagram account ids and JavaScript millisecond timestamps overflow a 32-bit integer, which SQLite never noticed and PostgreSQL would refuse. The page-id fields and three date fields became 64-bit integers, and the two container fields went from 64 to 1,024 characters, because a carousel stores a list of container ids.
-2. Make the settings environment-driven: PostgreSQL when a database engine is named, SQLite in write-ahead-log mode as the fallback for local development.
-3. Dump the data with natural foreign and primary keys, so rows refer to each other by meaning and not by row number.
-4. Run the schema migrations on the empty PostgreSQL database.
-5. Load the dump. 563 rows.
-6. Reset every sequence, so the first insert after the move does not collide with an imported primary key.
-7. Keep the SQLite file as a dated backup. Unsetting one environment variable falls back to it.
-
-The result was unlimited concurrent writers, persistent connections with health checks, and live dumps for backup. One side effect is recorded in the documentation as a warning for next time: a dump and reload with natural primary keys can change user ids, so existing sessions become invalid and everyone signs in again.
-
-The production database descends from a different code lineage, so a dump and load was not safe there. For that move I wrote an ETL script and a runbook in July 2026. The script opens the source read-only, refuses to run unless the target is an empty PostgreSQL database, loads in foreign-key order inside one transaction with primary keys preserved, encrypts secret fields on insert, keeps original timestamps, resets sequences, and prints a source-against-inserted count for every table. It fails loudly if any source column has no destination field, because a silently dropped column is data loss. The runbook insists on a checkpointed copy of the source, since a raw copy of a live write-ahead-log database can miss rows that are still in the log.
+Each channel has its own service, chosen by how the account was connected. An Instagram account reached through a Facebook Page and one connected by direct login take different routes to the same result, and the choice is made once, when the post is saved, so nothing downstream has to guess. Media is stored in object storage under a public URL, because the platforms fetch media rather than accept it, and images are converted on the way in to the format the platforms take.
 
 ## Decisions that mattered
 
 <dl class="decisions">
   <div>
     <dt>Make it publish, then make it elegant</dt>
-    <dd>The asynchronous publishing path I inherited was broken in ways that were slow to diagnose. I replaced it with a synchronous path for all six post types, so a user pressing publish got a post or an error. With the product usable again, I repaired the scheduler path properly and moved the newer platforms onto it.</dd>
+    <dd>The publishing path I inherited failed in ways that were slow to diagnose. I replaced it with a plain synchronous path first, so a user pressing publish got a post or an error, then repaired the scheduled path properly and moved the newer platforms onto it.</dd>
   </div>
   <div>
-    <dt>“Media not ready” is a timing fact, not a failure</dt>
-    <dd>Instagram answers a publish call on a video that is still processing with a specific error subcode. The code used to mark the post failed. Now that one subcode leaves the post in its publish state, the scheduler’s five-second tick tries again, and a counter on the post caps it at 20 attempts. Any other error still fails at once.</dd>
-  </div>
-  <div>
-    <dt>Convert to JPEG before Instagram sees it</dt>
-    <dd>Instagram’s API accepts JPEG only and rejects anything else with a generic download error. Uploads in PNG, WebP, HEIC or GIF are flattened onto white, since JPEG has no alpha channel, and saved at quality 92. If conversion fails the original goes through unchanged, so the normaliser can never be the thing that loses a user’s image.</dd>
+    <dt>“Not ready yet” is not “no”</dt>
+    <dd>A platform that is still processing a video answers a publish call with an error that means wait. The prototype marked such posts failed. Now the scheduler waits and tries again, within a limit, and only a real refusal fails the post.</dd>
   </div>
   <div>
     <dt>A second way into Instagram</dt>
-    <dd>Many small businesses have an Instagram account that was never linked to a Facebook Page. Direct login is a three-stage exchange: authorisation code, short-lived token, then a sixty-day token and the account’s details. It opened the product to users the Page-only route could not onboard.</dd>
+    <dd>Many small businesses have an Instagram account that was never linked to a Facebook Page. Direct login opened the product to users the Page-only route could not onboard.</dd>
   </div>
   <div>
-    <dt>Widen the ids before the move, not after</dt>
-    <dd>The 64-bit and wider-text changes went in as their own schema migrations ahead of the load. Met during the load instead, an overflowing id would have been a failed cutover half-way through.</dd>
+    <dt>Migrate live, and keep the way back</dt>
+    <dd>SQLite allows one writer, and scheduled posts were blocking on it. The move to PostgreSQL was rehearsed and then run live with zero data loss, with the schema widened first so that nothing could overflow during the load, and the previous database kept so the whole thing could be undone.</dd>
   </div>
   <div>
-    <dt>Real permalinks</dt>
-    <dd>Instagram returns a numeric media id on publish, and a URL built from it does not resolve. After each publish the scheduler asks for the real permalink and stores that, so the link in the schedule opens the post.</dd>
-  </div>
-  <div>
-    <dt>Media in object storage, fetched by URL</dt>
-    <dd>The platforms pull media from a public URL, so media belongs somewhere public and durable, not on the application server’s disk. 84 existing files were migrated to Cloudflare R2 and 81 were back-filled into the new media library. R2 URLs load in image and video tags but cannot be fetched from browser script, so downloads go through a small back-end proxy.</dd>
-  </div>
-  <div>
-    <dt>A second factor that cannot be walked around</dt>
-    <dd>MFA was added in April: a six-digit code by email, or TOTP enrolled by QR code. The July hardening found that the framework’s stock password-only sign-in route was still reachable, so it is now shadowed. Codes come from a cryptographic source, a challenge allows five attempts, and sign-in and MFA endpoints are rate-limited from a cache that all worker processes share.</dd>
-  </div>
-  <div>
-    <dt>Tokens as a ledger</dt>
-    <dd>Generation is priced in tokens, bought in packages through Stripe Checkout. Every credit and debit is a transaction row holding the balance after it. The webhook verifies Stripe’s signature and uses the checkout session id as the transaction’s reference, so a webhook delivered twice credits once.</dd>
-  </div>
-  <div>
-    <dt>Exactly one scheduler</dt>
-    <dd>The scheduler runs inside the web server’s process. With several worker processes, each would start its own and every post would publish several times. An environment gate leaves one owner process running the jobs, and management commands never start it.</dd>
-  </div>
-  <div>
-    <dt>Encrypt in the field, idempotently</dt>
-    <dd>OAuth tokens, WordPress application passwords and TOTP secrets are encrypted in their columns. Encrypted values carry a versioned marker and unmarked values read as plaintext, so existing rows were encrypted in place by a migration that is safe to run twice. Inside JSON columns only the secret values are encrypted, so the column stays valid JSON.</dd>
+    <dt>A second factor that cannot be skipped</dt>
+    <dd>Multi-factor sign-in is only worth having if every route in requires it. A later security pass found the framework’s stock password-only route still reachable, so it was closed.</dd>
   </div>
   <div>
     <dt>Write for the reviewer</dt>
-    <dd>Meta will not grant publishing permissions to an app without a privacy policy and working data-deletion instructions. I wrote both as public pages, GDPR-aligned, and made deletion real: a request revokes and clears every provider token, deactivates the account and stops its scheduled posts, and a daily job removes the account and its media after thirty days.</dd>
+    <dd>Meta will not grant publishing permissions to an app without a privacy policy and working data-deletion instructions. I wrote both as public pages, GDPR-aligned, and made deletion real: a request revokes the account’s provider tokens, stops its scheduled posts and removes the account and its media after a grace period.</dd>
   </div>
 </dl>
 
@@ -155,14 +109,12 @@ The production database descends from a different code lineage, so a dump and lo
   title="Evidence that it worked"
   items={[
     { figure: 'About 50', unit: 'business users', context: 'Of the production platform. My statement, September 2026; approximate, and not a count of paying customers.' },
-    { figure: '76', unit: 'automated tests', context: 'Across 11 files: sign-in, MFA, posts, schedule, Stripe, WordPress, media library, Creative Studio, assistant, messages and translations. Counted in the repository, 20 September 2026. A push deploys only if they pass.' },
-    { figure: '75', unit: 'API view classes', context: 'Behind 82 URL patterns, over 26 database models and 22 migrations. Counted in the source, 20 September 2026.' },
-    { figure: '563', unit: 'rows moved to PostgreSQL 16', context: 'The April 2026 cutover from SQLite, with the SQLite file kept for rollback. From the changelog entry for 18 to 19 April 2026.' },
-    { figure: '84', unit: 'media files migrated to R2', context: 'Existing uploads moved from the server’s disk to Cloudflare R2. From the changelog entry for 1 to 2 April 2026.' },
+    { figure: 'Seven', unit: 'third-party integrations', context: 'Meta (Facebook and Instagram), YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, plus WordPress blog publishing.' },
+    { figure: 'Zero', unit: 'data lost in the live migration', context: 'From SQLite to PostgreSQL, run on the live deployment with the previous database kept for rollback.' },
   ]}
 >
 
-The platform was live at socials.aizuzi.com when checked on 15 September 2026. The counts describe the size and care of the engineering. They say nothing about how often a post publishes successfully, which I have not measured in a form I would publish.
+The platform was live at socials.aizuzi.com when checked on 15 September 2026. The figures describe reach and the care taken. They say nothing about how often a post publishes successfully, which I have not measured in a form I would publish.
 
 </EvidenceBand>
 
@@ -170,9 +122,7 @@ The platform was live at socials.aizuzi.com when checked on 15 September 2026. T
 
 This is a client’s product, so there is a great deal I cannot show: no screenshots from inside the application, no code, no user data, and no names. The user figure is my own approximate statement.
 
-Built is not the same as live. Each platform grants publishing access through its own review, and the code says as much: TikTok’s sandbox restricts posts to private until its app review is passed, and Google Business Profile access is granted on application. The Meta routes are the mature ones. For the six further platforms this page claims that the task services exist and what they do, not that every one is switched on for every user.
-
-Known gaps, from the repository’s own list: Instagram’s direct-login host rejects image stories while accepting video stories, so those users must connect through Facebook for that one post type; statistics are empty for direct-login profiles because the insights call still uses the Page route; the front end has no automated tests; the main views module has grown past five thousand lines and should be split; and the scheduler would be better as its own service than as a thread inside the web server.
+Built is not the same as live. Each platform grants publishing access through its own review, and some of the newer integrations wait on that. The Meta routes are the mature ones. For the other platforms this page claims that the integrations exist and what they do, not that every one is switched on for every user.
 
 ## What I learned
 
@@ -180,7 +130,7 @@ Known gaps, from the repository’s own list: Instagram’s direct-login host re
 
 <p class="pull">Most of production engineering is deciding what an error means.</p>
 
-“Media not ready”, a locked database, a rejected PNG and a numeric id that leads nowhere all looked like the same thing to a user: the post failed. Each had a different cause and a different right answer, retry, migrate, convert, look up. I also learned to respect the unglamorous half of a migration. The load took seconds. The work was in the ids that would overflow, the sequences that would collide, the sessions that would break, and the file kept so the whole thing could be undone.
+“Not ready yet”, a locked database, a rejected image format and a link that leads nowhere all looked like the same thing to a user: the post failed. Each had a different cause and a different right answer. I also learned to respect the unglamorous half of a migration. The load took seconds. The work was in the fields that would overflow, the sessions that would break, and the copy kept so the whole thing could be undone.
 
 </div>
 

@@ -1,63 +1,61 @@
 ---
 /**
- * AI Zuzi layered architecture (BRIEF.md §13.2): layer, component, what it does.
- * Every row was read from the private repository on 20 September 2026: requirements.txt,
- * Frontend/package.json, backend/backend/settings.py, backend/SocialMediaPosts (views, urls, models,
- * migrations, encfields, security, ssrf, taskscheduler, services) and .github/workflows/ci.yml.
- * Counts were taken from the source, not from the repository's own documentation. No secrets, hosts,
- * app ids, user data or client names. Names are set in Instrument Sans; there is no monospace here.
+ * AI Zuzi layered architecture (BRIEF.md §13.2, reduced to product level by §14.4): layer, component,
+ * what it does. Each row was read from the private repository on 20 September 2026 and is stated here
+ * at the level of the CV bullets: no counts, lifetimes, limits, endpoints, library names or client detail.
+ * No secrets, hosts, app ids, user data or client names. Names are set in Instrument Sans; there is no monospace here.
  */
 interface Row { layer: string; parts: string[]; does: string; }
 const rows: Row[] = [
   {
     layer: 'Interface',
-    parts: ['React 18, Vite, Tailwind CSS, Radix primitives', 'react-i18next with five locales'],
-    does: 'Composer with a live phone preview, schedule calendar, media library, Creative Studio, assistant, statistics with a print-ready PDF report, a command palette and a system-status page. English, Polish, German, Dutch and Czech.',
+    parts: ['React, Vite, Tailwind CSS', 'five interface languages'],
+    does: 'Composer with a live phone preview, schedule calendar, media library, Creative Studio, assistant, statistics with a printable PDF report, a command palette and a system-status page. English, Polish, German, Dutch and Czech.',
   },
   {
     layer: 'API',
-    parts: ['Django 5, Django REST Framework', '75 API view classes behind 82 URL patterns'],
-    does: 'One REST surface for the single-page app. Views authenticate with JWT; scoped rate limits sit on the AI, assistant, sign-in and MFA endpoints, counted in a cache every worker process shares.',
+    parts: ['Django, Django REST Framework', 'JWT authentication with roles'],
+    does: 'One REST surface for the single-page app, with rate limits on the sign-in, second-factor and generation routes.',
   },
   {
     layer: 'Identity',
-    parts: ['SimpleJWT, pyotp, qrcode', 'a custom email-based user model with account types'],
-    does: 'Fifteen-minute access tokens and four-hour refresh tokens. A second factor by emailed one-time code or an authenticator app enrolled by QR code, with five attempts per challenge. The stock password-only sign-in route is shadowed, so the second factor cannot be skipped.',
+    parts: ['Multi-factor sign-in', 'email one-time code or authenticator app'],
+    does: 'A second factor on every route in, enrolled by emailed code or by an authenticator app.',
   },
   {
     layer: 'Publishing',
-    parts: ['APScheduler, one owner process', 'Meta Graph API, Instagram Business Login, six further task services, WordPress REST API'],
-    does: 'A post moves through create, init, check, publish and complete, or to error. Six Meta post types: image, carousel, reel, image story, video story and the publish step itself. Task services for YouTube, TikTok, Pinterest, Threads, LinkedIn and Google Business Profile, and blog publishing to WordPress.',
+    parts: ['Meta Graph API, Instagram Business Login', 'YouTube, TikTok, Pinterest, Threads, LinkedIn, Google Business Profile, WordPress'],
+    does: 'A post is composed once, scheduled, and published to each connected channel by that channel’s own service. Facebook and Instagram in every format the platforms take; blog publishing to WordPress.',
   },
   {
     layer: 'Generation',
-    parts: ['OpenAI API for text, vision and assistant threads', 'xAI API for images and video'],
-    does: 'Post text from parameters, from an image or from a link; blog drafts with SEO fields; an assistant with threads, file search and a prompt library; image, composition, edit and video generation in Creative Studio, each priced in tokens.',
+    parts: ['Text, image and video generation APIs', 'an assistant with a prompt library'],
+    does: 'Post text from parameters, from an image or from a link; blog drafts; image and video generation in Creative Studio, each priced in tokens.',
   },
   {
     layer: 'Payments',
-    parts: ['Stripe Checkout, signed webhooks, invoices', 'a token ledger in the database'],
-    does: 'Token packages are bought through hosted checkout. The webhook verifies Stripe’s signature, credits the balance once per session id and writes a transaction row holding the balance after it.',
+    parts: ['Stripe Checkout', 'webhooks and invoices'],
+    does: 'Token packages are bought through hosted checkout, credited once per purchase and invoiced automatically.',
   },
   {
     layer: 'Media',
-    parts: ['Cloudflare R2 through django-storages and boto3', 'Pillow'],
-    does: 'Uploads, generated media and brand logos live in object storage under public URLs that the platforms can fetch. Images are normalised to JPEG on the way in.',
+    parts: ['Cloudflare R2 object storage'],
+    does: 'Uploads, generated media and brand assets live in object storage under public URLs that the platforms can fetch. Images are converted on the way in to the format the platforms take.',
   },
   {
     layer: 'Data',
-    parts: ['PostgreSQL 16, psycopg 3', '26 models, 22 migrations'],
-    does: 'Persistent connections with health checks. The engine is chosen from the environment, and the settings refuse to start if a database engine is named and does not resolve to PostgreSQL.',
+    parts: ['PostgreSQL', 'migrated live from SQLite'],
+    does: 'A zero-data-loss live migration from SQLite to PostgreSQL, so that the scheduler and the web workers can write at the same time.',
   },
   {
-    layer: 'Secrets',
-    parts: ['Fernet field encryption, from the cryptography package', 'log redaction, SSRF guard, CSP header'],
-    does: 'OAuth tokens, WordPress application passwords and TOTP secrets are encrypted in the column with a versioned marker, so rows can be encrypted in place and the migration re-run safely. User-supplied URLs are resolved and refused if they point at a private address, on every redirect hop.',
+    layer: 'Security',
+    parts: ['Encryption at rest for stored credentials', 'rate limiting, request-forgery guards, log redaction, GDPR-aligned deletion'],
+    does: 'The security audit’s findings, applied: provider tokens and other credentials are encrypted in the database, user-supplied URLs are checked before they are fetched, and account deletion is real and scheduled.',
   },
   {
     layer: 'Operations',
-    parts: ['GitHub Actions, pytest, Sentry', 'Apache with mod_wsgi, Let’s Encrypt, a Docker image'],
-    does: 'Every push runs 76 back-end tests and a front-end build; a push to main deploys only if both pass. Errors from both sides go to Sentry. A structured audit log records sign-in, MFA, publishing, generation, payment and media events.',
+    parts: ['GitHub Actions, automated tests', 'error monitoring, an audit log'],
+    does: 'A push deploys only when the tests and the front-end build pass. Errors from both sides are reported. An audit log records sign-in, publishing, generation, payment and media events.',
   },
 ];
 ---

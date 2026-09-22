@@ -74,7 +74,8 @@ const ld = jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [];
     <meta name="twitter:image" content={ogImage} />
     <meta name="twitter:image:alt" content={ogImageAlt} />
 
-    {ld.map((obj) => <script is:inline type="application/ld+json" set:html={JSON.stringify(obj).replace(/</g, '\\u003c')} />)}
+    {/* The contact email's "@" is written as the JSON escape \u0040: JSON-LD consumers read the address, the page never carries it as plain text (BRIEF.md §14.5). */}
+    {ld.map((obj) => <script is:inline type="application/ld+json" set:html={JSON.stringify(obj).replace(/</g, '\\u003c').replace(/("email":"[^"@]+)@/g, '$1\\u0040')} />)}
     <script>import '../scripts/motion.ts';</script>
     <slot name="head" />
   </head>

@@ -34,8 +34,10 @@ Everything a future edit touches is data, not markup.
   ratio, never cropped. The schema in
   `src/content.config.ts` is strict: the build fails on a missing field, an unknown evidence
   label or a category outside research / products / experiments.
-- **Site-wide data**: `src/data/site.ts` (person, links, navigation, the homepage ledger,
-  the "now" line, category copy, homepage order).
+- **Site-wide data**: `src/data/site.ts` (person, links, navigation, the homepage ledger of three entries,
+  the "now" line, the homepage "also" row, category copy, homepage order). The contact email is kept as
+  `emailUser` and `emailDomain`: the `Email` component assembles it in the browser and the JSON-LD writes its
+  "@" as `\u0040`, so the address is never plain text in the HTML (grep the build for it: zero matches).
 - **Design tokens**: `src/styles/tokens.css` (colour, type scale, spacing, grid, motion).
 - **Components** in `src/components/`: Nav, Footer, EvidenceLabel, MetaBlock, ProjectCard
   (image or typographic plate with optional `plate.lines`; `layout="halves"` on the category pages sets truthful
@@ -68,10 +70,20 @@ from the fixed vocabulary only, dates on every figure that changes over time.
 
 - **NeuralTake and AI Zuzi are two works** (BRIEF.md §13). `/work/neuraltake` is the consultancy: method, nine service
   lines, stack and infrastructure; it never states a contract value, a client name or count, or the user figure.
-  `/work/aizuzi` is the client platform: every technical claim and count on it was read from the private repository
-  on 20 September 2026 (the counts are in the header comments of `AizuziStack.astro` and `AizuziPipeline.astro`); the
-  client company and pilot users are never named. Its cover is `src/assets/work/aizuzi/panel.png`, cropped by
-  `npm run images`. Homepage order is `homeOrder` in `src/data/site.ts`; catalogue order is `order` in each `.mdx` (1 to 8).
+  `/work/aizuzi` is the client platform, described at product level only until the client confirms it may be named
+  (BRIEF.md §14.4): what it does, the stack, the seven integrations by platform name, the zero-data-loss live migration,
+  the security work at CV-bullet level, about 50 business users. No implementation tallies (row, view, model, test or
+  file counts), lifetimes, limits, endpoints or changelog history anywhere on the site (BRIEF.md §14.2). The client
+  company and pilot users are never named. Its cover is `src/assets/work/aizuzi/panel.png`, cropped by `npm run images`.
+- **Prominence** (BRIEF.md §14.1). The homepage shows four works: MIQA and AI Zuzi as the two large plates, then
+  NeuralKite and ChefBot, then a quiet "also" row linking NeuralTake and the RSNA entry (`homeAlso`); the experiments
+  are not on the homepage and their figures are not in the ledger. `homeOrder` in `src/data/site.ts` lists the four;
+  catalogue order is `order` in each `.mdx` (1 to 8, the four featured works first), used by `/work` and the category pages.
+- **CV** (BRIEF.md §14.5). `src/pages/cv.astro` is built from the facts on Michal's own CV, in its order: education,
+  experience (NeuralTake, WorldQuant Brain), projects (MIQA, ChefBot, AI Zuzi, NeuralKite), skills, languages and
+  certifications. The PDF is served unaltered from `public/Michal-Kaszubski-CV.pdf` (copied from
+  `/var/www/kaszubski/assets/`) and linked as "Download the PDF" from `/cv` and `/about`; it carries the phone number,
+  the pages do not.
 
 ## Build
 
@@ -117,7 +129,10 @@ node /var/www/kaszubski/tools/shots.js http://127.0.0.1:3290 /var/www/kaszubski/
 ```
 
 `errors.json` must be empty. The font audit (`node /var/www/kaszubski/tools/fonts.js <baseUrl> <pages>`)
-must list exactly two families, Newsreader and Instrument Sans, and no uppercase or tracked text.
+must list exactly two families, Newsreader and Instrument Sans, and no uppercase or tracked text. Before a release,
+grep `dist/` (html, js, xml, json) for the strings that must never appear: `£5`, `GDPR compliant`, `mechanism`,
+`[removed]`, `Red Light`, and the removed tallies (`75 API`, `82 URL`, `26 models`, `84 files`, `76 tests`);
+a bare `563` still matches two SVG coordinates in the shorts charts, which is fine.
 Page weight, measured in Playwright as transferred bytes on the preview after the 18 September 2026 fix round
 (uncompressed CSS, as the preview serves it): the homepage's first load was 244 KB on desktop and 228 KB on a
 phone; after scrolling the whole page 310 KB on desktop and 337 KB on a phone (the limit is about 600 KB). The two

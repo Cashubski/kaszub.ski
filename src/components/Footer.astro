@@ -1,6 +1,7 @@
 ---
 import { person, site } from '../data/site';
 import ExternalLink from './ExternalLink.astro';
+import Email from './Email.astro';
 const year = new Date(site.factsDateISO).getFullYear();
 ---
 
@@ -20,9 +21,7 @@ const year = new Date(site.factsDateISO).getFullYear();
           <li><a class="row-link" href="/work">Index of works</a></li>
           <li><a class="row-link" href="/about">About</a></li>
         </ul>
-        <p class="small muted contact">
-          {person.email ? <a href={`mailto:${person.email}`} class="tap">{person.email}</a> : <>To get in touch, <ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</>}
-        </p>
+        <p class="small muted contact">To get in touch, email <Email class="tap" /> or <ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</p>
       </nav>
       <div class="colophon small muted">
         <p>Typeset in Newsreader and Instrument Sans. Built as a static site with Astro. No analytics, no cookies, nothing loaded from third parties until you ask for it.</p>

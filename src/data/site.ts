@@ -11,8 +11,8 @@ export const site = {
   /** Date the verified figures were taken (BRIEF.md v2). */
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
-  /** Date the copy was last revised (BRIEF.md §13); used for dateModified and the sitemap. */
-  revisedISO: '2026-09-20',
+  /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
+  revisedISO: '2026-09-22',
   locale: 'en_GB',
 } as const;
 
@@ -27,17 +27,30 @@ export const person = {
   /** Hero supporting sentence (BRIEF.md §2, may be lightly refined). */
   lede: 'I investigate how models fail, build production AI systems and create products that people actually use.',
   location: 'London, UK',
-  /** Contact email is a PLACEHOLDER until confirmed: null means the row is omitted or rendered as "on request". */
-  email: null as string | null,
+  /**
+   * Contact email (BRIEF.md §14.5), kept in two parts. It is assembled by the Email component in the
+   * browser and never written into the HTML as one string; the JSON-LD escapes the "@".
+   */
+  emailUser: 'removed',
+  emailDomain: 'gmail.com',
   github: 'https://github.com/Cashubski',
   linkedin: 'https://www.linkedin.com/in/m1k',
-  company: { name: 'NeuralTake', url: 'https://neuraltake.com' },
+  company: { name: 'NeuralTake', legalName: 'Neuraltake Limited', url: 'https://neuraltake.com', role: 'Managing Director and AI Engineer', since: 'October 2024' },
+  /** A past employer (BRIEF.md §14.5): on the CV, About and in the JSON-LD; not a work. */
+  pastEmployer: { name: 'WorldQuant Brain, LLC', role: 'Quantitative Research Consultant', years: 'October 2023 to October 2024' },
   education: [
-    { degree: 'MSc in AI and Medical Imaging', institution: 'UCL', years: '2025 to 2026' },
-    { degree: 'BSc Computer Science', institution: 'City, University of London', years: null as string | null },
+    { degree: 'MSc Artificial Intelligence and Medical Imaging', classification: 'on track for Distinction', institution: 'UCL', department: 'Department of Medical Physics and Biomedical Engineering', years: '2025 to 2026' },
+    { degree: 'BSc (Hons) Computer Science', classification: '2:1', institution: 'City, University of London', department: null as string | null, years: null as string | null },
   ],
   interests: ['reliable ML', 'production AI', 'product building', 'creative experimentation'],
+  languages: 'English (native), Polish (native, bilingual)',
+  certifications: 'Bloomberg Market Concepts; Thomson Reuters Eikon v4',
+  /** The technical skills line from the CV, in its order. */
+  technical: 'Python, SQL, PyTorch, scikit-learn, pandas, NumPy, Matplotlib, NiBabel; Django, PostgreSQL, TypeScript, React, REST APIs, GCP, Playwright, CI/CD, Git/GitHub',
 } as const;
+
+/** The email for JSON-LD. Base.astro writes its "@" as the JSON escape \u0040, so the address is never plain text in the page. */
+export const personEmailLd = `${person.emailUser}@${person.emailDomain}`;
 
 export const nav = [
   { label: 'Work', href: '/work' },
@@ -53,13 +66,13 @@ export const externalLinks = [
   { label: 'LinkedIn', href: person.linkedin },
 ] as const;
 
-/** Homepage evidence ledger (BRIEF.md §4): four entries, each with context; dated where the number changes over time. */
+/** Homepage evidence ledger (BRIEF.md §14.1): three entries, each with context; dated where the number changes over time. */
 export const ledger = [
   {
     value: '1,027',
     unit: 'MRI acquisitions evaluated',
     context: 'Retrospective prostate DWI dataset, 627 patients, patient-level cross-validation, UCL MSc research.',
-    asOf: 'Thesis, 2026',
+    asOf: 'Thesis, October 2025 to August 2026',
     kind: 'Research evidence',
   },
   {
@@ -76,13 +89,6 @@ export const ledger = [
     asOf: 'GPT store listing, screenshots from September 2026',
     kind: 'User adoption',
   },
-  {
-    value: '727,000',
-    unit: 'views',
-    context: 'Combined across an English and a Polish short-form channel, both produced through an automated API pipeline, about 1,000 subscribers each. Views, not unique viewers.',
-    asOf: 'YouTube Analytics export, 19 September 2026',
-    kind: 'Audience reach',
-  },
 ] as const;
 
 /** The short "now" line on the homepage. */
@@ -92,9 +98,14 @@ export const now = {
   links: [
     { label: 'RSNA entry', href: '/work/rsna-kaggle' },
     { label: 'AI Zuzi', href: '/work/aizuzi' },
-    { label: 'NeuralTake', href: '/work/neuraltake' },
   ],
 } as const;
+
+/** The quiet text row under the four homepage cards (BRIEF.md §14.1): the consultancy and the ongoing competition, by link only. */
+export const homeAlso = [
+  { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
+  { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
+] as const;
 
 /** The unfiltered index at /work. */
 export const indexPage = {
@@ -131,5 +142,5 @@ export const categories = {
 
 export type CategoryKey = keyof typeof categories;
 
-/** Homepage order of works (BRIEF.md §13.3): two large flagships, then AI Zuzi leading the rest. */
-export const homeOrder = ['miqa', 'neuraltake', 'aizuzi', 'neuralkite', 'chefbot', 'rsna-kaggle', 'cash-nova', 'multilingual-shorts'] as const;
+/** Homepage works (BRIEF.md §14.1): two large flagships, then two supporting cards. The other four are reached from `homeAlso` and the index. */
+export const homeOrder = ['miqa', 'aizuzi', 'neuralkite', 'chefbot'] as const;

@@ -1,45 +1,43 @@
 ---
 /**
- * AI Zuzi publishing pipeline (BRIEF.md §13.2), as inline SVG in the site's two typefaces.
- * Every stage is read from the private repository: services/user_services/post/create_post.py
- * (JPEG normalisation), taskscheduler.py (the interval jobs, the status values, the retry on Meta
- * subcode 2207027, the permalink fetch, the error handler) and services/task_services/socials
- * (one package per platform). Stages only: no volumes, timings beyond the code's own constants, or success rates.
- * Two drawings from one data set: three lanes of five for wide screens, one column for narrow ones.
+ * AI Zuzi publishing pipeline (BRIEF.md §13.2, kept at platform level by §14.4), as inline SVG in the
+ * site's two typefaces: compose, schedule, publish to each network. Stages only: no intervals, retry
+ * limits, error codes, formats or success rates. Two drawings from one data set: three lanes of five
+ * for wide screens, one column for narrow ones.
  */
 interface Node { label: string; detail: string; }
 interface Lane { name: string; nodes: Node[]; parallelFrom?: number; parallelNote?: string; }
 const lanes: Lane[] = [
   {
-    name: 'In the request, when a post is saved',
+    name: 'Compose',
     nodes: [
       { label: 'Composer', detail: 'Text, media, post type and target channels. Text can be written by hand or generated from parameters, an image or a link.' },
-      { label: 'Normalise media', detail: 'PNG, WebP, HEIC and GIF are flattened onto white and re-encoded as JPEG at quality 92, because Instagram accepts JPEG only.' },
-      { label: 'Store in R2', detail: 'Media goes to object storage and gets a public URL. The platforms fetch media by URL; they are never sent the bytes.' },
-      { label: 'Post row', detail: 'One row per post: a millisecond timestamp, the targets and the status create. Ids and timestamps are 64-bit.' },
-      { label: 'Now or later', detail: 'A post due now can publish inside the request. A post due later waits for the scheduler.' },
+      { label: 'Preview', detail: 'A live phone preview shows the post as each channel will render it.' },
+      { label: 'Prepare media', detail: 'Images are converted to the format the platforms take and stored in object storage under a public URL.' },
+      { label: 'Save', detail: 'One record per post, with its targets and the route each connected account uses.' },
+      { label: 'Now or later', detail: 'A post due now can publish at once. A post due later waits for the scheduler.' },
     ],
   },
   {
-    name: 'In the scheduler, one process, every five seconds',
+    name: 'Schedule',
     nodes: [
-      { label: 'Initialise', detail: 'Posts that have come due are collected with their profile’s tokens, decrypted in memory.' },
-      { label: 'Create containers', detail: 'Media is registered with each platform. A carousel makes one child container per image, then a parent.' },
-      { label: 'Check', detail: 'Every sixty seconds, containers still processing are polled until the platform says they are ready.' },
-      { label: 'Publish', detail: 'If Meta answers that the media is not ready yet, the post stays in publish and is tried again: up to 20 times, five seconds apart.' },
-      { label: 'Permalink and result', detail: 'The real Instagram permalink is fetched and stored, and the post is marked complete. A failure becomes a message and an email.' },
+      { label: 'Collect', detail: 'Posts that have come due are collected with their accounts’ credentials, decrypted only in memory.' },
+      { label: 'Register media', detail: 'Media is registered with each platform; a carousel registers each image, then the set.' },
+      { label: 'Wait', detail: 'Media still being processed by a platform is checked again until the platform says it is ready.' },
+      { label: 'Publish', detail: 'The post goes live. A platform that answers “not ready yet” is asked again, within a limit; a real refusal fails the post.' },
+      { label: 'Result', detail: 'The live post’s link is stored and the post is marked complete. A failure becomes a message the user can act on.' },
     ],
   },
   {
-    name: 'Per channel, routed by how the account was connected',
+    name: 'Publish, one service per channel',
     parallelFrom: 0,
-    parallelNote: 'One task service per platform, called side by side',
+    parallelNote: 'Chosen by how the account was connected, called side by side',
     nodes: [
-      { label: 'Facebook and Instagram', detail: 'Through a Facebook Page token on the Graph API: image, carousel, reel, image story and video story.' },
-      { label: 'Instagram, direct', detail: 'Accounts joined by Instagram Business Login carry a flag and are routed to Instagram’s own Graph host with their own token.' },
-      { label: 'Video platforms', detail: 'YouTube by a Data API v3 upload. TikTok by the Content Posting API’s direct-post flow.' },
-      { label: 'Feeds and listings', detail: 'LinkedIn text, image, carousel and video posts. Threads, Pinterest pins and Google Business Profile local posts.' },
-      { label: 'WordPress', detail: 'Blog posts through the site’s REST API under an application password: ten post formats, scheduling, categories, authors and media.' },
+      { label: 'Facebook and Instagram', detail: 'Through a Facebook Page: image, carousel, reel and stories.' },
+      { label: 'Instagram, direct', detail: 'Accounts connected by Instagram Business Login take their own route to the same formats.' },
+      { label: 'Video platforms', detail: 'YouTube uploads and TikTok posts through each platform’s publishing API.' },
+      { label: 'Feeds and listings', detail: 'LinkedIn text, image, carousel and video posts; Threads; Pinterest pins; Google Business Profile local posts.' },
+      { label: 'WordPress', detail: 'Blog posts through the site’s own API: scheduling, categories, authors and media.' },
     ],
   },
 ];
@@ -142,7 +140,7 @@ const desc = lanes.map((l) => `${l.name}: ${l.nodes.map((n) => `${n.label}. ${n.
 
 <div class="inkband ink">
   <h3 class="inkband__title azp-title">From the composer to a live post</h3>
-  <p>Three parts, as the code runs them. The request turns a draft into a row the scheduler can act on. One scheduler process walks each due post through a small state machine. Each channel has its own task service, chosen by how the account was connected.</p>
+  <p>Three parts. A post is composed once and saved with its targets. A scheduler walks each due post through registering its media, waiting for the platform and publishing. Each channel has its own service, chosen by how the account was connected.</p>
   <figure class="azp xwide">
     {drawings.map((d, i) => (
       <svg class={d.cls} viewBox={`0 0 ${d.w} ${d.h}`} role="img" aria-labelledby={`azp-t${i} azp-d${i}`} xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +164,7 @@ const desc = lanes.map((l) => `${l.name}: ${l.nodes.map((n) => `${n.label}. ${n.
     ))}
     <figcaption class="azp-cap small">
       <span class="azp-tag">Schematic</span>
-      <span class="muted">Publishing in AI Zuzi, stage by stage as the code runs it. The only numbers are constants in the source; no volumes or success rates are implied.</span>
+      <span class="muted">Publishing in AI Zuzi at platform level: compose, schedule, publish to each network. No volumes, timings or success rates are implied.</span>
     </figcaption>
   </figure>
 </div>

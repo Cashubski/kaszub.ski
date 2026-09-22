@@ -10,14 +10,14 @@ interface Props { kind: 'stack' | 'infra'; }
 interface Row { layer: string; parts: string[]; where: string; }
 const { kind } = Astro.props;
 const stack: Row[] = [
-  { layer: 'Back ends', parts: ['Python: Django 5, Django REST Framework', 'TypeScript: Next.js App Router, Prisma'], where: 'AI Zuzi is a Django REST API of 75 view classes. NeuralKite is a Next.js application with streaming endpoints.' },
+  { layer: 'Back ends', parts: ['Python: Django 5, Django REST Framework', 'TypeScript: Next.js App Router, Prisma'], where: 'AI Zuzi is a Django REST API behind a React single-page app. NeuralKite is a Next.js application with streaming endpoints.' },
   { layer: 'Front ends', parts: ['React 18, Vite, Tailwind CSS, Radix', 'Next.js, react-i18next'], where: 'A single-page app in five languages for AI Zuzi; server-rendered React for NeuralKite and for neuraltake.com itself.' },
   { layer: 'Models and agents', parts: ['Anthropic SDK, OpenAI API, xAI API', 'retrieval, tool use, structured output'], where: 'Claude agents that score, research and draft in NeuralKite. Text, vision, assistant threads, image and video generation in AI Zuzi.' },
-  { layer: 'Data', parts: ['PostgreSQL, SQLite, Prisma, the Django ORM', 'migrations, ETL, sequence and key handling'], where: 'A SQLite to PostgreSQL 16 cutover on AI Zuzi. A self-hosted warehouse holding a 2.8-million-company Crunchbase load for NeuralKite.' },
+  { layer: 'Data', parts: ['PostgreSQL, SQLite, Prisma, the Django ORM', 'migrations, ETL, sequence and key handling'], where: 'A zero-data-loss live migration from SQLite to PostgreSQL on AI Zuzi. A self-hosted warehouse holding a 2.8-million-company Crunchbase load for NeuralKite.' },
   { layer: 'Identity and payments', parts: ['JWT, TOTP and email one-time codes, NextAuth', 'Stripe Checkout, webhooks, invoices, billing'], where: 'Multi-factor sign-in and a token economy on AI Zuzi; subscription billing on NeuralKite.' },
   { layer: 'Integrations', parts: ['Meta Graph, Instagram, YouTube, TikTok, LinkedIn, Pinterest, Threads, Google Business Profile, WordPress', 'Companies House, SMTP and DNS at socket level'], where: 'OAuth connections and publishing services in AI Zuzi. Registry data and a mailbox verification engine in NeuralKite.' },
-  { layer: 'Security', parts: ['Field encryption at rest, AES-256-GCM and Fernet', 'SSRF guards, rate limits, CSP, log redaction'], where: 'Stored OAuth tokens in AI Zuzi and stored SMTP passwords in NeuralKite are encrypted before they reach the database. GDPR-aligned deletion with a thirty-day purge on AI Zuzi.' },
-  { layer: 'Quality', parts: ['pytest, GitHub Actions, Sentry', 'structured audit logging'], where: 'AI Zuzi deploys from main only when its 76 tests and its front-end build pass.' },
+  { layer: 'Security', parts: ['Field encryption at rest', 'SSRF guards, rate limits, CSP, log redaction'], where: 'Stored OAuth tokens in AI Zuzi and stored SMTP passwords in NeuralKite are encrypted before they reach the database. GDPR-aligned deletion with a thirty-day purge on AI Zuzi.' },
+  { layer: 'Quality', parts: ['pytest, GitHub Actions, Sentry', 'structured audit logging'], where: 'AI Zuzi deploys from main only when its automated tests and its front-end build pass.' },
 ];
 const infra: Row[] = [
   { layer: 'Servers', parts: ['A fleet of Ubuntu VPS machines', 'Docker, Google Cloud Run'], where: 'Long-running applications, databases and mail sit on the VPS fleet; containerised services go to Cloud Run.' },

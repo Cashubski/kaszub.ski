@@ -2,7 +2,9 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import { person, personId, site } from '../data/site';
+import Email from '../components/Email.astro';
+import { person, personId, personEmailLd, site } from '../data/site';
+const [msc, bsc] = person.education;
 import portrait from '../assets/work/portrait.jpg';
 
 const jsonLd = {
@@ -15,13 +17,17 @@ const jsonLd = {
   url: `${site.url}/`,
   jobTitle: person.role,
   homeLocation: { '@type': 'Place', name: person.location },
+  email: personEmailLd,
   sameAs: [person.github, person.linkedin],
-  worksFor: { '@type': 'Organization', name: person.company.name, url: person.company.url },
+  worksFor: { '@type': 'Organization', name: person.company.name, legalName: person.company.legalName, url: person.company.url },
+  hasOccupation: { '@type': 'Occupation', name: person.company.role },
   alumniOf: person.education.map((e) => ({ '@type': 'CollegeOrUniversity', name: e.institution })),
+  // The past employer as one line: schema.org has no past-employer property, so it travels in the description.
+  description: `${person.role} in ${person.location}. ${msc.degree} at ${msc.institution}, ${msc.classification}; ${bsc.degree} at ${bsc.institution}, ${bsc.classification}. ${person.company.role} at ${person.company.legalName} since ${person.company.since}; formerly ${person.pastEmployer.role} at ${person.pastEmployer.name}, ${person.pastEmployer.years}.`,
   // A stable URL (public/media/portrait.jpg), not a hashed build artefact.
   image: new URL('/media/portrait.jpg', site.url).toString(),
 };
-const description = `About ${person.name}: UCL MSc in AI and Medical Imaging, BSc Computer Science at City, founder and AI engineer at NeuralTake, London.`;
+const description = `About ${person.name}: UCL MSc in AI and Medical Imaging (on track for Distinction), BSc (Hons) Computer Science at City (2:1), Managing Director and AI Engineer at NeuralTake, formerly a quantitative research consultant to WorldQuant Brain. London.`;
 ---
 
 <Base title="About" description={description} jsonLd={jsonLd} ogImageAlt={`About ${person.name}`}>
@@ -36,19 +42,20 @@ const description = `About ${person.name}: UCL MSc in AI and Medical Imaging, BS
       </figure>
       <div class="about__text">
         <div class="about__body" data-reveal-group>
-          <p>I am an AI/ML engineer and founder in London. My MSc in AI and Medical Imaging at UCL (2025 to 2026) asked whether a model for flagging distorted prostate MRI could also tell when its own judgement was unreliable. Before that I read Computer Science at City, University of London.</p>
-          <p>I founded NeuralTake, my AI consultancy, in 2024. Through it I scope, build and support production AI software for clients, among them AI Zuzi, a social-media platform I engineer for a client company. I also build products of my own: NeuralKite for acquisition research and ChefBot, a cooking assistant on GPT. And I run two automated API pipelines: a fictional artist generated through the Eleven Music API, and a video pipeline that turns one concept into an English and a Polish short.</p>
-          <p>To get in touch,{' '}<ExternalLink href={person.linkedin}>message me on LinkedIn</ExternalLink>.</p>
+          <p>I am an AI/ML engineer and founder in London. My MSc in Artificial Intelligence and Medical Imaging at UCL (2025 to 2026, on track for Distinction) asked whether a model for flagging distorted prostate MRI could also tell when its own judgement was unreliable. Before that I read Computer Science at City, University of London (BSc Hons, 2:1), where I was president of two societies.</p>
+          <p>I founded NeuralTake, my AI consultancy, in October 2024. Through it I scope, build and support production AI software for clients, among them AI Zuzi, a social-media platform I engineer for a client company. From October 2023 to October 2024 I was a quantitative research consultant to WorldQuant Brain, researching and backtesting systematic trading signals in Python. I also build products of my own, NeuralKite for acquisition research and ChefBot, a cooking assistant on GPT, and I run two automated API pipelines for generated music and short-form video.</p>
+          <p>To get in touch, email <Email class="tap" /> or <ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</p>
         </div>
         <dl class="about__facts facts print panel" data-reveal="block">
-          <div><dt>Education</dt><dd>MSc in AI and Medical Imaging, UCL, 2025 to 2026</dd><dd>BSc Computer Science, City, University of London</dd></div>
-          <div><dt>Currently</dt><dd>Founder and AI engineer, <ExternalLink href={person.company.url}>NeuralTake</ExternalLink></dd></div>
+          <div><dt>Education</dt><dd>{msc.degree}, {msc.institution}, {msc.years}, {msc.classification}</dd><dd>{bsc.degree}, {bsc.institution}, {bsc.classification}</dd></div>
+          <div><dt>Currently</dt><dd>{person.company.role}, <ExternalLink href={person.company.url}>NeuralTake</ExternalLink>, since {person.company.since}</dd></div>
+          <div><dt>Previously</dt><dd>{person.pastEmployer.role}, {person.pastEmployer.name}, {person.pastEmployer.years}</dd></div>
           <div><dt>Interests</dt><dd>Reliable ML, production AI, product building, creative experimentation</dd></div>
           <div><dt>Location</dt><dd>{person.location}</dd></div>
           <div><dt>GitHub</dt><dd><ExternalLink href={person.github}>github.com/Cashubski</ExternalLink></dd></div>
           <div><dt>LinkedIn</dt><dd><ExternalLink href={person.linkedin}>linkedin.com/in/m1k</ExternalLink></dd></div>
-          <div><dt>Email</dt><dd>{person.email ? <a href={`mailto:${person.email}`}>{person.email}</a> : 'On request via LinkedIn'}</dd></div>
-          <div><dt>CV</dt><dd><a href="/cv">Read the curriculum vitae</a></dd></div>
+          <div><dt>Email</dt><dd><Email /></dd></div>
+          <div><dt>CV</dt><dd><a href="/cv">Read the curriculum vitae</a></dd><dd><a href="/Michal-Kaszubski-CV.pdf" download>Download the PDF</a></dd></div>
         </dl>
       </div>
     </div>
