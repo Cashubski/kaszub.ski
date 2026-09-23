@@ -4,8 +4,7 @@ import Base from '../layouts/Base.astro';
 import Ledger from '../components/Ledger.astro';
 import ProjectCard from '../components/ProjectCard.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import Email from '../components/Email.astro';
-import { person, personId, personEmailLd, site, now, homeOrder, homeAlso } from '../data/site';
+import { person, personId, site, now, homeOrder, homeAlso } from '../data/site';
 
 const works = await getCollection('work');
 const byId = new Map(works.map((w) => [w.id, w]));
@@ -25,7 +24,6 @@ const jsonLd = {
   jobTitle: person.role,
   description: person.lede,
   homeLocation: { '@type': 'Place', name: person.location },
-  email: personEmailLd,
   sameAs: [person.github, person.linkedin],
   worksFor: { '@type': 'Organization', name: person.company.name, legalName: person.company.legalName, url: person.company.url },
   hasOccupation: { '@type': 'Occupation', name: person.company.role },
@@ -49,7 +47,7 @@ const description = `${person.name}, ${person.role} in London: ML research, prod
           <li><a href="/cv">Curriculum vitae</a></li>
           <li><a href="/work">Index of works</a></li>
         </ul>
-        <p class="hero__contact small muted">To get in touch, email <Email class="tap" /> or <ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</p>
+        <p class="hero__contact small muted">To get in touch, message me on <ExternalLink href={person.linkedin} class="tap">LinkedIn</ExternalLink>. CV and references are available on request.</p>
       </div>
     </div>
     </div>

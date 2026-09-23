@@ -2,8 +2,7 @@
 import { Image } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import Email from '../components/Email.astro';
-import { person, personId, personEmailLd, site } from '../data/site';
+import { person, personId, site } from '../data/site';
 const [msc, bsc] = person.education;
 import portrait from '../assets/work/portrait.jpg';
 
@@ -17,7 +16,6 @@ const jsonLd = {
   url: `${site.url}/`,
   jobTitle: person.role,
   homeLocation: { '@type': 'Place', name: person.location },
-  email: personEmailLd,
   sameAs: [person.github, person.linkedin],
   worksFor: { '@type': 'Organization', name: person.company.name, legalName: person.company.legalName, url: person.company.url },
   hasOccupation: { '@type': 'Occupation', name: person.company.role },
@@ -44,7 +42,7 @@ const description = `About ${person.name}: UCL MSc in AI and Medical Imaging (on
         <div class="about__body" data-reveal-group>
           <p>I am an AI/ML engineer and founder in London. My MSc in Artificial Intelligence and Medical Imaging at UCL (2025 to 2026, on track for Distinction) asked whether a model for flagging distorted prostate MRI could also tell when its own judgement was unreliable. Before that I read Computer Science at City, University of London (BSc Hons, 2:1), where I was president of two societies.</p>
           <p>I founded NeuralTake, my AI consultancy, in October 2024. Through it I scope, build and support production AI software for clients, among them AI Zuzi, a social-media platform I engineer for a client company. From October 2023 to October 2024 I was a quantitative research consultant to WorldQuant Brain, researching and backtesting systematic trading signals in Python. I also build products of my own, NeuralKite for acquisition research and ChefBot, a cooking assistant on GPT, and I run two automated API pipelines for generated music and short-form video.</p>
-          <p>To get in touch, email <Email class="tap" /> or <ExternalLink href={person.linkedin} class="tap">message me on LinkedIn</ExternalLink>.</p>
+          <p>To get in touch, message me on <ExternalLink href={person.linkedin} class="tap">LinkedIn</ExternalLink>. CV and references are available on request.</p>
         </div>
         <dl class="about__facts facts print panel" data-reveal="block">
           <div><dt>Education</dt><dd>{msc.degree}, {msc.institution}, {msc.years}, {msc.classification}</dd><dd>{bsc.degree}, {bsc.institution}, {bsc.classification}</dd></div>
@@ -54,8 +52,7 @@ const description = `About ${person.name}: UCL MSc in AI and Medical Imaging (on
           <div><dt>Location</dt><dd>{person.location}</dd></div>
           <div><dt>GitHub</dt><dd><ExternalLink href={person.github}>github.com/Cashubski</ExternalLink></dd></div>
           <div><dt>LinkedIn</dt><dd><ExternalLink href={person.linkedin}>linkedin.com/in/m1k</ExternalLink></dd></div>
-          <div><dt>Email</dt><dd><Email /></dd></div>
-          <div><dt>CV</dt><dd><a href="/cv">Read the curriculum vitae</a></dd><dd><a href="/Michal-Kaszubski-CV.pdf" download>Download the PDF</a></dd></div>
+          <div><dt>CV</dt><dd><a href="/cv">Read the curriculum vitae</a></dd><dd>PDF and references on request</dd></div>
         </dl>
       </div>
     </div>

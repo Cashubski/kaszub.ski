@@ -36,9 +36,6 @@ Everything a future edit touches is data, not markup.
   label or a category outside research / products / experiments.
 - **Site-wide data**: `src/data/site.ts` (person, links, navigation, the homepage ledger of three entries,
   the "now" line, the homepage "also" row, category copy, homepage order). The contact email is kept as
-  `emailUser` and `emailDomain`: the `Email` component assembles it in the browser and the JSON-LD writes its
-  "@" as `\u0040`, so the address is never plain text in the HTML (grep the build for it: zero matches).
-- **Design tokens**: `src/styles/tokens.css` (colour, type scale, spacing, grid, motion).
 - **Components** in `src/components/`: Nav, Footer, EvidenceLabel, MetaBlock, ProjectCard
   (image or typographic plate with optional `plate.lines`; `layout="halves"` on the category pages sets truthful
   `sizes`, the Gallery passes each mixed-layout cell its own `sizes` and the halves value the JS filter switches to, `brief` drops the Built-with row on a phone except on the two experiments, a `compact` card prints only the first clause of `role` and of `result` (up to the first semicolon, so write the result with its lead fact first), a work with `evidence: []` prints "None yet verified", `cardCaption` captions a flagship screenshot), Gallery (filters with a no-JS
@@ -81,9 +78,7 @@ from the fixed vocabulary only, dates on every figure that changes over time.
   catalogue order is `order` in each `.mdx` (1 to 8, the four featured works first), used by `/work` and the category pages.
 - **CV** (BRIEF.md §14.5). `src/pages/cv.astro` is built from the facts on Michal's own CV, in its order: education,
   experience (NeuralTake, WorldQuant Brain), projects (MIQA, ChefBot, AI Zuzi, NeuralKite), skills, languages and
-  certifications. The PDF is served unaltered from `public/Michal-Kaszubski-CV.pdf` (copied from
-  `/var/www/kaszubski/assets/`) and linked as "Download the PDF" from `/cv` and `/about`; it carries the phone number,
-  the pages do not.
+  No email, phone number or PDF is published: contact is via LinkedIn and the CV is available on request.
 
 ## Build
 
@@ -131,7 +126,7 @@ node /var/www/kaszubski/tools/shots.js http://127.0.0.1:3290 /var/www/kaszubski/
 `errors.json` must be empty. The font audit (`node /var/www/kaszubski/tools/fonts.js <baseUrl> <pages>`)
 must list exactly two families, Newsreader and Instrument Sans, and no uppercase or tracked text. Before a release,
 grep `dist/` (html, js, xml, json) for the strings that must never appear: `£5`, `GDPR compliant`, `mechanism`,
-`[removed]`, `Red Light`, and the removed tallies (`75 API`, `82 URL`, `26 models`, `84 files`, `76 tests`);
+any email address or phone number, `Red Light`, and the removed tallies (`75 API`, `82 URL`, `26 models`, `84 files`, `76 tests`);
 a bare `563` still matches two SVG coordinates in the shorts charts, which is fine.
 Page weight, measured in Playwright as transferred bytes on the preview after the 18 September 2026 fix round
 (uncompressed CSS, as the preview serves it): the homepage's first load was 244 KB on desktop and 228 KB on a

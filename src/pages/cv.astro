@@ -6,7 +6,6 @@
  */
 import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import Email from '../components/Email.astro';
 import { person } from '../data/site';
 const [msc, bsc] = person.education;
 const description = `Curriculum vitae of ${person.name}, AI/ML engineer and founder in London: UCL MSc in AI and Medical Imaging, NeuralTake, WorldQuant Brain, MIQA, ChefBot, AI Zuzi and NeuralKite.`;
@@ -22,14 +21,13 @@ const description = `Curriculum vitae of ${person.name}, AI/ML engineer and foun
         </div>
         <div class="cv__contact small" data-reveal>
           <p>{person.location}</p>
-          <p><Email /></p>
           <p><ExternalLink href={person.github}>github.com/Cashubski</ExternalLink></p>
           <p><ExternalLink href={person.linkedin}>linkedin.com/in/m1k</ExternalLink></p>
           <p><a href="/">kaszub.ski</a></p>
         </div>
       </div>
       <div class="cv__actions no-print" data-reveal>
-        <a class="cv__pdf" href="/Michal-Kaszubski-CV.pdf" download>Download the PDF</a>
+        <span class="cv__pdf">PDF and references available on request</span>
         <button type="button" class="cv__print" data-print hidden>Print this page</button>
         <p class="small muted cv__pdf-note">The PDF is the CV as supplied in September 2026. This page carries its facts without the phone number.</p>
       </div>
@@ -144,7 +142,7 @@ const description = `Curriculum vitae of ${person.name}, AI/ML engineer and foun
       </dl>
     </section>
 
-    <p class="cv__foot small muted no-print" data-reveal>Facts on this page are as stated on the CV supplied in September 2026; the RSNA competition entry and the two automated content pipelines are on the <a href="/work">index of works</a>. <a href="/Michal-Kaszubski-CV.pdf" download>Download the PDF</a>.</p>
+    <p class="cv__foot small muted no-print" data-reveal>Facts on this page are as stated on the CV supplied in September 2026; the RSNA competition entry and the two automated content pipelines are on the <a href="/work">index of works</a>. A PDF and references are available on request.</p>
   </article>
 
   <script>

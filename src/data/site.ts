@@ -31,8 +31,6 @@ export const person = {
    * Contact email (BRIEF.md §14.5), kept in two parts. It is assembled by the Email component in the
    * browser and never written into the HTML as one string; the JSON-LD escapes the "@".
    */
-  emailUser: 'removed',
-  emailDomain: 'gmail.com',
   github: 'https://github.com/Cashubski',
   linkedin: 'https://www.linkedin.com/in/m1k',
   company: { name: 'NeuralTake', legalName: 'Neuraltake Limited', url: 'https://neuraltake.com', role: 'Managing Director and AI Engineer', since: 'October 2024' },
@@ -50,7 +48,8 @@ export const person = {
 } as const;
 
 /** The email for JSON-LD. Base.astro writes its "@" as the JSON escape \u0040, so the address is never plain text in the page. */
-export const personEmailLd = `${person.emailUser}@${person.emailDomain}`;
+/** Contact is by LinkedIn only; the CV and references are available on request. */
+export const contactNote = 'CV and references are available on request.';
 
 export const nav = [
   { label: 'Work', href: '/work' },
