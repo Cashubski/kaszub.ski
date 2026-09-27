@@ -1,0 +1,64 @@
+---
+import Base from '../layouts/Base.astro';
+import ExternalLink from '../components/ExternalLink.astro';
+import { openSource, openSourceNotes, person, site } from '../data/site';
+const merged = openSource.filter((e) => e.status.includes('merged'));
+const description = 'Open-source contributions to quantitative-finance libraries: what was wrong, how it was found, what the fix does. Six merged fixes in FinancePy and vectorbt; three estimators under review in skfolio.';
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Open source',
+  url: `${site.url}/open-source`,
+  description,
+  author: { '@id': `${site.url}/#person`, name: person.name },
+};
+---
+<Base title="Open source" description={description} jsonLd={jsonLd}>
+  <section class="container oss">
+    <div class="grid oss__grid">
+      <h1 class="display oss__title" data-reveal="mask">Bugs I found in libraries that quants use, and the fixes their authors merged.</h1>
+      <div class="oss__intro" data-reveal-group>
+        <p>Each entry names the library, what was wrong, how I found it and what the fix does, and links to the pull request so the claim can be checked. Most were found by testing a library against itself: Greeks against finite differences, put-call and in-out parities, closed forms against Monte Carlo, one engine against another. Only merged pull requests are described as merged.</p>
+        <p class="small muted">As of {site.factsDate.replace('15 September', '27 September')}. Commits are under my own name; the GitHub profile is <ExternalLink href={person.github}>github.com/Cashubski</ExternalLink>.</p>
+      </div>
+    </div>
+    {openSource.map((entry) => (
+      <div class="oss__project" data-rule>
+        <div class="grid">
+          <h2 class="serif oss__h2" data-reveal><ExternalLink href={entry.projectUrl}>{entry.project}</ExternalLink> <span class="oss__what muted">{entry.what}</span></h2>
+          <p class="oss__status small" data-reveal>{entry.status}, {entry.when}</p>
+        </div>
+        <ol class="oss__list" role="list">
+          {entry.items.map((item) => (
+            <li class="oss__item grid" data-reveal="block">
+              <p class="oss__lead">{item.text}</p>
+              <p class="oss__note">{openSourceNotes[item.href] ?? ''}</p>
+              <p class="oss__link small"><ExternalLink href={item.href} class="tap">Pull request on GitHub</ExternalLink></p>
+            </li>
+          ))}
+        </ol>
+      </div>
+    ))}
+    <p class="oss__foot small muted" data-reveal>The same work appears in brief on the <a href="/cv#open-source">CV</a>.</p>
+  </section>
+</Base>
+<style>
+  .oss { padding-top: var(--space-8); padding-bottom: var(--space-8); }
+  .oss__grid { row-gap: var(--space-6); }
+  .oss__title { grid-column: 1 / span 11; font-size: var(--step-4); max-width: 24ch; }
+  .oss__intro { grid-column: 1 / span 8; display: grid; gap: 1em; color: var(--ink-2); max-width: var(--measure-narrow); font-size: var(--step-1); line-height: 1.5; }
+  .oss__project { padding-block: var(--space-7); border-top: var(--hairline); }
+  .oss__h2 { grid-column: 1 / span 8; font-size: var(--step-3); }
+  .oss__what { font-size: var(--step-0); }
+  .oss__status { grid-column: 9 / span 4; align-self: end; color: var(--ink-2); }
+  .oss__list { list-style: none; margin: var(--space-6) 0 0; padding: 0; display: grid; gap: var(--space-6); }
+  .oss__item { align-items: start; row-gap: var(--space-3); }
+  .oss__lead { grid-column: 1 / span 5; font-family: var(--font-serif); font-size: var(--step-1); line-height: 1.4; color: var(--ink); }
+  .oss__note { grid-column: 6 / span 6; color: var(--ink-2); line-height: 1.55; max-width: var(--measure-narrow); }
+  .oss__link { grid-column: 6 / span 6; }
+  .oss__foot { margin-top: var(--space-7); }
+  @media (max-width: 900px) {
+    .oss__title, .oss__intro, .oss__h2, .oss__status, .oss__lead, .oss__note, .oss__link { grid-column: 1 / -1; }
+    .oss__status { align-self: start; }
+  }
+</style>

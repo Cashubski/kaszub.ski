@@ -57,6 +57,7 @@ export const nav = [
   { label: 'Products', href: '/products' },
   { label: 'Experiments', href: '/experiments' },
   { label: 'About', href: '/about' },
+  { label: 'Open source', href: '/open-source' },
   { label: 'CV', href: '/cv' },
 ] as const;
 
@@ -90,6 +91,21 @@ export const ledger = [
   },
 ] as const;
 
+/** Longer notes for the open-source page, keyed by pull request. British English, no invented numbers. */
+export const openSourceNotes: Record<string, string> = {
+  'https://github.com/domokane/FinancePy/pull/277': 'When the cost of carry equals the riskless rate, the Bjerksund and Stensland exercise boundary is undefined: beta is exactly one and the trigger price divides by zero. The library raised. Just below that point the approximation also fell under the European price, which an American option cannot do. The fix returns the European value where early exercise is never optimal and floors the approximation at the European bound, since both are lower bounds on the American price. Found by checking every American pricer against a 2,000-step binomial tree and against the no-dividend identity.',
+  'https://github.com/domokane/FinancePy/pull/278': 'The schedule generator produced the right coupon dates on its first call and different ones on every call after, because the first call replaced the maturity date with its weekend-adjusted version and later calls stepped backwards from that. Most products call the generator twice, so bonds with floating coupons, cross-currency swaps and cliquet options received shifted dates and a spurious one-day stub whenever the maturity fell on a weekend or holiday. One existing test had silently encoded the bug: its stored value included a one-day option that should not exist.',
+  'https://github.com/domokane/FinancePy/pull/279': 'The forward-start option class referenced calendar settings it never set, so it could not be constructed, and its valuation loop priced an extra option before the start date. Rewritten as the sequence of at-the-money forward-start options between reset dates, and tested against the Rubinstein 1991 closed form for one period and against the library’s own cliquet option for several.',
+  'https://github.com/domokane/FinancePy/pull/280': 'Two error messages concatenated an enum to a string, so an invalid option type raised a Python TypeError from the message itself instead of the library’s FinError.',
+  'https://github.com/domokane/FinancePy/pull/281': 'Four of the six Monte Carlo pricing methods returned NaN for every input: they passed the option type in the position the model reserves for the interest rate. A test now prices the same call with all six variants and pins each to the closed form.',
+  'https://github.com/domokane/FinancePy/pull/282': 'Under a flat volatility the fair variance strike of a variance swap must equal the squared volatility, whatever the rate and dividend yield. It came out too high by twice the dividend yield, because the log-contract drift used the rate alone and the option portfolio was compounded at the wrong rate, and it crashed on large strike grids. Fixed against the Demeterfi, Derman, Kamal and Zhou replication and verified to within 0.2 percent across rate and yield combinations.',
+  'https://github.com/polakowo/vectorbt/pull/872': 'The deflated Sharpe ratio of Bailey and López de Prado uses the raw kurtosis, which is 3 for Gaussian returns and recovers the classic Lo standard error. The implementation passed excess kurtosis, so the variance term was off by three quarters of the squared Sharpe ratio and could turn negative. It also zero-filled missing returns before computing skewness. Both fixed, with tests against the paper’s formula.',
+  'https://github.com/polakowo/vectorbt/pull/873': 'Found with a harness that runs every function through both the Numba and Rust engines on clean, gappy, constant and short inputs. The one discrepancy: expanding windows shorter than the minimum period raised an error in Numba and returned NaN in Rust and pandas.',
+  'https://github.com/skfolio/skfolio/pull/341': 'Weights are the benchmark plus a linear tilt in cross-sectionally demeaned characteristics, and the few coefficients maximise the realised CRRA utility of the return path, with no expected-return or covariance estimate. The smooth case is concave and solved with a trust-region method using the analytic gradient and Hessian; long-only and transaction-cost variants use a quasi-Newton method. Reviewed in discussion, including a look-ahead bias the reviewer caught and I fixed.',
+  'https://github.com/skfolio/skfolio/pull/342': 'Adds streaming updates to the Schur complementary allocation and to the covariance-based distance estimator, so both can be fed new observations without refitting on history. Chunked updates reproduce the batch fit exactly.',
+  'https://github.com/skfolio/skfolio/pull/340': 'Turns one panel field into a library of trailing statistics and lags as a single multi-factor exposure, with a policy for listing gaps: either invalidate the lookback or measure it in active observations.',
+};
+
 /** The short "now" line on the homepage. */
 export const now = {
   label: 'Now',
@@ -104,7 +120,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open-source contributions', note: 'six fixes merged in FinancePy and vectorbt', href: '/cv#open-source' },
+  { label: 'Open source', note: 'six fixes merged in FinancePy and vectorbt', href: '/open-source' },
 ] as const;
 
 /**
