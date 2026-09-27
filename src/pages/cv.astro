@@ -181,7 +181,7 @@ const description = `Curriculum vitae of ${person.name}, AI/ML engineer and foun
   .cv__contact :global(a) { display: inline-flex; min-height: 2.25rem; align-items: center; }
   .cv__actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-4); margin-top: var(--space-5); }
   /* Inline pull-request and project links: extend the tap area to 44px on touch layouts without moving the text. */
-  .cv__what li a[href*="/pull/"], .cv__h3 a[href^="https://github.com/"] { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
+  .cv__what li :global(a[href*="/pull/"]), .cv__h3 :global(a[href^="https://github.com/"]) { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
   .cv__pdf, .cv__print { display: inline-flex; align-items: center; border: 1px solid var(--ink); background: transparent; color: var(--ink); padding: 0.6rem 1rem; border-radius: var(--radius); cursor: pointer; font-weight: 500; min-height: 2.75rem; text-decoration: none; transition: background var(--dur) var(--ease), color var(--dur) var(--ease); }
   .cv__pdf { background: var(--ink); color: var(--paper); }
   .cv__pdf:hover { background: transparent; border-color: var(--cobalt); color: var(--cobalt); }
