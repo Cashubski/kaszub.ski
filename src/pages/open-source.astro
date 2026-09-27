@@ -58,7 +58,8 @@ const jsonLd = {
   .oss__link { grid-column: 6 / span 6; }
   .oss__foot { margin-top: var(--space-7); }
   /* Inline links: extend the tap area to 44px on touch layouts without moving the text. */
-  .oss__intro :global(a), .oss__h2 :global(a), .oss__foot a, .oss__status :global(a) { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
+  .oss__intro :global(a), .oss__h2 :global(a), .oss__status :global(a) { display: inline-block; padding-block: 0.6rem; margin-block: -0.6rem; }
+  .oss__foot a { display: inline-block; padding: 0.6rem 0.75rem; margin: -0.6rem -0.75rem; }
   @media (max-width: 900px) {
     .oss__title, .oss__intro, .oss__h2, .oss__status, .oss__lead, .oss__note, .oss__link { grid-column: 1 / -1; }
     .oss__status { align-self: start; }
