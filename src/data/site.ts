@@ -120,7 +120,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'six fixes merged in FinancePy and vectorbt', href: '/open-source' },
+  { label: 'Open source', note: 'six merged fixes', href: '/open-source' },
 ] as const;
 
 /**

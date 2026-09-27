@@ -129,6 +129,7 @@ const description = `${person.name}, ${person.role} in London: ML research, prod
   .also__item { display: inline-flex; align-items: baseline; }
   /* Each item holds together (a link and its note); the row breaks only between items. */
   .also__item { white-space: nowrap; }
+  @media (max-width: 480px) { .also__item { white-space: normal; } }
   .also a { font-weight: 500; }
 
   /* --- now: a short ruled note beside the last card ---------------------------- */
