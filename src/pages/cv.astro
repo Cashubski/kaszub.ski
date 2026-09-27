@@ -6,7 +6,7 @@
  */
 import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
-import { person } from '../data/site';
+import { person, openSource } from '../data/site';
 const [msc, bsc] = person.education;
 const description = `Curriculum vitae of ${person.name}, AI/ML engineer and founder in London: UCL MSc in AI and Medical Imaging, NeuralTake, WorldQuant Brain, MIQA, ChefBot, AI Zuzi and NeuralKite.`;
 ---
@@ -131,6 +131,23 @@ const description = `Curriculum vitae of ${person.name}, AI/ML engineer and foun
           </ul>
         </div>
       </div>
+    </section>
+
+    <section class="cv__section" data-rule id="open-source">
+      <h2 class="cv__h2 serif" data-reveal>Open source</h2>
+      {openSource.map((entry) => (
+        <div class="cv__entry" data-reveal>
+          <div class="cv__when small num">{entry.when}</div>
+          <div class="cv__what">
+            <h3 class="cv__h3"><ExternalLink href={entry.projectUrl}>{entry.project}</ExternalLink>, {entry.what}: {entry.status}</h3>
+            <ul>
+              {entry.items.map((item) => (
+                <li>{item.text} <ExternalLink href={item.href} class="cv__pr">Pull request</ExternalLink></li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      ))}
     </section>
 
     <section class="cv__section" data-rule>
