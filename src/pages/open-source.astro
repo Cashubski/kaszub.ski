@@ -3,7 +3,7 @@ import Base from '../layouts/Base.astro';
 import ExternalLink from '../components/ExternalLink.astro';
 import { openSource, openSourceNotes, person, site } from '../data/site';
 const merged = openSource.filter((e) => e.status.includes('merged'));
-const description = 'Open-source contributions to quantitative-finance libraries: what was wrong, how it was found, what the fix does. Six merged fixes in FinancePy and vectorbt; three estimators under review in skfolio.';
+const description = 'Open-source contributions to quantitative-finance libraries: what was wrong, how it was found, what the fix does. Eight merged fixes in FinancePy and vectorbt; estimators under review in skfolio and a fix in Riskfolio-Lib.';
 const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
@@ -19,7 +19,7 @@ const jsonLd = {
       <h1 class="display oss__title" data-reveal="mask">Bugs I found in libraries that quants use, and the fixes their authors merged.</h1>
       <div class="oss__intro" data-reveal-group>
         <p>Each entry names the library, what was wrong, how I found it and what the fix does, and links to the pull request so the claim can be checked. Most were found by testing a library against itself: Greeks against finite differences, put-call and in-out parities, closed forms against Monte Carlo, one engine against another. Only merged pull requests are described as merged.</p>
-        <p class="small muted">As of {site.factsDate.replace('15 September', '27 September')}. Commits are under my own name; the GitHub profile is <ExternalLink href={person.github}>github.com/Cashubski</ExternalLink>.</p>
+        <p class="small muted">As of {site.factsDate.replace('15 September', '28 September')}. Commits are under my own name; the GitHub profile is <ExternalLink href={person.github}>github.com/Cashubski</ExternalLink>.</p>
       </div>
     </div>
     {openSource.map((entry) => (

@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-09-27',
+  revisedISO: '2026-09-28',
   locale: 'en_GB',
 } as const;
 
@@ -120,7 +120,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'six merged fixes', href: '/open-source' },
+  { label: 'Open source', note: 'eight merged fixes', href: '/open-source' },
 ] as const;
 
 /**
@@ -134,12 +134,14 @@ export const openSource = [
     projectUrl: 'https://github.com/domokane/FinancePy',
     what: 'a derivatives-pricing library',
     when: 'September 2026',
-    status: 'four pull requests merged',
+    status: 'six pull requests merged',
     items: [
       { text: 'Fixed the Bjerksund and Stensland American option pricer, which divided by zero at a zero dividend yield and fell below the European price near it; the fix returns the European value when early exercise is never optimal and floors the approximation at the European bound.', href: 'https://github.com/domokane/FinancePy/pull/277' },
       { text: 'Made date-schedule generation repeatable: a second call stepped back from the adjusted maturity date and shifted every coupon date whenever the maturity fell on a weekend or holiday, which reached bonds, cross-currency swaps and cliquet options.', href: 'https://github.com/domokane/FinancePy/pull/278' },
       { text: 'Rewrote the forward-start option, which could not be constructed, and verified it against the Rubinstein closed form and the library’s cliquet option.', href: 'https://github.com/domokane/FinancePy/pull/279' },
       { text: 'Corrected two FX option error paths that raised a Python type error instead of the library’s own error.', href: 'https://github.com/domokane/FinancePy/pull/280' },
+      { text: 'Fixed four of the six Monte Carlo pricing methods, which returned NaN for every input because they passed the option type where the model expects the interest rate.', href: 'https://github.com/domokane/FinancePy/pull/281' },
+      { text: 'Fixed the variance-swap fair strike, which was too high by twice the dividend yield and crashed on large strike grids, and verified it against the Demeterfi, Derman, Kamal and Zhou replication.', href: 'https://github.com/domokane/FinancePy/pull/282' },
     ],
   },
   {
