@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-09-28',
+  revisedISO: '2026-09-30',
   locale: 'en_GB',
 } as const;
 
@@ -99,6 +99,9 @@ export const openSourceNotes: Record<string, string> = {
   'https://github.com/domokane/FinancePy/pull/280': 'Two error messages concatenated an enum to a string, so an invalid option type raised a Python TypeError from the message itself instead of the library’s FinError.',
   'https://github.com/domokane/FinancePy/pull/281': 'Four of the six Monte Carlo pricing methods returned NaN for every input: they passed the option type in the position the model reserves for the interest rate. A test now prices the same call with all six variants and pins each to the closed form.',
   'https://github.com/domokane/FinancePy/pull/282': 'Under a flat volatility the fair variance strike of a variance swap must equal the squared volatility, whatever the rate and dividend yield. It came out too high by twice the dividend yield, because the log-contract drift used the rate alone and the option portfolio was compounded at the wrong rate, and it crashed on large strike grids. Fixed against the Demeterfi, Derman, Kamal and Zhou replication and verified to within 0.2 percent across rate and yield combinations.',
+  'https://github.com/domokane/FinancePy/pull/283': 'The FX variance swap class could not run at all. Once it did, it carried the same two dividend defects as the equity version fixed earlier, with the foreign rate in place of the dividend yield. Both classes also divided realised variance by the number of observations instead of the number of returns, which understates it by one part in N.',
+  'https://github.com/domokane/FinancePy/pull/284': 'The double digital still had the payout-currency errors that had already been corrected in the single digital. A domestic cash payout was discounted at the foreign rate, and a payout of one unit of foreign currency, which is an asset-or-nothing claim, used the cash-or-nothing probability term. A range digital is a digital call at the lower strike less one at the upper strike, so the tests pin it to that difference in both currencies.',
+  'https://github.com/domokane/FinancePy/pull/285': 'The rainbow option read an attribute it never set, so it could not be priced. In its one-factor model the correlation of the two rates is the product of their loadings, but the code squared the first and ignored the second, and the Monte Carlo passed the loadings where a correlation matrix was expected. After the fix it matches the equity rainbow option (Stulz 1982) for all four payoffs. FX option rho called a curve method that does not exist.',
   'https://github.com/polakowo/vectorbt/pull/872': 'The deflated Sharpe ratio of Bailey and López de Prado uses the raw kurtosis, which is 3 for Gaussian returns and recovers the classic Lo standard error. The implementation passed excess kurtosis, so the variance term was off by three quarters of the squared Sharpe ratio and could turn negative. It also zero-filled missing returns before computing skewness. Both fixed, with tests against the paper’s formula.',
   'https://github.com/polakowo/vectorbt/pull/873': 'Found with a harness that runs every function through both the Numba and Rust engines on clean, gappy, constant and short inputs. The one discrepancy: expanding windows shorter than the minimum period raised an error in Numba and returned NaN in Rust and pandas.',
   'https://github.com/skfolio/skfolio/pull/341': 'Weights are the benchmark plus a linear tilt in cross-sectionally demeaned characteristics, and the few coefficients maximise the realised CRRA utility of the return path, with no expected-return or covariance estimate. The smooth case is concave and solved with a trust-region method using the analytic gradient and Hessian; long-only and transaction-cost variants use a quasi-Newton method. Reviewed in discussion, including a look-ahead bias the reviewer caught and I fixed.',
@@ -120,7 +123,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'eight merged fixes', href: '/open-source' },
+  { label: 'Open source', note: 'eleven merged fixes', href: '/open-source' },
 ] as const;
 
 /**
@@ -134,7 +137,7 @@ export const openSource = [
     projectUrl: 'https://github.com/domokane/FinancePy',
     what: 'a derivatives-pricing library',
     when: 'September 2026',
-    status: 'six pull requests merged',
+    status: 'nine pull requests merged',
     items: [
       { text: 'Fixed the Bjerksund and Stensland American option pricer, which divided by zero at a zero dividend yield and fell below the European price near it; the fix returns the European value when early exercise is never optimal and floors the approximation at the European bound.', href: 'https://github.com/domokane/FinancePy/pull/277' },
       { text: 'Made date-schedule generation repeatable: a second call stepped back from the adjusted maturity date and shifted every coupon date whenever the maturity fell on a weekend or holiday, which reached bonds, cross-currency swaps and cliquet options.', href: 'https://github.com/domokane/FinancePy/pull/278' },
@@ -142,6 +145,9 @@ export const openSource = [
       { text: 'Corrected two FX option error paths that raised a Python type error instead of the library’s own error.', href: 'https://github.com/domokane/FinancePy/pull/280' },
       { text: 'Fixed four of the six Monte Carlo pricing methods, which returned NaN for every input because they passed the option type where the model expects the interest rate.', href: 'https://github.com/domokane/FinancePy/pull/281' },
       { text: 'Fixed the variance-swap fair strike, which was too high by twice the dividend yield and crashed on large strike grids, and verified it against the Demeterfi, Derman, Kamal and Zhou replication.', href: 'https://github.com/domokane/FinancePy/pull/282' },
+      { text: 'Made the FX variance swap price at all, fixed the same dividend defects as the equity version, and corrected realised variance in both classes to divide by the number of returns rather than the number of observations.', href: 'https://github.com/domokane/FinancePy/pull/283' },
+      { text: 'Fixed the FX double digital option, which discounted a domestic payout at the foreign rate and valued a foreign payout with the wrong probability term, and tested it against the difference of two single digital options.', href: 'https://github.com/domokane/FinancePy/pull/284' },
+      { text: 'Made the FX rainbow option price at all, corrected its correlation, which ignored the second rate, and repaired FX option rho, which raised an error for every product that inherits it.', href: 'https://github.com/domokane/FinancePy/pull/285' },
     ],
   },
   {
