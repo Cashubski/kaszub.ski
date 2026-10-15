@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-09-30',
+  revisedISO: '2026-10-15',
   locale: 'en_GB',
 } as const;
 
@@ -102,6 +102,8 @@ export const openSourceNotes: Record<string, string> = {
   'https://github.com/domokane/FinancePy/pull/283': 'The FX variance swap class could not run at all. Once it did, it carried the same two dividend defects as the equity version fixed earlier, with the foreign rate in place of the dividend yield. Both classes also divided realised variance by the number of observations instead of the number of returns, which understates it by one part in N.',
   'https://github.com/domokane/FinancePy/pull/284': 'The double digital still had the payout-currency errors that had already been corrected in the single digital. A domestic cash payout was discounted at the foreign rate, and a payout of one unit of foreign currency, which is an asset-or-nothing claim, used the cash-or-nothing probability term. A range digital is a digital call at the lower strike less one at the upper strike, so the tests pin it to that difference in both currencies.',
   'https://github.com/domokane/FinancePy/pull/285': 'The rainbow option read an attribute it never set, so it could not be priced. In its one-factor model the correlation of the two rates is the product of their loadings, but the code squared the first and ignored the second, and the Monte Carlo passed the loadings where a correlation matrix was expected. After the fix it matches the equity rainbow option (Stulz 1982) for all four payoffs. FX option rho called a curve method that does not exist.',
+  'https://github.com/domokane/FinancePy/pull/286': 'SABR is the market-standard smile model for interest-rate options. In the library the variable holding one minus beta was overwritten by the correlation term before the denominator of the Hagan formula was formed, so the smile was right at the money and wrong away from it. With beta zero and no volatility of volatility, SABR is the Bachelier model and its Black volatility is known exactly: on a 3 percent forward the library was 215 basis points of volatility too high at a 1 percent strike, against 3 for the textbook formula. The fix renames one variable in three places.',
+  'https://github.com/domokane/FinancePy/pull/287': 'The swaption volatility surface compared a numpy grid with an empty list, so its calibration check always raised, and its printed summary had been copied from the FX surface and referred to attributes it never sets. Its fixed-beta SABR fits started from zero parameters, which divided by zero for beta one and left beta one half three volatility points off a smooth smile.',
   'https://github.com/polakowo/vectorbt/pull/872': 'The deflated Sharpe ratio of Bailey and López de Prado uses the raw kurtosis, which is 3 for Gaussian returns and recovers the classic Lo standard error. The implementation passed excess kurtosis, so the variance term was off by three quarters of the squared Sharpe ratio and could turn negative. It also zero-filled missing returns before computing skewness. Both fixed, with tests against the paper’s formula.',
   'https://github.com/polakowo/vectorbt/pull/873': 'Found with a harness that runs every function through both the Numba and Rust engines on clean, gappy, constant and short inputs. The one discrepancy: expanding windows shorter than the minimum period raised an error in Numba and returned NaN in Rust and pandas.',
   'https://github.com/skfolio/skfolio/pull/341': 'Weights are the benchmark plus a linear tilt in cross-sectionally demeaned characteristics, and the few coefficients maximise the realised CRRA utility of the return path, with no expected-return or covariance estimate. The smooth case is concave and solved with a trust-region method using the analytic gradient and Hessian; long-only and transaction-cost variants use a quasi-Newton method. Reviewed in discussion, including a look-ahead bias the reviewer caught and I fixed.',
@@ -123,12 +125,12 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'eleven merged fixes', href: '/open-source' },
+  { label: 'Open source', note: 'fourteen merged pull requests', href: '/open-source' },
 ] as const;
 
 /**
  * Open-source contributions to quantitative-finance libraries (CV, "Open source" section).
- * Only merged pull requests are listed as merged; the skfolio work is under review and says so.
+ * Only merged pull requests are listed as merged; skfolio #340 and #341 are under review and say so.
  * Every link is to the pull request itself, so the claim can be checked.
  */
 export const openSource = [
@@ -137,7 +139,7 @@ export const openSource = [
     projectUrl: 'https://github.com/domokane/FinancePy',
     what: 'a derivatives-pricing library',
     when: 'September 2026',
-    status: 'nine pull requests merged',
+    status: 'eleven pull requests merged',
     items: [
       { text: 'Fixed the Bjerksund and Stensland American option pricer, which divided by zero at a zero dividend yield and fell below the European price near it; the fix returns the European value when early exercise is never optimal and floors the approximation at the European bound.', href: 'https://github.com/domokane/FinancePy/pull/277' },
       { text: 'Made date-schedule generation repeatable: a second call stepped back from the adjusted maturity date and shifted every coupon date whenever the maturity fell on a weekend or holiday, which reached bonds, cross-currency swaps and cliquet options.', href: 'https://github.com/domokane/FinancePy/pull/278' },
@@ -148,6 +150,8 @@ export const openSource = [
       { text: 'Made the FX variance swap price at all, fixed the same dividend defects as the equity version, and corrected realised variance in both classes to divide by the number of returns rather than the number of observations.', href: 'https://github.com/domokane/FinancePy/pull/283' },
       { text: 'Fixed the FX double digital option, which discounted a domestic payout at the foreign rate and valued a foreign payout with the wrong probability term, and tested it against the difference of two single digital options.', href: 'https://github.com/domokane/FinancePy/pull/284' },
       { text: 'Made the FX rainbow option price at all, corrected its correlation, which ignored the second rate, and repaired FX option rho, which raised an error for every product that inherits it.', href: 'https://github.com/domokane/FinancePy/pull/285' },
+      { text: 'Fixed the SABR volatility formula, which overwrote one minus beta with another term, so smiles were exact at the money but wrong in the wings by up to two volatility points; tested against the exact Bachelier limit.', href: 'https://github.com/domokane/FinancePy/pull/286' },
+      { text: 'Repaired the swaption volatility surface, whose calibration report and printed summary always raised an error and whose fixed-beta SABR fits started from a degenerate point.', href: 'https://github.com/domokane/FinancePy/pull/287' },
     ],
   },
   {
@@ -166,11 +170,11 @@ export const openSource = [
     projectUrl: 'https://github.com/skfolio/skfolio',
     what: 'a scikit-learn-compatible portfolio-optimisation library',
     when: 'September 2026',
-    status: 'three estimators under review',
+    status: 'one pull request merged, two under review',
     items: [
-      { text: 'A parametric portfolio policy estimator after Brandt, Santa-Clara and Valkanov (2009): weights as a linear function of characteristics, fitted by maximising realised CRRA utility, with long-only and transaction-cost variants.', href: 'https://github.com/skfolio/skfolio/pull/341' },
-      { text: 'Online learning for the Schur complementary allocation, so it can be updated in a stream.', href: 'https://github.com/skfolio/skfolio/pull/342' },
-      { text: 'A rolling-window multi-factor exposure estimator with gap-tolerant lags.', href: 'https://github.com/skfolio/skfolio/pull/340' },
+      { text: 'Under review: a parametric portfolio policy estimator after Brandt, Santa-Clara and Valkanov (2009): weights as a linear function of characteristics, fitted by maximising realised CRRA utility, with long-only and transaction-cost variants.', href: 'https://github.com/skfolio/skfolio/pull/341' },
+      { text: 'Merged: online learning for the Schur complementary allocation, so it can be updated in a stream. The maintainer extended it with spectral seriation, released it in skfolio 1.8.4 and credits me in the source file.', href: 'https://github.com/skfolio/skfolio/pull/342' },
+      { text: 'Under review: a rolling-window multi-factor exposure estimator with gap-tolerant lags.', href: 'https://github.com/skfolio/skfolio/pull/340' },
     ],
   },
 ] as const;
