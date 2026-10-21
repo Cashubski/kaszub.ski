@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-10-15',
+  revisedISO: '2026-10-21',
   locale: 'en_GB',
 } as const;
 
@@ -104,6 +104,10 @@ export const openSourceNotes: Record<string, string> = {
   'https://github.com/domokane/FinancePy/pull/285': 'The rainbow option read an attribute it never set, so it could not be priced. In its one-factor model the correlation of the two rates is the product of their loadings, but the code squared the first and ignored the second, and the Monte Carlo passed the loadings where a correlation matrix was expected. After the fix it matches the equity rainbow option (Stulz 1982) for all four payoffs. FX option rho called a curve method that does not exist.',
   'https://github.com/domokane/FinancePy/pull/286': 'SABR is the market-standard smile model for interest-rate options. In the library the variable holding one minus beta was overwritten by the correlation term before the denominator of the Hagan formula was formed, so the smile was right at the money and wrong away from it. With beta zero and no volatility of volatility, SABR is the Bachelier model and its Black volatility is known exactly: on a 3 percent forward the library was 215 basis points of volatility too high at a 1 percent strike, against 3 for the textbook formula. The fix renames one variable in three places.',
   'https://github.com/domokane/FinancePy/pull/287': 'The swaption volatility surface compared a numpy grid with an empty list, so its calibration check always raised, and its printed summary had been copied from the FX surface and referred to attributes it never sets. Its fixed-beta SABR fits started from zero parameters, which divided by zero for beta one and left beta one half three volatility points off a smooth smile.',
+  'https://github.com/domokane/FinancePy/pull/412': 'The premium leg of a credit default swap pays the running spread on each coupon date if the reference entity survives, plus the accrued portion on default. The first coupon was accrued over the length of the next period instead of the current one, a leftover from an older layout of the accrual factors that had a leading zero. The difference is a few days of accrual, about 0.06 percent of the risky PV01 on a five-year contract. In the final coupon period there is no next period, so the compiled kernel read past the end of the array and returned a negative clean PV01 and a par spread of minus 248 basis points. The fix is a one-index change; fifteen pinned regression values across the CDS, index, option and tranche tests moved by 0.05 to 0.5 percent and were updated with an instrumented run.',
+  'https://github.com/domokane/FinancePy/pull/411': 'Adjusting single-name curves so that the portfolio reprices a traded index is standard in index and tranche pricing. The spread-based version started its iteration counter at the value its loop condition tests for convergence, so the loop never ran and the input curves were returned unchanged. Once the loop did run it called a method renamed a month earlier. With both fixed, ten random issuer curves with a 176 basis-point intrinsic spread reprice to 100 and 150 basis-point index coupons, and non-zero upfronts match to one part in a million of notional.',
+  'https://github.com/domokane/FinancePy/pull/414': 'The party paying the fixed rate on a forward rate agreement receives the difference between the realised and contract rates, so the contract gains when the forward rises. The library flipped that sign, with comments in the code questioning it, so a pay-fixed FRA struck at 3 percent was worth minus 4,811 on a million notional with the forward at 4.08 percent while a pay-fixed swap on the same curve was positive. Curve bootstraps were unaffected because they solve for a zero value.',
+  'https://github.com/domokane/FinancePy/pull/410': 'Pricing a floating-rate note from its discount margin read the previous and next coupon dates from attributes that were only set as a side effect of the accrued-interest method, so calling the pricer first raised an error and calling it later for another settlement date silently reused the old coupon period. The lookup now lives in one helper both methods call.',
   'https://github.com/polakowo/vectorbt/pull/872': 'The deflated Sharpe ratio of Bailey and López de Prado uses the raw kurtosis, which is 3 for Gaussian returns and recovers the classic Lo standard error. The implementation passed excess kurtosis, so the variance term was off by three quarters of the squared Sharpe ratio and could turn negative. It also zero-filled missing returns before computing skewness. Both fixed, with tests against the paper’s formula.',
   'https://github.com/polakowo/vectorbt/pull/873': 'Found with a harness that runs every function through both the Numba and Rust engines on clean, gappy, constant and short inputs. The one discrepancy: expanding windows shorter than the minimum period raised an error in Numba and returned NaN in Rust and pandas.',
   'https://github.com/skfolio/skfolio/pull/341': 'Weights are the benchmark plus a linear tilt in cross-sectionally demeaned characteristics, and the few coefficients maximise the realised CRRA utility of the return path, with no expected-return or covariance estimate. The smooth case is concave and solved with a trust-region method using the analytic gradient and Hessian; long-only and transaction-cost variants use a quasi-Newton method. Reviewed in discussion, including a look-ahead bias the reviewer caught and I fixed.',
@@ -125,7 +129,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'fourteen merged pull requests', href: '/open-source' },
+  { label: 'Open source', note: 'eighteen merged pull requests', href: '/open-source' },
 ] as const;
 
 /**
@@ -138,8 +142,8 @@ export const openSource = [
     project: 'FinancePy',
     projectUrl: 'https://github.com/domokane/FinancePy',
     what: 'a derivatives-pricing library',
-    when: 'September 2026',
-    status: 'eleven pull requests merged',
+    when: 'September and October 2026',
+    status: 'fifteen pull requests merged',
     items: [
       { text: 'Fixed the Bjerksund and Stensland American option pricer, which divided by zero at a zero dividend yield and fell below the European price near it; the fix returns the European value when early exercise is never optimal and floors the approximation at the European bound.', href: 'https://github.com/domokane/FinancePy/pull/277' },
       { text: 'Made date-schedule generation repeatable: a second call stepped back from the adjusted maturity date and shifted every coupon date whenever the maturity fell on a weekend or holiday, which reached bonds, cross-currency swaps and cliquet options.', href: 'https://github.com/domokane/FinancePy/pull/278' },
@@ -152,6 +156,10 @@ export const openSource = [
       { text: 'Made the FX rainbow option price at all, corrected its correlation, which ignored the second rate, and repaired FX option rho, which raised an error for every product that inherits it.', href: 'https://github.com/domokane/FinancePy/pull/285' },
       { text: 'Fixed the SABR volatility formula, which overwrote one minus beta with another term, so smiles were exact at the money but wrong in the wings by up to two volatility points; tested against the exact Bachelier limit.', href: 'https://github.com/domokane/FinancePy/pull/286' },
       { text: 'Repaired the swaption volatility surface, whose calibration report and printed summary always raised an error and whose fixed-beta SABR fits started from a degenerate point.', href: 'https://github.com/domokane/FinancePy/pull/287' },
+      { text: 'Fixed the credit default swap premium leg, which accrued the first coupon over the following period rather than the current one and, in the final coupon period, read past the end of its accrual factors and returned a negative risky PV01.', href: 'https://github.com/domokane/FinancePy/pull/412' },
+      { text: 'Made the CDS index spread adjustment do something: its calibration loop never ran, so the issuer curves came back unchanged, and once entered it called a method that no longer existed.', href: 'https://github.com/domokane/FinancePy/pull/411' },
+      { text: 'Corrected the sign of a pay-fixed forward rate agreement, which lost value when the forward rate rose, the opposite of a pay-fixed swap on the same curve.', href: 'https://github.com/domokane/FinancePy/pull/414' },
+      { text: 'Fixed floating-rate note pricing from a discount margin, which crashed unless accrued interest had been computed first and otherwise reused a stale coupon period.', href: 'https://github.com/domokane/FinancePy/pull/410' },
     ],
   },
   {
