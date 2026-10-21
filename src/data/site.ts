@@ -112,6 +112,7 @@ export const openSourceNotes: Record<string, string> = {
   'https://github.com/polakowo/vectorbt/pull/873': 'Found with a harness that runs every function through both the Numba and Rust engines on clean, gappy, constant and short inputs. The one discrepancy: expanding windows shorter than the minimum period raised an error in Numba and returned NaN in Rust and pandas.',
   'https://github.com/skfolio/skfolio/pull/341': 'Weights are the benchmark plus a linear tilt in cross-sectionally demeaned characteristics, and the few coefficients maximise the realised CRRA utility of the return path, with no expected-return or covariance estimate. The smooth case is concave and solved with a trust-region method using the analytic gradient and Hessian; long-only and transaction-cost variants use a quasi-Newton method. Reviewed in discussion, including a look-ahead bias the reviewer caught and I fixed.',
   'https://github.com/skfolio/skfolio/pull/342': 'Adds streaming updates to the Schur complementary allocation and to the covariance-based distance estimator, so both can be fed new observations without refitting on history. Chunked updates reproduce the batch fit exactly.',
+  'https://github.com/skfolio/skfolio/pull/445': 'The regime-adjusted exponentially weighted covariance scales its forecast by a short-term volatility multiplier built from the norm of a standardised return vector. For the diagonal target the norm was divided by the square root of the number of assets, but the expected norm of a standard Gaussian vector is the mean of a chi distribution, which is smaller: dividing by the square root of n biases the multiplier below one even when the risk scale is right, by 35 percent of variance for one asset and 9 percent for five. The fix divides by the expected chi statistic, as the Mahalanobis target already did. The maintainer agreed with the derivation, noted it also holds for Gaussian scale mixtures such as multivariate Student-t returns, and found that the change improved the QLIKE loss of next-day variance forecasts on the library’s stock dataset over 2011 to 2022.',
   'https://github.com/skfolio/skfolio/pull/340': 'Turns one panel field into a library of trailing statistics and lags as a single multi-factor exposure, with a policy for listing gaps: either invalidate the lookback or measure it in active observations.',
 };
 
@@ -129,7 +130,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'eighteen merged pull requests', href: '/open-source' },
+  { label: 'Open source', note: 'nineteen merged pull requests', href: '/open-source' },
 ] as const;
 
 /**
@@ -177,11 +178,13 @@ export const openSource = [
     project: 'skfolio',
     projectUrl: 'https://github.com/skfolio/skfolio',
     what: 'a scikit-learn-compatible portfolio-optimisation library',
-    when: 'September 2026',
-    status: 'one pull request merged, two under review',
+    when: 'September and October 2026',
+    status: 'two pull requests merged, five under review',
     items: [
       { text: 'Under review: a parametric portfolio policy estimator after Brandt, Santa-Clara and Valkanov (2009): weights as a linear function of characteristics, fitted by maximising realised CRRA utility, with long-only and transaction-cost variants.', href: 'https://github.com/skfolio/skfolio/pull/341' },
       { text: 'Merged: online learning for the Schur complementary allocation, so it can be updated in a stream. The maintainer extended it with spectral seriation, released it in skfolio 1.8.4 and credits me in the source file.', href: 'https://github.com/skfolio/skfolio/pull/342' },
+      { text: 'Merged: a bias fix in the regime-adjusted covariance estimator, whose short-term volatility multiplier was normalised by the square root of the asset count rather than by the expected chi statistic, understating variance by a third for a single asset; the maintainer confirmed the argument and measured better next-day variance forecasts on 2011 to 2022 stock data.', href: 'https://github.com/skfolio/skfolio/pull/445' },
+      { text: 'Under review: three further fixes from auditing the library against closed forms: a deterministic Student-t copula distribution function, information criteria that count only estimated parameters, and a dropped rebalancing date in walk-forward splits with negative offsets.', href: 'https://github.com/skfolio/skfolio/pull/449' },
       { text: 'Under review: a rolling-window multi-factor exposure estimator with gap-tolerant lags.', href: 'https://github.com/skfolio/skfolio/pull/340' },
     ],
   },
