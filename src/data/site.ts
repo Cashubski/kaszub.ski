@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-10-21',
+  revisedISO: '2026-10-25',
   locale: 'en_GB',
 } as const;
 
@@ -113,6 +113,10 @@ export const openSourceNotes: Record<string, string> = {
   'https://github.com/skfolio/skfolio/pull/341': 'Weights are the benchmark plus a linear tilt in cross-sectionally demeaned characteristics, and the few coefficients maximise the realised CRRA utility of the return path, with no expected-return or covariance estimate. The smooth case is concave and solved with a trust-region method using the analytic gradient and Hessian; long-only and transaction-cost variants use a quasi-Newton method. Reviewed in discussion, including a look-ahead bias the reviewer caught and I fixed.',
   'https://github.com/skfolio/skfolio/pull/342': 'Adds streaming updates to the Schur complementary allocation and to the covariance-based distance estimator, so both can be fed new observations without refitting on history. Chunked updates reproduce the batch fit exactly.',
   'https://github.com/skfolio/skfolio/pull/445': 'The regime-adjusted exponentially weighted covariance scales its forecast by a short-term volatility multiplier built from the norm of a standardised return vector. For the diagonal target the norm was divided by the square root of the number of assets, but the expected norm of a standard Gaussian vector is the mean of a chi distribution, which is smaller: dividing by the square root of n biases the multiplier below one even when the risk scale is right, by 35 percent of variance for one asset and 9 percent for five. The fix divides by the expected chi statistic, as the Mahalanobis target already did. The maintainer agreed with the derivation, noted it also holds for Gaussian scale mixtures such as multivariate Student-t returns, and found that the change improved the QLIKE loss of next-day variance forecasts on the library’s stock dataset over 2011 to 2022.',
+  'https://github.com/domokane/FinancePy/pull/415': 'Under the US Treasury convention (31 CFR 356, Appendix B) a bond price is the sum of discounted coupons and principal, with the fractional first period discounted at simple interest. The library did this while full coupon periods remained but compounded over the fraction once the bond was in its final period, so the convention changed on the penultimate coupon date. Setting the number of remaining full periods to zero in the regulation’s general formula gives simple interest, which is also what the street convention does in that period. On a 4 percent semi-annual bond three months from maturity at a 5 percent yield the price moved by 0.8 cents per 100; mid-period prices and the existing Treasury pins are unchanged.',
+  'https://github.com/skfolio/skfolio/pull/450': 'Akaike and Schwarz information criteria penalise the number of estimated parameters. The univariate marginals counted every parameter of the underlying scipy distribution, including a location or scale the user had fixed, so a zero-mean Gaussian paid for two parameters when it fitted one, and a Student-t with fixed location and scale paid for three when it fitted one. The library ranks candidate marginals by these criteria before building a vine copula, so fixed-parameter candidates, a natural choice for daily returns, were unfairly ranked. The count now subtracts the fixed attributes. Tested over the four distributions with none, one and two parameters fixed.',
+  'https://github.com/skfolio/skfolio/pull/452': 'Calendar-based walk-forward splitting generates rebalancing anchors on a frequency and shifts them by an offset, for example three days before each Monday. The anchor range had been widened on the start side to allow for the shift but not on the end side, so with a negative offset the final anchor, which falls just after the data but maps to a date inside it, was never generated. On a four-week daily sample the last test window was silently merged into the previous one, or dropped. The fix widens the end of the range by the same offset; anchors beyond the data are still filtered out, so positive offsets are unchanged.',
+  'https://github.com/skfolio/skfolio/pull/449': 'The bivariate Student-t copula has no closed-form distribution function, and the library estimated it by Monte Carlo, so the same input gave different values on each call and the deep tails were inaccurate. I proposed a deterministic one-dimensional quadrature of the conditional t distribution with tests against a double integral of the bivariate density. The maintainer found the conditional form could miss mass under strong correlation in a batched evaluation and a separate precision loss in the shared tail-concentration code, and addressed both in his own pull request with a finite-interval integration and a joint survival probability method, released in skfolio 1.10.',
   'https://github.com/skfolio/skfolio/pull/340': 'Turns one panel field into a library of trailing statistics and lags as a single multi-factor exposure, with a policy for listing gaps: either invalidate the lookback or measure it in active observations.',
 };
 
@@ -130,7 +134,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'nineteen merged pull requests', href: '/open-source' },
+  { label: 'Open source', note: 'twenty-two merged pull requests', href: '/open-source' },
 ] as const;
 
 /**
@@ -144,7 +148,7 @@ export const openSource = [
     projectUrl: 'https://github.com/domokane/FinancePy',
     what: 'a derivatives-pricing library',
     when: 'September and October 2026',
-    status: 'fifteen pull requests merged',
+    status: 'sixteen pull requests merged',
     items: [
       { text: 'Fixed the Bjerksund and Stensland American option pricer, which divided by zero at a zero dividend yield and fell below the European price near it; the fix returns the European value when early exercise is never optimal and floors the approximation at the European bound.', href: 'https://github.com/domokane/FinancePy/pull/277' },
       { text: 'Made date-schedule generation repeatable: a second call stepped back from the adjusted maturity date and shifted every coupon date whenever the maturity fell on a weekend or holiday, which reached bonds, cross-currency swaps and cliquet options.', href: 'https://github.com/domokane/FinancePy/pull/278' },
@@ -161,6 +165,7 @@ export const openSource = [
       { text: 'Made the CDS index spread adjustment do something: its calibration loop never ran, so the issuer curves came back unchanged, and once entered it called a method that no longer existed.', href: 'https://github.com/domokane/FinancePy/pull/411' },
       { text: 'Corrected the sign of a pay-fixed forward rate agreement, which lost value when the forward rate rose, the opposite of a pay-fixed swap on the same curve.', href: 'https://github.com/domokane/FinancePy/pull/414' },
       { text: 'Fixed floating-rate note pricing from a discount margin, which crashed unless accrued interest had been computed first and otherwise reused a stale coupon period.', href: 'https://github.com/domokane/FinancePy/pull/410' },
+      { text: 'Aligned the US Treasury yield convention in a bond’s final coupon period with the Treasury formula, which uses simple interest over the fractional period; the library compounded there, so the convention switched once a bond entered its last period.', href: 'https://github.com/domokane/FinancePy/pull/415' },
     ],
   },
   {
@@ -179,12 +184,14 @@ export const openSource = [
     projectUrl: 'https://github.com/skfolio/skfolio',
     what: 'a scikit-learn-compatible portfolio-optimisation library',
     when: 'September and October 2026',
-    status: 'two pull requests merged, five under review',
+    status: 'four pull requests merged, two under review',
     items: [
       { text: 'Under review: a parametric portfolio policy estimator after Brandt, Santa-Clara and Valkanov (2009): weights as a linear function of characteristics, fitted by maximising realised CRRA utility, with long-only and transaction-cost variants.', href: 'https://github.com/skfolio/skfolio/pull/341' },
       { text: 'Merged: online learning for the Schur complementary allocation, so it can be updated in a stream. The maintainer extended it with spectral seriation, released it in skfolio 1.8.4 and credits me in the source file.', href: 'https://github.com/skfolio/skfolio/pull/342' },
       { text: 'Merged: a bias fix in the regime-adjusted covariance estimator, whose short-term volatility multiplier was normalised by the square root of the asset count rather than by the expected chi statistic, understating variance by a third for a single asset; the maintainer confirmed the argument and measured better next-day variance forecasts on 2011 to 2022 stock data.', href: 'https://github.com/skfolio/skfolio/pull/445' },
-      { text: 'Under review: three further fixes from auditing the library against closed forms: a deterministic Student-t copula distribution function, information criteria that count only estimated parameters, and a dropped rebalancing date in walk-forward splits with negative offsets.', href: 'https://github.com/skfolio/skfolio/pull/449' },
+      { text: 'Merged: information criteria for the univariate marginals now count only estimated parameters, so a distribution with a fixed location or scale is no longer penalised for parameters it did not fit when the library selects a marginal.', href: 'https://github.com/skfolio/skfolio/pull/450' },
+      { text: 'Merged: walk-forward splits with a negative calendar offset dropped the last rebalancing date, because the anchor range was extended on the start side but not the end; the fix mirrors the start-side adjustment.', href: 'https://github.com/skfolio/skfolio/pull/452' },
+      { text: 'Reported and prototyped a fix for the Student-t copula distribution function, which was computed by Monte Carlo and so varied between calls and lost accuracy in the tails; the maintainer thanked me for the finding and shipped a deterministic integration, together with a joint survival method, in his own pull request.', href: 'https://github.com/skfolio/skfolio/pull/449' },
       { text: 'Under review: a rolling-window multi-factor exposure estimator with gap-tolerant lags.', href: 'https://github.com/skfolio/skfolio/pull/340' },
     ],
   },
