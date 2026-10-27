@@ -85,7 +85,7 @@ export const ledger = [
   {
     value: '25,000+',
     unit: 'ChefBot conversations',
-    context: 'A GPT-based cooking assistant I designed, rated 4.7 from 100+ ratings on the GPT store. Conversations, not people.',
+    context: 'A cooking assistant I designed, rated 4.7 from 100+ ratings as a GPT; it continues as a ChatGPT plugin. Conversations, not people.',
     asOf: 'GPT store listing, screenshots from September 2026',
     kind: 'User adoption',
   },
@@ -218,7 +218,7 @@ export const categories = {
     label: 'Products',
     path: '/products',
     title: 'Products',
-    description: 'Production AI systems and commercial delivery: the NeuralTake consultancy, the AI Zuzi client platform, NeuralKite and a GPT-based cooking assistant.',
+    description: 'Production AI systems and commercial delivery: the NeuralTake consultancy, the AI Zuzi client platform, NeuralKite and a cooking assistant for ChatGPT.',
     intro: 'Work where the evidence is production software, signed contracts and people using the thing.',
   },
   experiments: {

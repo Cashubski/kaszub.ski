@@ -1,18 +1,21 @@
 ---
 title: "ChefBot"
 editorialTitle: "ChefBot: from a photo of the fridge to a meal"
-summary: "A cooking assistant built on GPT that turns whatever is in the fridge into a meal, as one multi-step flow. 25,000+ conversations and a 4.7 rating from 100+ ratings on the GPT store."
+summary: "A cooking assistant that turns whatever is in the fridge into a meal. It began as a GPT (25,000+ conversations, rated 4.7 from 100+ ratings) and continues as a ChatGPT plugin with 18 skills."
 category: products
 years: "2024 to present"
 role: "Designed the retrieval, prompt logic and multi-step tool flows; orchestration on GPT, not model training"
-status: "Live on the GPT store (a ChatGPT account is needed to open it); figures from the store listing, screenshots supplied September 2026"
+status: "Live as a plugin in the ChatGPT plugin directory (a ChatGPT account is needed); the GPT figures are from the store listing, screenshot September 2026"
 evidence: ["User adoption", "Production deployment"]
-seoDescription: "ChefBot, a cooking assistant built on GPT: fridge photo to recipe, dietary adaptation and PDF guide. 25,000+ conversations, rated 4.7 from 100+ ratings."
-technologies: ["GPT (custom GPT on ChatGPT)", "Prompt logic", "Retrieval", "Multi-step tool flows", "Image input", "Code interpreter", "Web search", "Image generation", "Canvas"]
-result: "25,000+ conversations and a 4.7 rating from 100+ ratings in the Lifestyle category of the GPT store (store listing, screenshot supplied September 2026). Conversations, not people."
+seoDescription: "ChefBot, a cooking assistant for ChatGPT: fridge photo to recipe, now a plugin with 18 skills. As a GPT: 25,000+ conversations, rated 4.7 from 100+ ratings."
+technologies: ["ChatGPT plugin (skills)", "Prompt logic", "Multi-step tool flows", "Image input", "Python", "Unit tests", "Code interpreter", "Web search", "Image generation", "Canvas"]
+result: "25,000+ conversations and a 4.7 rating from 100+ ratings as a GPT (store listing, screenshot September 2026; conversations, not people); continues as a plugin since October 2026."
 links:
-  - label: "ChefBot on the GPT store (requires a ChatGPT account)"
-    href: "https://chatgpt.com/g/g-FJXCOCAri-chefbot-gpt"
+  - label: "ChefBot in the ChatGPT plugin directory (requires a ChatGPT account)"
+    href: "https://chatgpt.com/plugins/plugin_65cf8e2b928081919e9c1544d32a79dc"
+    external: true
+  - label: "chefbot.neuraltake.com"
+    href: "https://chefbot.neuraltake.com"
     external: true
 cover: ../../assets/work/chefbot/store-listing.png
 coverFit: inset
@@ -32,6 +35,9 @@ metrics:
   - value: "4.7 from 100+ ratings"
     context: "GPT store rating; the histogram is overwhelmingly five-star."
     asOf: "Screenshot supplied September 2026"
+  - value: "18 skills, 7 scripts, 94 tests"
+    context: "the plugin that replaced the GPT, 27 October 2026"
+    asOf: "27 October 2026"
 ---
 import { Image } from 'astro:assets';
 import EvidenceBand from '../../components/EvidenceBand.astro';
@@ -58,6 +64,16 @@ ChefBot starts from the other end. The person shows it what they have, and it wo
 I did not train the underlying language model. ChefBot is built on GPT, and my work is the orchestration around it.
 
 <ChefbotSchematic />
+
+## From GPT to plugin
+
+In 2026 ChatGPT retired custom GPTs in favour of plugins: packages of skills, and optionally a connected server, that ChatGPT loads into a conversation. ChefBot continues as a skills-only plugin, listed in the plugin directory and with its own site at <ExternalLink href="https://chefbot.neuraltake.com">chefbot.neuraltake.com</ExternalLink> for support, privacy and terms.
+
+The migration tool turned the GPT into a single instruction file. I rebuilt it as eighteen focused skills, each with the conditions that should trigger it, the procedure, the house style and the limits it must state: fridge to meal, recipe scaling, baking formulas, meal planning, cook-along, entertaining, dietary adaptation, nutrition estimates, substitutions, flavour pairings, drink pairings, food safety, equipment adaptation, recipe cards, a recipe doctor, techniques and cuisines, an onboarding skill and the core assistant.
+
+The parts of cooking that should not be left to a language model's arithmetic became small Python scripts with 94 unit tests, run where the conversation has a code tool and mirrored by a written procedure where it does not: scaling and unit conversion with kitchen rounding, shopping lists merged by aisle, serving-time schedules counted back from the meal, a roast timer with internal temperatures and resting, a dish matcher over a library of 132 dishes, nutrition estimates over a table of 295 ingredients, and baker's percentages. Reference tables carry the facts that must not drift: regulated allergens and their hidden sources, substitution ratios, safe temperatures and storage times from the FSA and USDA, pairings, equipment conversions. A packaging script checks every listing limit OpenAI publishes before a release is built.
+
+What stayed is the product: the fridge-photo flow and the three conversation starters people already knew. What the plugin cannot do is also worth stating. It is skills only, so it has no accounts and stores nothing between conversations; a saved pantry or recipe book would need a connected server, which this form of plugin cannot add later.
 
 ## Decisions that mattered
 
@@ -128,7 +144,7 @@ OpenAI emails a GPT’s builder when someone leaves written feedback. These are 
 
 ## Limitations and status
 
-ChefBot is live on the GPT store. It runs on a third-party platform that provides both its hosting and its model, so its availability is outside my control, and opening it requires a ChatGPT account. The figures are the rounded ones OpenAI shows on the listing, taken from screenshots supplied in September 2026. They count conversations, never people.
+ChefBot is live as a plugin in the ChatGPT plugin directory. It runs on a third-party platform that provides both its hosting and its model, so its availability is outside my control, and opening it requires a ChatGPT account. The figures on this page are the rounded ones OpenAI showed on the GPT listing, taken from screenshots supplied in September 2026. They count conversations, never people, and they belong to the GPT: they do not carry over to the plugin automatically, and no figures are claimed for the plugin.
 
 Less food waste and learning to cook are what the assistant is designed for and what the quoted feedback describes. Neither has been measured. The single exchange shown above was opened from the new-cuisine starter, so this page does not yet show the fridge-photo flow running end to end.
 
@@ -144,4 +160,4 @@ What it asks for, what it does next without being told, and what it leaves the p
 
 ## Try it
 
-ChefBot is on the GPT store: <ExternalLink href="https://chatgpt.com/g/g-FJXCOCAri-chefbot-gpt">ChefBot GPT on chatgpt.com</ExternalLink>. The link requires a ChatGPT account; without one the page reports that the GPT cannot be found.
+ChefBot is in the ChatGPT plugin directory: <ExternalLink href="https://chatgpt.com/plugins/plugin_65cf8e2b928081919e9c1544d32a79dc">ChefBot on chatgpt.com</ExternalLink>. The link requires a ChatGPT account. Support, the privacy policy and the terms are at <ExternalLink href="https://chefbot.neuraltake.com">chefbot.neuraltake.com</ExternalLink>.
