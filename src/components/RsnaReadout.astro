@@ -30,8 +30,9 @@ const cases = CASES.map((c) => {
 <section class="rr wide" data-rsna-readout aria-labelledby="rr-title">
   <h2 id="rr-title">What the model sees in a knee</h2>
   <p class="rr__intro">
-    A 2.5D EfficientNetV2 and DINOv2 ensemble, read against 58 image-verified, held-out gold studies. For each study the
-    ensemble gives a confidence for each of the twelve abnormalities; at or above 0.50 it calls the abnormality present.
+    A 2.5D EfficientNetV2 and DINOv2 ensemble, read against the 46 image-verified gold studies held out of training
+    (macro AUC 0.904). For each study the ensemble gives a confidence for each of the twelve abnormalities; at or above
+    0.50 it calls the abnormality present.
     Three studies are set out below against the radiologist’s ground truth.
   </p>
 

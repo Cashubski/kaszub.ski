@@ -1,15 +1,15 @@
 ---
 title: "RSNA knee MRI challenge"
 editorialTitle: "Weak supervision for knee MRI: 58 gold-labelled studies, 4,407 reports"
-summary: "An ongoing entry to the 2026 RSNA Knee Abnormality Detection competition on Kaggle: radiology reports teach an EfficientNetV2 and DINOv2 ensemble that must read knee MRI from the images alone."
+summary: "An entry to the 2026 RSNA Knee Abnormality Detection competition on Kaggle, now closed: radiology reports taught an EfficientNetV2 and DINOv2 ensemble to read knee MRI from the images alone. It reached 0.941 on the public leaderboard by itself."
 category: research
-role: "Competitor: DICOM data engineering, weak-supervision pipeline, model design and training"
+role: "Competitor, solo: DICOM data engineering, weak-supervision pipeline, model design and training, submission engineering"
 years: "2026"
-status: "Ongoing competition; no leaderboard position or medal to report"
+status: "Closed 22 October 2026. Final standing 1,849th of 6,425 teams on the private leaderboard (preliminary); no medal"
 evidence: ["Public benchmark"]
-seoDescription: "An ongoing entry to the 2026 RSNA knee MRI competition on Kaggle, with an interactive readout of the model against radiologist ground truth."
-technologies: ["PyTorch", "EfficientNetV2", "DINOv2", "timm", "2.5D slice stacks", "Weak supervision", "GroupKFold", "DICOM"]
-result: "Competition ongoing: no medal or leaderboard position. On 58 held-out gold studies my EfficientNetV2 and DINOv2 ensemble calls 83.5% of label cells correctly at a 0.50 threshold (my own validation, September 2026)."
+seoDescription: "An entry to the 2026 RSNA knee MRI competition on Kaggle, closed October 2026: the method, the final standing with its provenance, and the post-mortem."
+technologies: ["PyTorch", "EfficientNetV2", "DINOv2", "timm", "2.5D slice stacks", "Multiple-instance learning", "Weak supervision", "GroupKFold", "DICOM", "Kaggle code competitions"]
+result: "1,849th of 6,425 teams (private 0.942, public 0.958) from a blend built on the strongest public notebook. My own ensemble reached 0.941 on the public leaderboard alone, 1 September 2026. No medal."
 links:
   - label: "Competition on Kaggle"
     href: "https://www.kaggle.com/competitions/rsna-knee-abnormality-detection"
@@ -17,16 +17,19 @@ links:
   - label: "Kaggle profile"
     href: "https://www.kaggle.com/michalkaszubski"
     external: true
+  - label: "1st-place write-up"
+    href: "https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/writeups/1st-place-solution"
+    external: true
 plate:
-  figure: "83.5%"
-  caption: "of label cells called correctly at a 0.50 threshold across 58 held-out gold studies; my own validation, not a leaderboard score"
+  figure: "0.941"
+  caption: "public leaderboard AUC of my own ensemble on 1 September 2026, ahead of every public single model of its day; final standing 1,849th of 6,425 from a blend on the public notebook"
   lines:
     - value: "58 / 4,407"
       context: "training studies carry the 12 gold labels; every study has a free-text report"
-    - value: "300+ GPU-hours"
-      context: "on 3× A100 80GB, for a 2.5D EfficientNetV2 and DINOv2 ensemble"
-    - value: "Ongoing"
-      context: "no leaderboard position and no medal is claimed"
+    - value: "0.904"
+      context: "macro AUC of the ensemble on the 46 gold studies held out of training"
+    - value: "6,425 teams"
+      context: "competition closed 22 October 2026; no medal"
 schematic: rsna
 order: 6
 featured: false
@@ -34,38 +37,43 @@ schemaType: CreativeWork
 metrics:
   - value: "58 of 4,407 training studies"
     context: "carry the 12 gold labels; every training study has a free-text radiology report"
-    asOf: "15 September 2026"
-  - value: "83.5% of label cells correct"
-    context: "2.5D EfficientNetV2 and DINOv2 ensemble at a 0.50 threshold on 58 image-verified, held-out gold studies; own validation, not a competition score"
-    asOf: "September 2026"
-  - value: "3× A100 80GB, 300+ GPU-hours"
-    context: "compute used for the ensemble"
-    asOf: "September 2026"
-  - value: "No leaderboard result"
-    context: "Competition ongoing; no medal or leaderboard position is claimed"
-    asOf: "15 September 2026"
+    asOf: "October 2026"
+  - value: "0.941 public, own ensemble"
+    context: "28-member 2.5D EfficientNetV2 and DINOv2 ensemble alone on the public leaderboard; 0.943 blended with the public notebook of its day"
+    asOf: "1 September 2026"
+  - value: "1,849th of 6,425"
+    context: "final private standing (preliminary), private 0.942 and public 0.958, from a blend built on the public 0.958 notebook; no medal"
+    asOf: "22 October 2026"
+  - value: "0.904 macro AUC"
+    context: "the ensemble against the 46 image-verified gold studies held out of training; own validation"
+    asOf: "October 2026"
 ---
 import EvidenceBand from '../../components/EvidenceBand.astro';
 import ExternalLink from '../../components/ExternalLink.astro';
 import RsnaKaggleModel from '../../components/RsnaKaggleModel.astro';
 import RsnaReadout from '../../components/RsnaReadout.astro';
 
-The underlying scans are patient data and cannot be shown, so this page shows aggregate results and model outputs only.
+The underlying scans are patient data and cannot be shown, so this page shows aggregate results and model outputs only. The competition has closed; the standing is reported below with its provenance.
 
 ## The hypothesis
 
-The 2026 RSNA Knee Abnormality Detection competition is a research code competition on Kaggle: multimodal knee-MRI classification of a defined set of clinically important abnormalities. It is still running, so this page reports a method, its status and my own held-out validation. There is no medal or leaderboard position to report.
+The 2026 RSNA Knee Abnormality Detection competition was a research code competition on Kaggle: twelve clinically important knee abnormalities, predicted per MRI study, scored by the ROC AUC averaged over the twelve. It closed on 22 October 2026 with 6,425 teams.
 
-My entry rests on a hypothesis about labels. Only 58 of the 4,407 training studies carry the 12 gold labels, which is far too few to train an image model on directly. But every training study comes with a free-text radiology report. If the reports can be turned into labels, the image model can learn from thousands of studies instead of dozens, and still run on the images alone when it is scored. The 58 gold studies are then worth more as a test than as training data.
+My entry rested on a hypothesis about labels. Only 58 of the 4,407 training studies carry the 12 gold labels, far too few to train an image model on directly. But every training study comes with a free-text radiology report. If the reports can be turned into labels, the image model can learn from thousands of studies instead of dozens, and still run on the images alone when it is scored. The 58 gold studies are then worth more as a test than as training data.
+
+The result showed the hypothesis was half right. The report is a usable teacher: on report-derived labels my ensemble reached 0.941 on the public leaderboard, ahead of every public single model of its day. It is also a biased teacher. On the 58 gold studies the report labels agree with the image-verified truth on 97% of ACL cells but only 69% of synovitis and 79% of effusion and contusion cells. The test set is graded by readers of the images, so a model trained on reports inherits what the reports leave out, and averaging more such models removes variance but never that bias. The winning entry built its labels by having language models read the images as well as the reports, and finished a full point ahead on the same data with a smaller model.
 
 ## What I did
 
 - Preprocessed about 500 GB of raw DICOM in shards on Kaggle, writing windowed, rescaled uint8 arrays at 384 pixels, and synced the result to a GPU cluster.
 - Laid the pipeline out as four stages: report, labels, image model, image-only inference.
-- Built a first baseline over 2.5D slice stacks: a timm slice encoder feeding a BiGRU, then attention pooling, series aggregation and 12 logits, trained with DistributedDataParallel on two Quadro GV100 GPUs with binary cross-entropy, mixed precision, a cosine schedule and AUC logged per label.
-- Moved from that baseline to the current model, a 2.5D ensemble of EfficientNetV2 and DINOv2, trained on 3× A100 80GB over more than 300 GPU-hours.
-- Split the data with GroupKFold at patient level, so validation never sees a patient the model trained on.
-- Held out the 58 image-verified gold studies and read the ensemble against them, label by label. The readout below is that comparison.
+- Built a report-to-label extractor over reports in nine languages and validated it on the 58 gold studies: macro AUC 0.887 against image-verified truth, with the per-label agreement shown below.
+- Built a first baseline over 2.5D slice stacks: a timm slice encoder feeding a BiGRU, then attention pooling, series aggregation and 12 logits, trained with DistributedDataParallel on two Quadro GV100 GPUs.
+- Replaced it with a 2.5D multiple-instance ensemble of EfficientNetV2-S and DINOv2-S: five patient-grouped folds, best and EMA checkpoints, 28 to 38 members merged by percentile rank per label with weights fitted on out-of-fold predictions; trained on 3× A100 80GB over more than 300 GPU-hours.
+- Audited the pipeline for silent defects and fixed what the audit found: no augmentation in the dataset, ViT members training in fp16 by default, and a flip test-time augmentation that cost 0.004 because the model never saw mirrored knees in training.
+- Measured every lever against a frozen validation and the gold holdout with paired bootstraps, and dropped the ones that did not hold: a DINO rebuild, label surgery, per-head attention, a budget rebalance.
+- Shipped 37 scored submissions through a fail-closed inference notebook that runs the ensemble on two T4 GPUs inside Kaggle's nine-hour limit, with a budget ladder that drops members when the clock runs short.
+- In the final week, when a public notebook reached 0.958, forked it, pinned its dependencies, and blended my ensemble into it as a separate stage on both GPUs. That blend is where the final standing comes from; my own models' scores are reported separately.
 
 ## Decisions that mattered
 
@@ -80,7 +88,7 @@ My entry rests on a hypothesis about labels. Only 58 of the 4,407 training studi
   </div>
   <div>
     <dt>Start with a baseline, then replace it</dt>
-    <dd>The first model was a timm slice encoder with a BiGRU reading the slices in order. It proved the data path and the per-label logging. The approach then evolved into an ensemble of two different image encoders, EfficientNetV2 and DINOv2, still over 2.5D slice stacks.</dd>
+    <dd>The first model was a timm slice encoder with a BiGRU reading the slices in order. It proved the data path and the per-label logging. The approach then evolved into an ensemble of two image encoders, EfficientNetV2 and DINOv2, still over 2.5D slice stacks.</dd>
   </div>
   <div>
     <dt>Split by patient, before anything else</dt>
@@ -90,27 +98,91 @@ My entry rests on a hypothesis about labels. Only 58 of the 4,407 training studi
     <dt>Look at every label, study by study</dt>
     <dd>There are 12 labels and very few gold examples of each. A single averaged score would hide a label the model has not learned, so each label is tracked on its own and the readout shows whole studies, misses included.</dd>
   </div>
+  <div>
+    <dt>Measure the teacher, not only the student</dt>
+    <dd>In September I scored the report labels themselves against the 58 gold studies, cell by cell. That audit is the most important number on this page: it showed where the training signal was wrong before any model could, and it predicted the private leaderboard better than the public leaderboard did. What I did not do was act on it by making better labels; the winning entry did.</dd>
+  </div>
+  <div>
+    <dt>Treat a public notebook as a floor, not a plan</dt>
+    <dd>When the public frontier reached 0.958 in the final week, I forked it rather than ignore it, kept every blend fail-closed so a broken stage could never ship a broken file, and wrote down before the private board what a copy could and could not do. The private board agreed: every entry built on that notebook, 1,633 of them, lost 0.016 as one block.</dd>
+  </div>
 </dl>
 
 <RsnaKaggleModel />
 
 <RsnaReadout />
 
+## Results
+
+Final standing: 1,849th of 6,425 teams on the private leaderboard (preliminary), private score 0.942, public 0.958. The standing came from a blend built on the strongest public notebook; my own ensemble reached 0.941 on the public leaderboard on its own, and 0.943 blended with the public notebook of its day.
+
+<div class="table-wrap" role="region" aria-label="Scored submissions, public and private leaderboard" tabindex="0">
+
+| Date | Submission | Public (30%) | Private (70%) |
+| --- | --- | --- | --- |
+| 24 Aug | Prior-only baseline, pipeline check | 0.500 | |
+| 25 Aug | Fold-0 EfficientNetV2, half-trained | 0.818 | |
+| 27 Aug | Fold-0 EfficientNetV2 through the fixed inference pipeline | 0.861 | |
+| 28 Aug | Public floor notebook, forked byte-exact as a calibration | 0.936 | |
+| 28 to 30 Aug | My 4-fold arm blended 50/50 with the public floor | 0.938 to 0.940 | |
+| 1 Sept | My ensemble alone, 28 members | 0.941 | |
+| 1 to 7 Sept | My 28- to 38-member arm blended with the public floor | 0.943 | |
+| 23 Sept | The same blend at 0.60 public, 0.40 mine | 0.939 | 0.921 |
+| 20 Oct | Copy of the public 0.958 notebook | 0.958 | 0.942 |
+| 21 Oct | 0.958 notebook with my arm blended in at 0.20 on all labels | 0.957 | 0.941 |
+| 22 Oct | 0.958 notebook with my arm on three labels at 0.20 (selected) | 0.958 | 0.942 |
+| 22 Oct | 0.958 notebook with my arm on five labels at 0.30 (selected) | 0.958 | 0.942 |
+
+</div>
+
+Private scores are shown where they were read from the submissions page after the close. On the private 70% the whole field moved down: first place from 0.970 to 0.960, the gold line (rank 23) from 0.965 to 0.954, the 1,633 copies of the public notebook from 0.958 to 0.942, and my own blend from 0.939 to 0.921.
+
+### Per-label readout on the gold studies
+
+The ensemble, read label by label against the image-verified gold studies held out of training (46 of the 58; the other 12 sat inside training folds). Macro AUC 0.904.
+
+<div class="table-wrap" role="region" aria-label="Ensemble AUC per abnormality on the gold holdout" tabindex="0">
+
+| Abnormality | Ensemble AUC on the gold holdout |
+| --- | --- |
+| ACL | 0.948 |
+| MCL | 0.828 |
+| Medial meniscus | 0.966 |
+| Lateral meniscus | 0.817 |
+| Medial OA | 0.982 |
+| Lateral OA | 0.845 |
+| Patellofemoral OA | 0.879 |
+| Effusion | 0.949 |
+| Synovitis | 0.792 |
+| Baker's cyst | 0.997 |
+| Contusion | 0.929 |
+| Fracture | 0.912 |
+| Macro average | 0.904 |
+
+</div>
+
+**How far the reports agree with the images.** The report-derived training labels, scored cell by cell against the 58 gold studies: 86.5% of the 696 cells agree. ACL agrees on 96.6%, the menisci on 86 to 90%, contusion and effusion on 79%, synovitis on 69%. Fluid and inflammation are visible on MRI but under-dictated in reports, which is where the training signal was weakest.
+
+**Where the pixels out-know the reports.** On the same gold studies, the ensemble's own predictions beat the report labels at predicting image truth on effusion (+0.113 AUC), synovitis (+0.098), contusion (+0.080), fracture (+0.080), lateral OA (+0.066) and Baker's cyst (+0.059); the reports win on MCL (+0.168 for the reports), patellofemoral OA (+0.091), lateral meniscus (+0.065) and ACL (+0.012). A model trained on the reports had learned to see things its own labels missed.
+
 <EvidenceBand
   tone="shade"
-  title="Evidence so far"
-  intro="The competition is ongoing and I publish no leaderboard position or medal. What can be stated is my own held-out validation and what exists."
+  title="Evidence"
+  intro="The competition has closed. The standing is stated with its provenance, and my own models' scores are given separately from the blend that produced it."
 >
 
-<div class="table-wrap" role="region" aria-label="State of the RSNA entry, September 2026" tabindex="0">
+<div class="table-wrap" role="region" aria-label="State of the RSNA entry, October 2026" tabindex="0">
 
-| Part | State, September 2026 | Context |
+| Part | Final state, October 2026 | Context |
 | --- | --- | --- |
 | Data engineering | done | about 500 GB of raw DICOM, preprocessed in shards on Kaggle to uint8 at 384 px, synced to a GPU cluster |
+| Report-to-label extractor | done; macro AUC 0.887 on the gold studies | reports in nine languages; 86.5% of label cells agree with image truth |
 | Baseline model | built, superseded | timm slice encoder, BiGRU, attention pooling, series aggregation, 12 logits; two Quadro GV100 GPUs |
-| Current model | trained | 2.5D EfficientNetV2 and DINOv2 ensemble; 3× A100 80GB, more than 300 GPU-hours |
-| Held-out validation | 83.5% of label cells correct | 58 image-verified gold studies, 12 labels each, threshold 0.50; weakest on synovitis and effusion |
-| Leaderboard result | none | competition still running; no position, score or medal is claimed |
+| Current model | trained | 2.5D EfficientNetV2 and DINOv2 ensemble, 28 to 38 members; 3× A100 80GB, more than 300 GPU-hours |
+| Held-out validation | macro AUC 0.904; 83.5% of label cells correct at 0.50 | gold studies held out of training; weakest on synovitis, lateral meniscus and MCL |
+| Public leaderboard, own ensemble | 0.941 alone, 0.943 blended with the public floor | 1 September 2026; ahead of every public single model of its day |
+| Final standing | 1,849th of 6,425; private 0.942, public 0.958 | a blend on the public 0.958 notebook; preliminary pending Kaggle's verification |
+| Medal | none | the bronze line on the private board sat above 0.942 |
 
 </div>
 
@@ -118,18 +190,38 @@ My entry rests on a hypothesis about labels. Only 58 of the 4,407 training studi
 
 ## Limitations and status
 
-Fifty-eight studies is a small test set, and the three cases in the readout are illustrations, not a sample. Label-cell accuracy at a fixed threshold is a blunt measure. Most labels are absent in most knees, so a model earns a good share of its cells by saying no, and 83.5% should be read with that in mind. The ensemble slips most on synovitis and effusion. None of this is a competition score: the competition is still running, and there is no leaderboard position or medal to report.
+Fifty-eight studies is a small test set, and the 46 held out of training are smaller still: per-label AUCs on that many cases carry uncertainties of several hundredths, and the three cases in the readout are illustrations, not a sample. Label-cell accuracy at a fixed threshold is a blunt measure. Most labels are absent in most knees, so a model earns a good share of its cells by saying no, and 83.5% should be read with that in mind.
+
+The final standing has a provenance that should be stated plainly. The private score of 0.942 belongs to a blend built on a public notebook that 1,633 other teams also submitted; my ensemble added to it changed nothing on the private board. My own models' scores are 0.941 on the public leaderboard alone and 0.921 private in a blend with the public notebook of September. The private leaderboard is preliminary until Kaggle verifies the top entries.
+
+Two of the five final-day submissions timed out on Kaggle's nine-hour rerun and one threw an exception: the rerun hosts vary several-fold in data-mount speed, and my weights copy had no per-file timeout. None of the three would have scored differently from the two that finished.
+
+The training repository is private. The scans are patient data and are not shown; this page shows aggregate results and model outputs only.
 
 ## What I learned
 
 <div class="offset">
 
-<p class="pull">Weak supervision moves the difficulty from the images to the reports.</p>
+<p class="pull">In a weak-label competition, the labels are the model.</p>
 
-The question stops being how to train on 58 studies and becomes how far a label read from a report can be believed. The data engineering had to come first: until about 500 GB of DICOM is in a form the GPUs can consume, there is no model to discuss. The second lesson carried over from the MSc: the split comes first, because nothing measured afterwards can be trusted without it. The third is that a model is easier to judge one study at a time than through one averaged number.
+The question I set out with, how far a label read from a report can be believed, turned out to be the whole competition. My extractor's labels scored 0.887 on the gold studies; the winning team's, made by language models reading the report and the images together, scored 0.936 to 0.943. On the same data, with a smaller network, that difference was worth a full point on the private board, and nothing I did on the model side moved it by more than 0.002.
 
 </div>
 
+**Measure the teacher first.** The September audit of my labels against image truth was the most predictive number of the campaign: it said synovitis, effusion and contusion would be weak, and they were. The right response to that audit was better labels, not better models. I had the diagnosis in week three and spent the next six weeks on ensembling.
+
+**A leaderboard printed to three decimals cannot see a lever worth less than 0.005.** Five changes that were positive on validation were null on the board. The only honest instrument was the gold holdout.
+
+**A copied public notebook is a floor.** It was tuned to the 30% public slice and fell 0.016 on the private 70%, while the leaders fell 0.010. Everything built on it fell with it.
+
+**Compute follows validation, not the other way round.** More than 300 A100-hours bought 0.002 on the board. The winner's single model trained in hours, on labels that cost model-reading time instead of GPU time.
+
+The earlier lessons stand: the data engineering has to come first, the patient-level split has to be settled before anything is measured, and a model is easier to judge one study at a time than through one averaged number.
+
+## What the winning entry did
+
+Team Kangaroo (tascj and liushuzhi) finished first with 0.958 on the private board and published a write-up and their code. They treated it as a labelling competition: one non-interactive language-model session per training study, with tools to view the slices, reading the report and the images together and writing an evidence-cited probability for each of the twelve findings; a reading guide refined on the 58 gold studies; and labels judged by log loss and confident errors as well as AUC. They added 3D region boxes per finding on 751 studies and per-slice lesion boxes on 1,800, and trained a single-slice ConvNeXt-T per series that pools its features inside the predicted region. One such model scored 0.954 on the private board; an ensemble of five scored 0.958. Their labels and training notebooks are public.
+
 ## Competition and profile
 
-The <ExternalLink href="https://www.kaggle.com/competitions/rsna-knee-abnormality-detection">competition page on Kaggle</ExternalLink> describes the task and the data. My <ExternalLink href="https://www.kaggle.com/michalkaszubski">Kaggle profile</ExternalLink> is public. The training repository is private.
+The <ExternalLink href="https://www.kaggle.com/competitions/rsna-knee-abnormality-detection">competition page on Kaggle</ExternalLink> describes the task and the data. My <ExternalLink href="https://www.kaggle.com/michalkaszubski">Kaggle profile</ExternalLink> is public. The winning team's <ExternalLink href="https://www.kaggle.com/competitions/rsna-knee-abnormality-detection/writeups/1st-place-solution">1st-place write-up</ExternalLink> is public too. The training repository is private.

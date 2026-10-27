@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-10-25',
+  revisedISO: '2026-10-27',
   locale: 'en_GB',
 } as const;
 
@@ -123,17 +123,17 @@ export const openSourceNotes: Record<string, string> = {
 /** The short "now" line on the homepage. */
 export const now = {
   label: 'Now',
-  text: 'Competing in the 2026 RSNA Knee Abnormality Detection challenge on Kaggle (ongoing), and engineering AI Zuzi for a client through NeuralTake, my consultancy.',
+  text: 'Contributing fixes to open-source quant libraries, twenty-two merged so far, and engineering AI Zuzi for a client through NeuralTake, my consultancy.',
   links: [
-    { label: 'RSNA entry', href: '/work/rsna-kaggle' },
+    { label: 'Open source', href: '/open-source' },
     { label: 'AI Zuzi', href: '/work/aizuzi' },
   ],
 } as const;
 
-/** The quiet text row under the four homepage cards (BRIEF.md §14.1): the consultancy and the ongoing competition, by link only. */
+/** The quiet text row under the four homepage cards (BRIEF.md §14.1): the consultancy, the closed competition and open source, by link only. */
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
-  { label: 'RSNA knee MRI challenge', note: 'ongoing', href: '/work/rsna-kaggle' },
+  { label: 'RSNA knee MRI challenge', note: 'closed October 2026', href: '/work/rsna-kaggle' },
   { label: 'Open source', note: 'twenty-two merged pull requests', href: '/open-source' },
 ] as const;
 
@@ -211,7 +211,7 @@ export const categories = {
     label: 'Research',
     path: '/research',
     title: 'Research',
-    description: 'ML research: model reliability in prostate MRI at UCL, and an ongoing entry to a public RSNA knee MRI benchmark.',
+    description: 'ML research: model reliability in prostate MRI at UCL, and a closed entry to a public RSNA knee MRI benchmark.',
     intro: 'Work judged by scientific standards: patient-level splits, plain status wording, and results only where they exist.',
   },
   products: {
