@@ -12,7 +12,7 @@ export const site = {
   factsDate: '15 September 2026',
   factsDateISO: '2026-09-15',
   /** Date the copy was last revised (BRIEF.md §14); used for dateModified and the sitemap. */
-  revisedISO: '2026-10-29',
+  revisedISO: '2026-11-03',
   locale: 'en_GB',
 } as const;
 
@@ -114,6 +114,8 @@ export const openSourceNotes: Record<string, string> = {
   'https://github.com/skfolio/skfolio/pull/342': 'Adds streaming updates to the Schur complementary allocation and to the covariance-based distance estimator, so both can be fed new observations without refitting on history. Chunked updates reproduce the batch fit exactly.',
   'https://github.com/skfolio/skfolio/pull/445': 'The regime-adjusted exponentially weighted covariance scales its forecast by a short-term volatility multiplier built from the norm of a standardised return vector. For the diagonal target the norm was divided by the square root of the number of assets, but the expected norm of a standard Gaussian vector is the mean of a chi distribution, which is smaller: dividing by the square root of n biases the multiplier below one even when the risk scale is right, by 35 percent of variance for one asset and 9 percent for five. The fix divides by the expected chi statistic, as the Mahalanobis target already did. The maintainer agreed with the derivation, noted it also holds for Gaussian scale mixtures such as multivariate Student-t returns, and found that the change improved the QLIKE loss of next-day variance forecasts on the library’s stock dataset over 2011 to 2022.',
   'https://github.com/domokane/FinancePy/pull/415': 'Under the US Treasury convention (31 CFR 356, Appendix B) a bond price is the sum of discounted coupons and principal, with the fractional first period discounted at simple interest. The library did this while full coupon periods remained but compounded over the fraction once the bond was in its final period, so the convention changed on the penultimate coupon date. Setting the number of remaining full periods to zero in the regulation’s general formula gives simple interest, which is also what the street convention does in that period. On a 4 percent semi-annual bond three months from maturity at a 5 percent yield the price moved by 0.8 cents per 100; mid-period prices and the existing Treasury pins are unchanged.',
+  'https://github.com/domokane/FinancePy/pull/433': 'The Heston model prices a call from two probabilities, each a Fourier integral of a characteristic function over frequency. When the mean-reversion speed is smaller than the product of the correlation and the volatility of variance, the variance process is mean-fleeing under the share measure, and the first characteristic function only reaches its limit of one inside a layer around zero frequency whose width shrinks exponentially with maturity. At thirty years the layer is about 1e-20 wide and the integrand carries a 1/u tail across twenty decades, so the adaptive quadrature never saw the layer and returned a call price of minus 12.36 where the Lewis methods gave 24.68. The closed-form exponents were checked against a numerical solution of the Riccati equations and were correct, so the fix is to the integration: both methods now integrate in the logarithm of the frequency, which makes the tail bounded and puts the layer at a finite, resolvable point. Over 400 random parameter sets the largest difference from the Lewis price fell from 48.6 to 5.7e-5.',
+  'https://github.com/domokane/FinancePy/pull/434': 'The Anderson pricer for an option on a CDS index integrates the payoff over a lognormal forward spread, and at each spread it needs the risky PV01 of the index contract that starts at expiry. The previous coupon date was found by scanning for the first payment date after the valuation date, but the forward contract starts at expiry, so the scan landed on the first coupon after expiry and the accrual from it was negative. Separately, the coupon loop started from the second payment. At the forward spread the two errors nearly cancelled, which is why prices looked plausible, but the dropped coupon should have been survival weighted and discounted while the added constant was neither, so the PV01 had the wrong dependence on the spread. The previous coupon is now the forward contract’s first accrual start, floored at zero when a business day adjustment pushes it past expiry, and the loop includes the first coupon. On a ten-name index at 150 basis points the forward PV01 moved from 3.6234 to 3.6172, and payer values by up to 0.17 percent at high volatility.',
   'https://github.com/skfolio/skfolio/pull/450': 'Akaike and Schwarz information criteria penalise the number of estimated parameters. The univariate marginals counted every parameter of the underlying scipy distribution, including a location or scale the user had fixed, so a zero-mean Gaussian paid for two parameters when it fitted one, and a Student-t with fixed location and scale paid for three when it fitted one. The library ranks candidate marginals by these criteria before building a vine copula, so fixed-parameter candidates, a natural choice for daily returns, were unfairly ranked. The count now subtracts the fixed attributes. Tested over the four distributions with none, one and two parameters fixed.',
   'https://github.com/skfolio/skfolio/pull/452': 'Calendar-based walk-forward splitting generates rebalancing anchors on a frequency and shifts them by an offset, for example three days before each Monday. The anchor range had been widened on the start side to allow for the shift but not on the end side, so with a negative offset the final anchor, which falls just after the data but maps to a date inside it, was never generated. On a four-week daily sample the last test window was silently merged into the previous one, or dropped. The fix widens the end of the range by the same offset; anchors beyond the data are still filtered out, so positive offsets are unchanged.',
   'https://github.com/skfolio/skfolio/pull/449': 'The bivariate Student-t copula has no closed-form distribution function, and the library estimated it by Monte Carlo, so the same input gave different values on each call and the deep tails were inaccurate. I proposed a deterministic one-dimensional quadrature of the conditional t distribution with tests against a double integral of the bivariate density. The maintainer found the conditional form could miss mass under strong correlation in a batched evaluation and a separate precision loss in the shared tail-concentration code, and addressed both in his own pull request with a finite-interval integration and a joint survival probability method, released in skfolio 1.10.',
@@ -123,7 +125,7 @@ export const openSourceNotes: Record<string, string> = {
 /** The short "now" line on the homepage. */
 export const now = {
   label: 'Now',
-  text: 'Contributing fixes to open-source quant libraries, twenty-two merged so far, and engineering AI Zuzi for a client through NeuralTake, my consultancy.',
+  text: 'Contributing fixes to open-source quant libraries, twenty-four merged so far, and engineering AI Zuzi for a client through NeuralTake, my consultancy.',
   links: [
     { label: 'Open source', href: '/open-source' },
     { label: 'AI Zuzi', href: '/work/aizuzi' },
@@ -134,7 +136,7 @@ export const now = {
 export const homeAlso = [
   { label: 'NeuralTake', note: 'my consultancy', href: '/work/neuraltake' },
   { label: 'RSNA knee MRI challenge', note: 'closed October 2026', href: '/work/rsna-kaggle' },
-  { label: 'Open source', note: 'twenty-two merged pull requests', href: '/open-source' },
+  { label: 'Open source', note: 'twenty-four merged pull requests', href: '/open-source' },
 ] as const;
 
 /**
@@ -147,8 +149,8 @@ export const openSource = [
     project: 'FinancePy',
     projectUrl: 'https://github.com/domokane/FinancePy',
     what: 'a derivatives-pricing library',
-    when: 'September and October 2026',
-    status: 'sixteen pull requests merged',
+    when: 'September to November 2026',
+    status: 'eighteen pull requests merged',
     items: [
       { text: 'Fixed the Bjerksund and Stensland American option pricer, which divided by zero at a zero dividend yield and fell below the European price near it; the fix returns the European value when early exercise is never optimal and floors the approximation at the European bound.', href: 'https://github.com/domokane/FinancePy/pull/277' },
       { text: 'Made date-schedule generation repeatable: a second call stepped back from the adjusted maturity date and shifted every coupon date whenever the maturity fell on a weekend or holiday, which reached bonds, cross-currency swaps and cliquet options.', href: 'https://github.com/domokane/FinancePy/pull/278' },
@@ -166,6 +168,8 @@ export const openSource = [
       { text: 'Corrected the sign of a pay-fixed forward rate agreement, which lost value when the forward rate rose, the opposite of a pay-fixed swap on the same curve.', href: 'https://github.com/domokane/FinancePy/pull/414' },
       { text: 'Fixed floating-rate note pricing from a discount margin, which crashed unless accrued interest had been computed first and otherwise reused a stale coupon period.', href: 'https://github.com/domokane/FinancePy/pull/410' },
       { text: 'Aligned the US Treasury yield convention in a bond’s final coupon period with the Treasury formula, which uses simple interest over the fractional period; the library compounded there, so the convention switched once a bond entered its last period.', href: 'https://github.com/domokane/FinancePy/pull/415' },
+      { text: 'Fixed the Gatheral and Weber Heston pricers, which returned negative call prices at long maturities when the variance is mean-fleeing under the share measure; the formulas were sound and the quadrature was missing a boundary layer near zero frequency, so both now integrate in the logarithm of the frequency.', href: 'https://github.com/domokane/FinancePy/pull/433' },
+      { text: 'Fixed the forward risky PV01 in the Anderson CDS index option pricer, which took the previous coupon date from after option expiry and dropped the first coupon; the two errors nearly cancelled at the forward spread but gave the wrong spread dependence inside the lognormal integral.', href: 'https://github.com/domokane/FinancePy/pull/434' },
     ],
   },
   {
